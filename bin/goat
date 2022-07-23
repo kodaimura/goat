@@ -1,0 +1,91 @@
+#!/bin/bash
+
+APP_NAME=${1:-goatapp}
+shift
+
+DB="sqlite3"
+
+while (( $# > 0 ))
+do
+  case $1 in
+    -db | --db | --db=*)
+      if [[ $1 =~ ^--db= ]]; then
+        DB=$2
+      elif [ -z $2 ]; then
+        echo "'db' requires an argument. (sqlite3 or pg)" 1>&2
+        exit 1
+      else
+        DB=$2
+        shift
+      fi
+  esac
+  shift
+done
+
+if [ $DB != "sqlite3" ] && [ $DB != "pg" ]; then
+	echo "'db' requires an argument. (sqlite3 or pg)" 1>&2
+  exit 1
+fi
+
+#シェルの実行ディレクトリの絶対パス
+CURRENT_DIR=$(pwd)
+#このスクリプトの絶対パス
+SELF_DIR=$(cd $(dirname $0); pwd)
+#goatコピー元プログラムの絶対パス
+GOAT_DIR=$(cd $SELF_DIR; cd ../goat; pwd)
+#subプログラムの絶対パス
+SUB_DIR=$(cd $SELF_DIR; cd ../sub; pwd)
+
+mkdir $CURRENT_DIR/$APP_NAME
+cd $CURRENT_DIR/$APP_NAME
+
+go mod init $APP_NAME
+
+cp -r $GOAT_DIR/cmd .
+mv cmd/goat cmd/$APP_NAME
+
+cp -r $GOAT_DIR/config .
+cp -r $GOAT_DIR/docs .
+cp -r $GOAT_DIR/internal .
+cp -r $GOAT_DIR/pkg .
+cp -r $GOAT_DIR/scripts .
+cp -r $GOAT_DIR/web .
+
+mkdir log
+
+#sqlite3の場合はsubで置換
+if [ $DB = "sqlite3" ]; then
+  cp -r $SUB_DIR/scripts .
+  cp -r $SUB_DIR/repository internal/model/
+  cp -r $SUB_DIR/db internal/core/
+fi
+
+#.goファイル内のgoatを全て置換
+for fpass in `find . -name "*.go"`
+do sed -i "" s/goat/$APP_NAME/g $fpass
+done
+
+for fpass in `find . -name "*.DS_Store"`
+do rm $fpass
+done
+
+cat <<EOF > .gitignore
+log/
+*.db
+*.sqlite3
+.env
+local.env
+.DS_Store
+main
+EOF
+
+git init
+
+go mod tidy
+
+go build cmd/$APP_NAME/main.go
+
+echo ""
+echo "config/env/ 内のファイルを設定"
+echo "開発環境では下記コマンドで実行"
+echo "ENV=local go run cmd/$APP_NAME/main.go"
