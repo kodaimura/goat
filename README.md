@@ -49,9 +49,7 @@ JWT_SECRET_KEY=    (必須)
 
 ```
 appname/ 配下にファイル作成
-> touch [DB_NAME(←local.env)].db
-
-> sqlite3 DB_NAME.db
+> sqlite3 [DB_NAME(←local.env)].db
 
 DB_NAME> scripts/create-table.sql を実行
 ```
@@ -73,5 +71,5 @@ DB_NAME=# scripts/pg-create-table.sql を実行
 * 開発環境では下記コマンドで実行 (local.envが読み込まれる)
 
 ```
-ENV=local go run cmd/myte/main.go
+ENV=local go run cmd/<appname>/main.go
 ```

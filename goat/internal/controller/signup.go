@@ -29,7 +29,7 @@ func newSignupController() *signupController {
 
 
 //GET /signup
-func (sc *signupController) signupPage(c *gin.Context) {
+func (ctr *signupController) signupPage(c *gin.Context) {
     c.HTML(200, "signup.html", gin.H{
         "commons": constants.Commons,
     })
@@ -37,11 +37,11 @@ func (sc *signupController) signupPage(c *gin.Context) {
 
 
 //POST /signup
-func (sc *signupController) signup(c *gin.Context) {
+func (ctr *signupController) signup(c *gin.Context) {
     un := c.PostForm("username")
     pw := c.PostForm("password")
 
-    if _, err := sc.ur.SelectByUsername(un); err == nil {
+    if _, err := ctr.ur.SelectByUsername(un); err == nil {
         c.HTML(409, "signup.html", gin.H{
             "commons": constants.Commons,
             "error": "Usernameが既に使われています。",
@@ -52,7 +52,7 @@ func (sc *signupController) signup(c *gin.Context) {
 
     hashed, _ := bcrypt.GenerateFromPassword([]byte(pw), bcrypt.DefaultCost)
 
-    if sc.ur.Signup(un, string(hashed)) != nil {
+    if ctr.ur.Signup(un, string(hashed)) != nil {
         c.HTML(500, "signup.html", gin.H{
             "commons": constants.Commons,
             "error": "登録に失敗しました。",

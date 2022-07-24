@@ -30,14 +30,14 @@ type accountController struct {
 }
 
 
-func newAccountController() accountController {
+func newAccountController() *accountController {
 	ur := repository.NewUserRepository()
-	return accountController{ur}
+	return &accountController{ur}
 }
 
 
 //PUT[POST] /api/account/password
-func (ac accountController) changePassword(c *gin.Context) {
+func (ctr *accountController) changePassword(c *gin.Context) {
 	userId, _ := jwt.GetUserId(c)
 
 	var body map[string]interface{}
@@ -45,7 +45,7 @@ func (ac accountController) changePassword(c *gin.Context) {
 	newPw := body["password"].(string)
 	hashed, err := bcrypt.GenerateFromPassword([]byte(newPw), bcrypt.DefaultCost)
 
-	if err != nil || ac.ur.UpdatePasswordByUserId(userId, string(hashed)) != nil {
+	if err != nil || ctr.ur.UpdatePasswordByUserId(userId, string(hashed)) != nil {
 		logger.LogError(err.Error())
 		c.JSON(500, gin.H{"error": http.StatusText(500)})
 		c.Abort()
@@ -57,13 +57,13 @@ func (ac accountController) changePassword(c *gin.Context) {
 
 
 //PUT[POST] /api/account/username
-func (ac accountController) changeUsername(c *gin.Context) {
+func (ctr *accountController) changeUsername(c *gin.Context) {
 	userId, _ := jwt.GetUserId(c)
 	var body map[string]interface{}
 	c.BindJSON(&body)
 	newUn := body["username"].(string)
 
-	if err := ac.ur.UpdateUsernameByUserId(userId, newUn); err != nil {
+	if err := ctr.ur.UpdateUsernameByUserId(userId, newUn); err != nil {
 		logger.LogError(err.Error())
 		c.JSON(500, gin.H{"error": http.StatusText(500)})
 		c.Abort()
@@ -75,9 +75,9 @@ func (ac accountController) changeUsername(c *gin.Context) {
 
 
 //GET /api/account/profile
-func (ac accountController) getProfile(c *gin.Context) {
+func (ctr *accountController) getProfile(c *gin.Context) {
 	userId, _ := jwt.GetUserId(c)
-	user, err := ac.ur.SelectByUserId(userId)
+	user, err := ctr.ur.SelectByUserId(userId)
 
 	if err != nil {
 		logger.LogError(err.Error())
@@ -91,10 +91,10 @@ func (ac accountController) getProfile(c *gin.Context) {
 
 
 //DELETE /api/account
-func (ac accountController) delete(c *gin.Context) {
+func (ctr *accountController) delete(c *gin.Context) {
 	userId, _ := jwt.GetUserId(c)
 
-	if err := ac.ur.DeleteByUserId(userId); err != nil {
+	if err := ctr.ur.DeleteByUserId(userId); err != nil {
 		logger.LogError(err.Error())
 		c.JSON(500, gin.H{"error": http.StatusText(500)})
 		c.Abort()
