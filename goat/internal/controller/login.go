@@ -57,7 +57,7 @@ func (lc *loginController) login(c *gin.Context) {
     }
 
     var cc jwt.CustomClaims
-    cc.UId = user.UId
+    cc.UserId = user.UserId
     cc.Username = user.Username
     jwtStr, err := jwt.GenerateJWT(cc)
 

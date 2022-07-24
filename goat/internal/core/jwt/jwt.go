@@ -98,7 +98,7 @@ func decodeJWT(encoded string) (*jwtpackage.Token, error) {
 } 
 
 
-func getPayload (token *jwtpackage.Token) (JwtPayload, error) {
+func getPayload(token *jwtpackage.Token) (JwtPayload, error) {
 	var pl JwtPayload
 
 	jsonString, err := json.Marshal(token.Claims.(jwtpackage.MapClaims))

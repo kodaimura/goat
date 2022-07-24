@@ -38,14 +38,14 @@ func newAccountController() accountController {
 
 //PUT[POST] /api/account/password
 func (ac accountController) changePassword(c *gin.Context) {
-	uid, _ := jwt.GetUId(c)
+	userId, _ := jwt.GetUserId(c)
 
 	var body map[string]interface{}
 	c.BindJSON(&body)
 	newPw := body["password"].(string)
 	hashed, err := bcrypt.GenerateFromPassword([]byte(newPw), bcrypt.DefaultCost)
 
-	if err != nil || ac.ur.UpdatePasswordByUId(uid, string(hashed)) != nil {
+	if err != nil || ac.ur.UpdatePasswordByUserId(userId, string(hashed)) != nil {
 		logger.LogError(err.Error())
 		c.JSON(500, gin.H{"error": http.StatusText(500)})
 		c.Abort()
@@ -58,12 +58,12 @@ func (ac accountController) changePassword(c *gin.Context) {
 
 //PUT[POST] /api/account/username
 func (ac accountController) changeUsername(c *gin.Context) {
-	uid, _ := jwt.GetUId(c)
+	userId, _ := jwt.GetUserId(c)
 	var body map[string]interface{}
 	c.BindJSON(&body)
 	newUn := body["username"].(string)
 
-	if err := ac.ur.UpdateUsernameByUId(uid, newUn); err != nil {
+	if err := ac.ur.UpdateUsernameByUserId(userId, newUn); err != nil {
 		logger.LogError(err.Error())
 		c.JSON(500, gin.H{"error": http.StatusText(500)})
 		c.Abort()
@@ -76,8 +76,8 @@ func (ac accountController) changeUsername(c *gin.Context) {
 
 //GET /api/account/profile
 func (ac accountController) getProfile(c *gin.Context) {
-	uid, _ := jwt.GetUId(c)
-	user, err := ac.ur.SelectByUId(uid)
+	userId, _ := jwt.GetUserId(c)
+	user, err := ac.ur.SelectByUserId(userId)
 
 	if err != nil {
 		logger.LogError(err.Error())
@@ -92,9 +92,9 @@ func (ac accountController) getProfile(c *gin.Context) {
 
 //DELETE /api/account
 func (ac accountController) delete(c *gin.Context) {
-	uid, _ := jwt.GetUId(c)
+	userId, _ := jwt.GetUserId(c)
 
-	if err := ac.ur.DeleteByUId(uid); err != nil {
+	if err := ac.ur.DeleteByUserId(userId); err != nil {
 		logger.LogError(err.Error())
 		c.JSON(500, gin.H{"error": http.StatusText(500)})
 		c.Abort()

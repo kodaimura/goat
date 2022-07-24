@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"fmt"
 	"database/sql"
 
 	"goat/internal/core/db"
@@ -11,14 +10,14 @@ import (
 
 type UserRepository interface {
 	Select() ([]entity.User, error)
-	SelectByUId(uid int) (entity.User, error)
-	UpdateByUId(uid int, user *entity.User) error
-	DeleteByUId(uid int) error
+	SelectByUserId(userId int) (entity.User, error)
+	UpdateByUserId(userId int, user *entity.User) error
+	DeleteByUserId(userId int) error
 
 	Signup(username, password string) error
 	SelectByUsername(username string) (entity.User, error)
-	UpdatePasswordByUId(uid int, password string) error
-	UpdateUsernameByUId(uid int, username string) error
+	UpdatePasswordByUserId(userId int, password string) error
+	UpdateUsernameByUserId(userId int, username string) error
 }
 
 
@@ -38,7 +37,7 @@ func (ur *userRepository) Select() ([]entity.User, error){
 
 	rows, err := ur.db.Query(
 		`SELECT 
-			UID,
+			USER_ID,
 			USERNAME, 
 			CREATE_AT, 
 			UPDATE_AT 
@@ -52,7 +51,7 @@ func (ur *userRepository) Select() ([]entity.User, error){
 	for rows.Next() {
 		user := entity.User{}
 		err = rows.Scan(
-			&user.UId, 
+			&user.UserId, 
 			&user.Username, 
 			&user.CreateAt, 
 			&user.UpdateAt,
@@ -67,18 +66,18 @@ func (ur *userRepository) Select() ([]entity.User, error){
 }
 
 
-func (ur *userRepository) SelectByUId(uid int) (entity.User, error){
+func (ur *userRepository) SelectByUserId(userId int) (entity.User, error){
 	var user entity.User
 	err := ur.db.QueryRow(
 		`SELECT 
-			UID, 
+			USER_ID, 
 			USERNAME, 
 			CREATE_AT, 
 			UPDATE_AT 
 		 FROM USERS 
-		 WHERE UID = $1`, uid,
+		 WHERE UID = $1`, userId,
 	).Scan(
-		&user.UId, 
+		&user.UserId, 
 		&user.Username, 
 		&user.CreateAt, 
 		&user.UpdateAt,
@@ -92,7 +91,7 @@ func (ur *userRepository) SelectByUsername(username string) (entity.User, error)
 	var user entity.User
 	err := ur.db.QueryRow(
 		`SELECT 
-			UID, 
+			USER_ID, 
 			USERNAME, 
 			PASSWORD, 
 			CREATE_AT, 
@@ -101,7 +100,7 @@ func (ur *userRepository) SelectByUsername(username string) (entity.User, error)
 		 WHERE USERNAME = $1`, 
 		 username,
 	).Scan(
-		&user.UId, 
+		&user.UserId, 
 		&user.Username, 
 		&user.Password, 
 		&user.CreateAt, 
@@ -112,44 +111,46 @@ func (ur *userRepository) SelectByUsername(username string) (entity.User, error)
 }
 
 
-func (ur *userRepository) UpdateByUId(uid int, user *entity.User) error {
+func (ur *userRepository) UpdateByUserId(userId int, user *entity.User) error {
 	_, err := ur.db.Exec(
 		`UPDATE USERS 
 		 SET USERNAME = $1 
-		 WHERE UID = $2`,
+		 WHERE USER_ID = $2`,
 		user.Username, 
-		uid,
+		userId,
 	)
 	return err
 }
 
 
-func (ur *userRepository) UpdatePasswordByUId(uid int, password string) error {
+func (ur *userRepository) UpdatePasswordByUserId(userId int, password string) error {
 	_, err := ur.db.Exec(
 		`UPDATE USERS 
 		 SET PASSWORD = $1 
-		 WHERE UID = $2`, 
+		 WHERE USER_ID = $2`, 
 		 password, 
-		 uid,
+		 userId,
 	)
 	return err
 }
 
 
-func (ur *userRepository) UpdateUsernameByUId(uid int, username string) error {
+func (ur *userRepository) UpdateUsernameByUserId(userId int, username string) error {
 	_, err := ur.db.Exec(
 		`UPDATE USERS 
 		 SET USERNAME = $1 
-		 WHERE UID = $2`, 
+		 WHERE USER_ID = $2`, 
 		 username, 
-		 uid,
+		 userId,
 	)
 	return err
 }
 
 
-func (ur *userRepository) DeleteByUId(uid int) error {
-	_, err := ur.db.Exec(`DELETE FROM USERS WHERE UID = $1`, uid)
+func (ur *userRepository) DeleteByUserId(userId int) error {
+	_, err := ur.db.Exec(
+		`DELETE FROM USERS WHERE USER_ID = $1`, userId,
+	)
 
 	return err
 }
@@ -164,6 +165,5 @@ func (ur *userRepository) Signup(username, password string) error {
 		username, 
 		password,
 	)
-	fmt.Println(err)
 	return err
 }

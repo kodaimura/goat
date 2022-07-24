@@ -12,8 +12,8 @@ import (
 func setRootRoute(r *gin.Engine) {
     auth := r.Group("/", jwt.JwtAuthMiddleware())
 
-    lc := newRootController()
-    auth.GET("/", lc.indexPage)
+    rc := newRootController()
+    auth.GET("/", rc.indexPage)
 }
 
 
