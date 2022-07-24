@@ -32,10 +32,10 @@ func NewUserRepository() UserRepository {
 }
 
 
-func (ur *userRepository) Select() ([]entity.User, error){
+func (rep *userRepository) Select() ([]entity.User, error){
 	var users []entity.User
 
-	rows, err := ur.db.Query(
+	rows, err := rep.db.Query(
 		`SELECT 
 			USER_ID,
 			USERNAME, 
@@ -66,9 +66,9 @@ func (ur *userRepository) Select() ([]entity.User, error){
 }
 
 
-func (ur *userRepository) SelectByUserId(userId int) (entity.User, error){
+func (rep *userRepository) SelectByUserId(userId int) (entity.User, error){
 	var user entity.User
-	err := ur.db.QueryRow(
+	err := rep.db.QueryRow(
 		`SELECT 
 			USER_ID, 
 			USERNAME, 
@@ -87,9 +87,9 @@ func (ur *userRepository) SelectByUserId(userId int) (entity.User, error){
 }
 
 
-func (ur *userRepository) SelectByUsername(username string) (entity.User, error){
+func (rep *userRepository) SelectByUsername(username string) (entity.User, error){
 	var user entity.User
-	err := ur.db.QueryRow(
+	err := rep.db.QueryRow(
 		`SELECT 
 			USER_ID, 
 			USERNAME, 
@@ -111,8 +111,8 @@ func (ur *userRepository) SelectByUsername(username string) (entity.User, error)
 }
 
 
-func (ur *userRepository) UpdateByUserId(userId int, user *entity.User) error {
-	_, err := ur.db.Exec(
+func (rep *userRepository) UpdateByUserId(userId int, user *entity.User) error {
+	_, err := rep.db.Exec(
 		`UPDATE USERS 
 		 SET USERNAME = $1 
 		 WHERE USER_ID = $2`,
@@ -123,8 +123,8 @@ func (ur *userRepository) UpdateByUserId(userId int, user *entity.User) error {
 }
 
 
-func (ur *userRepository) UpdatePasswordByUserId(userId int, password string) error {
-	_, err := ur.db.Exec(
+func (rep *userRepository) UpdatePasswordByUserId(userId int, password string) error {
+	_, err := rep.db.Exec(
 		`UPDATE USERS 
 		 SET PASSWORD = $1 
 		 WHERE USER_ID = $2`, 
@@ -135,8 +135,8 @@ func (ur *userRepository) UpdatePasswordByUserId(userId int, password string) er
 }
 
 
-func (ur *userRepository) UpdateUsernameByUserId(userId int, username string) error {
-	_, err := ur.db.Exec(
+func (rep *userRepository) UpdateUsernameByUserId(userId int, username string) error {
+	_, err := rep.db.Exec(
 		`UPDATE USERS 
 		 SET USERNAME = $1 
 		 WHERE USER_ID = $2`, 
@@ -147,8 +147,8 @@ func (ur *userRepository) UpdateUsernameByUserId(userId int, username string) er
 }
 
 
-func (ur *userRepository) DeleteByUserId(userId int) error {
-	_, err := ur.db.Exec(
+func (rep *userRepository) DeleteByUserId(userId int) error {
+	_, err := rep.db.Exec(
 		`DELETE FROM USERS WHERE USER_ID = $1`, userId,
 	)
 
@@ -156,8 +156,8 @@ func (ur *userRepository) DeleteByUserId(userId int) error {
 }
 
 
-func (ur *userRepository) Signup(username, password string) error {
-	_, err := ur.db.Exec(
+func (rep *userRepository) Signup(username, password string) error {
+	_, err := rep.db.Exec(
 		`INSERT INTO USERS (
 			USERNAME, 
 			PASSWORD

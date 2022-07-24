@@ -33,7 +33,7 @@ func newLoginController() *loginController {
 
 
 //GET /login
-func (lc *loginController) loginPage(c *gin.Context) {
+func (ctr *loginController) loginPage(c *gin.Context) {
     c.HTML(200, "login.html", gin.H{
         "commons": constants.Commons,
     })
@@ -41,11 +41,11 @@ func (lc *loginController) loginPage(c *gin.Context) {
 
 
 //POST /login
-func (lc *loginController) login(c *gin.Context) {
+func (ctr *loginController) login(c *gin.Context) {
     un := c.PostForm("username")
     pw := c.PostForm("password")
 
-    user, err := lc.ur.SelectByUsername(un)
+    user, err := ctr.ur.SelectByUsername(un)
 
     if err != nil || bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(pw)) != nil{
         c.HTML(401, "login.html", gin.H{
@@ -78,7 +78,7 @@ func (lc *loginController) login(c *gin.Context) {
 
 
 //GET /logout
-func (lc *loginController) logout(c *gin.Context) {
+func (ctr *loginController) logout(c *gin.Context) {
     cf := config.GetConfig()
     c.SetCookie(jwt.COOKIE_KEY_JWT, "", 0, "/", cf.AppHost, false, true)
     c.Redirect(303, "/login")

@@ -29,7 +29,7 @@ func newRootController() *rootController {
 
 
 //GET /
-func (ic *rootController) indexPage(c *gin.Context) {
+func (ctr *rootController) indexPage(c *gin.Context) {
     username, err := jwt.GetUsername(c)
 
     if err != nil {
