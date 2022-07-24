@@ -11,14 +11,14 @@ import (
 
 type UserRepository interface {
 	Select() ([]entity.User, error)
-    SelectByUId(uid int) (entity.User, error)
-    UpdateByUId(uid int, user *entity.User) error
-    DeleteByUId(uid int) error
+	SelectByUId(uid int) (entity.User, error)
+	UpdateByUId(uid int, user *entity.User) error
+	DeleteByUId(uid int) error
 
-    Signup(username, password string) error
-    SelectByUsername(username string) (entity.User, error)
-    UpdatePasswordByUId(uid int, password string) error
-    UpdateUsernameByUId(uid int, username string) error
+	Signup(username, password string) error
+	SelectByUsername(username string) (entity.User, error)
+	UpdatePasswordByUId(uid int, password string) error
+	UpdateUsernameByUId(uid int, username string) error
 }
 
 

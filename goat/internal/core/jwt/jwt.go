@@ -1,9 +1,9 @@
 package jwt
 
 import (
-    "encoding/json"
-    "errors"
-    "time"
+	"encoding/json"
+	"errors"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	jwtpackage "github.com/golang-jwt/jwt/v4"
@@ -21,7 +21,7 @@ type JwtPayload struct {
 func GenerateJWT(claims CustomClaims) (string, error) {
 	pl := generatePayload(claims)
 
-    return encodeJWT(pl)
+	return encodeJWT(pl)
 }
 
 
@@ -30,7 +30,7 @@ func generatePayload(claims CustomClaims) JwtPayload {
 
 	pl.CustomClaims = claims
 	pl.IssuedAt =  time.Now().Unix()
-    pl.ExpiresAt = time.Now().Add(time.Second * JWT_EXPIRES).Unix()
+	pl.ExpiresAt = time.Now().Add(time.Second * JWT_EXPIRES).Unix()
 
 	return pl
 }
@@ -39,7 +39,7 @@ func generatePayload(claims CustomClaims) JwtPayload {
 func encodeJWT(payload JwtPayload) (string, error) {
 	cf := config.GetConfig()
 	token := jwtpackage.NewWithClaims(jwtpackage.SigningMethodHS256, payload)
-    return token.SignedString([]byte(cf.JwtSecretKey))
+	return token.SignedString([]byte(cf.JwtSecretKey))
 }
 
 
@@ -74,8 +74,8 @@ func JwtApiAuthMiddleware() gin.HandlerFunc {
 
 
 func jwtAuth(c *gin.Context) (JwtPayload, error) {
-	tokenStr, _ := c.Cookie(COOKIE_KEY_JWT)
-	token, err := decodeJWT(tokenStr)
+	encoded, _ := c.Cookie(COOKIE_KEY_JWT)
+	token, err := decodeJWT(encoded)
 
 	if err != nil {
 		return JwtPayload{}, err
@@ -85,9 +85,9 @@ func jwtAuth(c *gin.Context) (JwtPayload, error) {
 }
 
 
-func decodeJWT(tokenStr string) (*jwtpackage.Token, error) {
+func decodeJWT(encoded string) (*jwtpackage.Token, error) {
 	cf := config.GetConfig()
-	token, err := jwtpackage.Parse(tokenStr, func(token *jwtpackage.Token) (interface{}, error) {
+	token, err := jwtpackage.Parse(encoded, func(token *jwtpackage.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwtpackage.SigningMethodHMAC); !ok {
 			return nil, errors.New("Unexpected signing method")
 		}
@@ -103,9 +103,9 @@ func getPayload (token *jwtpackage.Token) (JwtPayload, error) {
 
 	jsonString, err := json.Marshal(token.Claims.(jwtpackage.MapClaims))
 
-    if err == nil {
-        err = json.Unmarshal(jsonString, &pl)
-    }
+	if err == nil {
+		err = json.Unmarshal(jsonString, &pl)
+	}
 
-    return pl, err
+	return pl, err
 }

@@ -5,7 +5,7 @@ import (
     "log"
     "fmt"
 
-	"github.com/joho/godotenv"
+    "github.com/joho/godotenv"
 )
 
 
@@ -29,8 +29,8 @@ func init() {
 	err := godotenv.Load(fmt.Sprintf("config/env/%s.env", os.Getenv("ENV")))
 
 	if err != nil {
-        log.Panic(err)
-    }
+		log.Panic(err)
+	}
 
 	cf.AppHost = os.Getenv("APP_HOST")
 	cf.AppPort = os.Getenv("APP_PORT")

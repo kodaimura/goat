@@ -3,7 +3,7 @@
 Go(Gin)のWebアプリケーション雛形作成スクリプト。\
 ディレクトリ構成 + Signup/Login/Logout 機能を画面およびサーバプログラム自動生成。
 
-* インストール後 ~ /goat/bin にPATHを通し、下記コマンド実行。
+* インストール後 ~ /goat/bin にPATHを通し、下記コマンド実行
 ```
 goat <appname> [-db sqlite3 or pg]
 ```
@@ -70,7 +70,7 @@ DB_NAME=# scripts/pg-create-table.sql を実行
 ```
 
 ### 実行
-* 開発環境では下記で実行 (local.envが読み込まれる)
+* 開発環境では下記コマンドで実行 (local.envが読み込まれる)
 
 ```
 ENV=local go run cmd/myte/main.go

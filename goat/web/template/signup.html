@@ -12,29 +12,29 @@
 	<h2>Create an account</h2>
 	<div class="form-wrapper">
 		<div class="error" id="error">
-		{{.error}}
+			{{.error}}
 		</div>
-  	<form method="POST" onsubmit="return checkPassword();">
-    	<div class="form-item">
-    		<label for="username">Username</label>
-    		<input type="text" name="username" required="required">
-    	</div>
-    	<div class="form-item">
-     		<label for="password">Password</label>
-    		<input type="password" id="pw1" name="password" required="required">
-    	</div>
-    	<div class="form-item">
-     		<label for="password">Password (for confirmation)</label>
-    		<input type="password" id="pw2" required="required">
-    	</div>
-    	<div class="button-wrapper">
-    		<input type="submit" id="signup" value="Create"></input>
-    	</div>
-  	</form>
-  </div>
-  <div class="form-footer">
-    <p><a href="login">Sign in to {{.commons.appname}}</a></p>
-  </div>
-  </div>
+		<form method="POST" onsubmit="return checkPassword();">
+			<div class="form-item">
+				<label for="username">Username</label>
+				<input type="text" name="username" required="required">
+			</div>
+			<div class="form-item">
+				<label for="password">Password</label>
+				<input type="password" id="pw1" name="password" required="required">
+			</div>
+			<div class="form-item">
+				<label for="password">Password (for confirmation)</label>
+				<input type="password" id="pw2" required="required">
+			</div>
+			<div class="button-wrapper">
+				<input type="submit" id="signup" value="Create"></input>
+			</div>
+		</form>
+	</div>
+	<div class="form-footer">
+		<p><a href="login">Sign in to {{.commons.appname}}</a></p>
+	</div>
+	</div>
 </body>
 </html>

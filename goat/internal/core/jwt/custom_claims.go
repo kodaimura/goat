@@ -3,7 +3,7 @@ package jwt
 import (
 	"errors"
 
-    "github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin"
 )
 
 /*
@@ -12,7 +12,7 @@ JwtPayload拡張
 
 type CustomClaims struct {
 	UId int `json:"uid"`
-    Username string `json:"username"`
+	Username string `json:"username"`
 }
 
 
