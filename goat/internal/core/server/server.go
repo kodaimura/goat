@@ -8,11 +8,9 @@ import (
     "goat/internal/controller"
 )
 
-
 func Run() {
     cf := config.GetConfig()
-
-    logger.SetAccessLogger()
+    logger.SetLogger()
     r := router()
     r.Run(":" + cf.AppPort)
 }

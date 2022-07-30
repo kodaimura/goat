@@ -4,8 +4,7 @@ import (
     "github.com/gin-gonic/gin"
     
     "goat/internal/core/jwt"
-    "goat/internal/model/repository"
-    "goat/internal/constants"
+    "goat/internal/constant"
 )
 
 
@@ -17,14 +16,11 @@ func setRootRoute(r *gin.Engine) {
 }
 
 
-type rootController struct {
-    ur repository.UserRepository
-}
+type rootController struct {}
 
 
 func newRootController() *rootController {
-    ur := repository.NewUserRepository()
-    return &rootController{ur}
+    return &rootController{}
 }
 
 
@@ -38,7 +34,7 @@ func (ctr *rootController) indexPage(c *gin.Context) {
     }
 
     c.HTML(200, "index.html", gin.H{
-        "commons": constants.Commons,
+        "commons": constant.Commons,
         "username": username,
     })
 }

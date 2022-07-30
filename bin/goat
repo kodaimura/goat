@@ -54,10 +54,11 @@ cp -r $GOAT_DIR/web .
 mkdir log
 
 #sqlite3の場合はsubで置換
-if [ $DB = "sqlite3" ]; then
+if [ $DB = "pg" ]; then
   rm -r scripts
   cp -r $SUB_DIR/scripts .
   cp -r $SUB_DIR/repository internal/model/
+  cp -r $SUB_DIR/queryservice internal/model/
   cp -r $SUB_DIR/db internal/core/
 fi
 

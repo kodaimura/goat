@@ -6,9 +6,6 @@ import (
 
 
 func SetRouter(r *gin.Engine) {
-    setLoginRoute(r)
-    setSignupRoute(r)
+    setUserRoute(r)
     setRootRoute(r)
-
-    setApiAccountRoute(r)
 } 

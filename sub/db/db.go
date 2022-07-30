@@ -4,7 +4,7 @@ import (
     "log"
     "database/sql"
     
-    _ "github.com/mattn/go-sqlite3"
+    _ "github.com/lib/pq"
 
     "goat/config"
 )
@@ -17,8 +17,12 @@ func init() {
 
     cf := config.GetConfig()
 
-    dbname := "./" + cf.DbName + ".db"
-    db, err = sql.Open("sqlite3", dbname)
+    db, err = sql.Open(
+        "postgres",
+        "host=" + cf.DbHost + " port=" + cf.DbPort +
+        " user=" + cf.DbUser + " password=" + cf.DbPassword +
+        " dbname=" + cf.DbName + " sslmode=disable",
+    )
 
     if err != nil {
         log.Panic(err)

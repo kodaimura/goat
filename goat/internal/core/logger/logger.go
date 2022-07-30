@@ -15,8 +15,6 @@ const LOGFOLDER = "log/"
 const FORMAT = "2006-01-02-15-04-05"
 const LOGFILE_EX = ".log"
 
-var file *os.File
-
 var logF *log.Logger
 var logE *log.Logger
 var logW *log.Logger
@@ -24,7 +22,7 @@ var logI *log.Logger
 var logD *log.Logger
 
 
-func init() {
+func SetLogger() {
     if _, err := os.Stat(LOGFOLDER); err != nil {
         os.Mkdir(LOGFOLDER, 0777)
     }
@@ -32,12 +30,11 @@ func init() {
     t := time.Now()
     fn := LOGFOLDER + t.Format(FORMAT) + LOGFILE_EX
 
-    file, err := os.Create(fn); 
+    file, err := os.Create(fn);
 
     if err != nil {
         log.Panic(err)
     }
-
 
     logF = log.New(
         io.MultiWriter(os.Stdout, file),
@@ -68,11 +65,9 @@ func init() {
         "[DEBUG]",
         log.LstdFlags,
     )
-}
 
-
-func SetAccessLogger () {
     gin.DefaultWriter = io.MultiWriter(os.Stdout, file)
+
 }
 
 
@@ -85,7 +80,7 @@ func LogError(msg string) {
     pc, file, line, _ := runtime.Caller(1)
     f := runtime.FuncForPC(pc)
     logE.Println("\n", "File:", file, "Line:", line, "\n",
-     "Func:", f.Name(), "Msg:", msg,
+        "Func:", f.Name(), "Msg:", msg,
     )
 }
 
