@@ -1,14 +1,14 @@
 package service
 
 import (
-    "golang.org/x/crypto/bcrypt"
-    
-    "goat/internal/core/jwt"
+	"golang.org/x/crypto/bcrypt"
 
-    "goat/internal/core/logger"
-    "goat/internal/model/entity"
-    "goat/internal/model/repository"
-    "goat/internal/model/queryservice"
+	"goat/internal/core/jwt"
+	
+	"goat/internal/core/logger"
+	"goat/internal/model/entity"
+	"goat/internal/model/repository"
+	"goat/internal/model/queryservice"
 )
 
 
@@ -21,7 +21,7 @@ type UserService interface {
 
 type userService struct {
 	ur repository.UserRepository
-    uq queryservice.UserQueryService
+	uq queryservice.UserQueryService
 }
 
 
