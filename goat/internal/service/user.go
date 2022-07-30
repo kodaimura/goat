@@ -27,8 +27,8 @@ type userService struct {
 
 func NewUserService() UserService {
 	ur := repository.NewUserRepository()
-    uq := queryservice.NewUserQueryService()
-    return &userService{ur, uq}
+	uq := queryservice.NewUserQueryService()
+	return &userService{ur, uq}
 }
 
 
@@ -77,21 +77,21 @@ func (us *userService) Login(username, password string) int {
 
 func (us *userService) GenerateJWT(userId int) string {
 	user, err := us.uq.QueryUser(userId)
-
+	
 	if err != nil {
 		logger.LogError(err.Error())
 		return GENERATE_JWT_FAILURE_STR
 	}
 
 	var cc jwt.CustomClaims
-    cc.UserId = user.UserId
-    cc.Username = user.Username
-    jwtStr, err := jwt.GenerateJWT(cc)
+	cc.UserId = user.UserId
+	cc.Username = user.Username
+	jwtStr, err := jwt.GenerateJWT(cc)
 
-    if err != nil {
-    	logger.LogError(err.Error())
-    	return GENERATE_JWT_FAILURE_STR
-    }
+	if err != nil {
+		logger.LogError(err.Error())
+		return GENERATE_JWT_FAILURE_STR
+	}
 
-    return jwtStr
+	return jwtStr
 }
