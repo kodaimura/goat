@@ -10,7 +10,7 @@ import (
 
 func Run() {
     cf := config.GetConfig()
-    logger.SetLogger()
+    logger.SetAccessLogger()
     r := router()
     r.Run(":" + cf.AppPort)
 }
