@@ -10,8 +10,8 @@ import (
 
 type UserRepository interface {
 	Insert(user *entity.User) error
-	UpdateUser(id int, user *entity.User) error
-	DeleteUser(id int) error
+	Update(id int, user *entity.User) error
+	Delete(id int) error
 
 	UpdatePassword(id int, password string) error
 	UpdateName(id int, name string) error
@@ -42,7 +42,7 @@ func (rep *userRepository) Insert(user *entity.User) error {
 }
 
 
-func (rep *userRepository) UpdateUser(id int, user *entity.User) error {
+func (rep *userRepository) Update(id int, user *entity.User) error {
 	_, err := rep.db.Exec(
 		`UPDATE USERS 
 		 SET USER_NAME = ? 
@@ -54,7 +54,7 @@ func (rep *userRepository) UpdateUser(id int, user *entity.User) error {
 }
 
 
-func (rep *userRepository) DeleteUser(id int) error {
+func (rep *userRepository) Delete(id int) error {
 	_, err := rep.db.Exec(
 		`DELETE FROM USERS WHERE USER_ID = ?`, 
 		id,
