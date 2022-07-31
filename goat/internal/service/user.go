@@ -3,12 +3,12 @@ package service
 import (
 	"golang.org/x/crypto/bcrypt"
 
-	"goat/internal/core/jwt"
+	"goat-cg/internal/core/jwt"
 	
-	"goat/internal/core/logger"
-	"goat/internal/model/entity"
-	"goat/internal/model/repository"
-	"goat/internal/model/queryservice"
+	"goat-cg/internal/core/logger"
+	"goat-cg/internal/model/entity"
+	"goat-cg/internal/model/repository"
+	"goat-cg/internal/model/queryservice"
 )
 
 
@@ -31,6 +31,13 @@ func NewUserService() UserService {
 	return &userService{ur, uq}
 }
 
+
+// Signup() Return value
+/*----------------------------------------*/
+const SIGNUP_SUCCESS_INT = 0
+const SIGNUP_CONFLICT_INT = 1
+const SIGNUP_ERROR_INT = 2
+/*----------------------------------------*/
 
 func (us *userService) Signup(username, password string) int {
 	_, err := us.uq.QueryUserByName(username)
@@ -61,9 +68,12 @@ func (us *userService) Signup(username, password string) int {
 }
 
 
-/* 
-return ユーザ識別ID
-*/
+// Login() Return value
+/*----------------------------------------*/
+const LOGIN_FAILURE_INT = -1
+// 正常時: ユーザ識別ID
+/*----------------------------------------*/
+
 func (us *userService) Login(username, password string) int {
 	user, err := us.uq.QueryUserByName(username)
 
@@ -74,6 +84,12 @@ func (us *userService) Login(username, password string) int {
 	return user.UserId
 }
 
+
+// GenerateJWT() Return value
+/*----------------------------------------*/
+const GENERATE_JWT_FAILURE_STR = ""
+// 正常時: jwt文字列
+/*----------------------------------------*/
 
 func (us *userService) GenerateJWT(userId int) string {
 	user, err := us.uq.QueryUser(userId)
