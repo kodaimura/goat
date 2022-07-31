@@ -60,7 +60,7 @@ func (ctr *userController) loginPage(c *gin.Context) {
 
 //POST /signup
 func (ctr *userController) signup(c *gin.Context) {
-    name := c.PostForm("username")
+    name := c.PostForm("user_name")
     pass := c.PostForm("password")
 
     result := ctr.us.Signup(name, pass)
@@ -85,7 +85,7 @@ func (ctr *userController) signup(c *gin.Context) {
 
 //POST /login
 func (ctr *userController) login(c *gin.Context) {
-    name := c.PostForm("username")
+    name := c.PostForm("user_name")
     pass := c.PostForm("password")
 
     userId := ctr.us.Login(name, pass)
@@ -93,7 +93,7 @@ func (ctr *userController) login(c *gin.Context) {
     if userId == service.LOGIN_FAILURE_INT {
         c.HTML(401, "login.html", gin.H{
             "commons": constant.Commons,
-            "error": "UsernameまたはPasswordが異なります。",
+            "error": "UserNameまたはPasswordが異なります。",
         })
         c.Abort()
         return

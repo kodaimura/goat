@@ -11,8 +11,8 @@ JwtPayload拡張
 */
 
 type CustomClaims struct {
-	UserId int `json:"userid"`
-	Username string `json:"username"`
+	UserId int
+	UserName string
 }
 
 
@@ -25,11 +25,11 @@ func GetUserId (c *gin.Context) (int, error) {
 	}	
 }
 
-func GetUsername (c *gin.Context) (string, error) {
+func GetUserName (c *gin.Context) (string, error) {
 	pl := c.Keys[CONTEXT_KEY_PAYLOAD]
 	if pl == nil {
-		return "", errors.New("GetUsername error")
+		return "", errors.New("GetUserName error")
 	} else {
-		return pl.(JwtPayload).Username, nil
+		return pl.(JwtPayload).UserName, nil
 	}
 }

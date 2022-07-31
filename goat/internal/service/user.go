@@ -3,12 +3,12 @@ package service
 import (
 	"golang.org/x/crypto/bcrypt"
 
-	"goat-cg/internal/core/jwt"
+	"goat/internal/core/jwt"
 	
-	"goat-cg/internal/core/logger"
-	"goat-cg/internal/model/entity"
-	"goat-cg/internal/model/repository"
-	"goat-cg/internal/model/queryservice"
+	"goat/internal/core/logger"
+	"goat/internal/model/entity"
+	"goat/internal/model/repository"
+	"goat/internal/model/queryservice"
 )
 
 
@@ -39,8 +39,8 @@ const SIGNUP_CONFLICT_INT = 1
 const SIGNUP_ERROR_INT = 2
 /*----------------------------------------*/
 
-func (us *userService) Signup(username, password string) int {
-	_, err := us.uq.QueryUserByName(username)
+func (serv *userService) Signup(username, password string) int {
+	_, err := serv.uq.QueryUserByName(username)
 
 	if err == nil {
 		return SIGNUP_CONFLICT_INT
@@ -54,10 +54,10 @@ func (us *userService) Signup(username, password string) int {
 	}
 
 	var user entity.User
-	user.Username = username
+	user.UserName = username
 	user.Password = string(hashed)
 
-	err = us.ur.Insert(&user)
+	err = serv.ur.Insert(&user)
 
 	if err != nil {
 		logger.LogError(err.Error())
@@ -74,8 +74,8 @@ const LOGIN_FAILURE_INT = -1
 // 正常時: ユーザ識別ID
 /*----------------------------------------*/
 
-func (us *userService) Login(username, password string) int {
-	user, err := us.uq.QueryUserByName(username)
+func (serv *userService) Login(username, password string) int {
+	user, err := serv.uq.QueryUserByName(username)
 
 	if err != nil || bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)) != nil {
 		return LOGIN_FAILURE_INT
@@ -91,8 +91,8 @@ const GENERATE_JWT_FAILURE_STR = ""
 // 正常時: jwt文字列
 /*----------------------------------------*/
 
-func (us *userService) GenerateJWT(userId int) string {
-	user, err := us.uq.QueryUser(userId)
+func (serv *userService) GenerateJWT(userId int) string {
+	user, err := serv.uq.QueryUser(userId)
 	
 	if err != nil {
 		logger.LogError(err.Error())
@@ -101,7 +101,7 @@ func (us *userService) GenerateJWT(userId int) string {
 
 	var cc jwt.CustomClaims
 	cc.UserId = user.UserId
-	cc.Username = user.Username
+	cc.UserName = user.UserName
 	jwtStr, err := jwt.GenerateJWT(cc)
 
 	if err != nil {

@@ -14,7 +14,7 @@ type UserRepository interface {
 	DeleteUser(id int) error
 
 	UpdatePassword(id int, password string) error
-	UpdateUsername(id int, username string) error
+	UpdateName(id int, name string) error
 }
 
 
@@ -32,10 +32,10 @@ func NewUserRepository() UserRepository {
 func (rep *userRepository) Insert(user *entity.User) error {
 	_, err := rep.db.Exec(
 		`INSERT INTO USERS (
-			USERNAME, 
+			USER_NAME, 
 			PASSWORD
 		 ) VALUES(?,?)`,
-		user.Username, 
+		user.UserName, 
 		user.Password,
 	)
 	return err
@@ -45,9 +45,9 @@ func (rep *userRepository) Insert(user *entity.User) error {
 func (rep *userRepository) UpdateUser(id int, user *entity.User) error {
 	_, err := rep.db.Exec(
 		`UPDATE USERS 
-		 SET USERNAME = ? 
+		 SET USER_NAME = ? 
 		 WHERE USER_ID = ?`,
-		user.Username, 
+		user.UserName, 
 		id,
 	)
 	return err
@@ -76,12 +76,12 @@ func (rep *userRepository) UpdatePassword(id int, password string) error {
 }
 
 
-func (rep *userRepository) UpdateUsername(id int, username string) error {
+func (rep *userRepository) UpdateName(id int, name string) error {
 	_, err := rep.db.Exec(
 		`UPDATE USERS 
-		 SET USERNAME = ? 
+		 SET USER_NAME = ? 
 		 WHERE USER_ID = ?`, 
-		username, 
+		name, 
 		id,
 	)
 	return err

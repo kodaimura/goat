@@ -30,7 +30,7 @@ func (qs *userQueryService) QueryUsers() ([]entity.User, error){
 	rows, err := qs.db.Query(
 		`SELECT 
 			USER_ID,
-			USERNAME, 
+			USER_NAME, 
 			CREATE_AT, 
 			UPDATE_AT 
 		 FROM USERS`,
@@ -44,7 +44,7 @@ func (qs *userQueryService) QueryUsers() ([]entity.User, error){
 		u := entity.User{}
 		err = rows.Scan(
 			&u.UserId, 
-			&u.Username, 
+			&u.UserName, 
 			&u.CreateAt, 
 			&u.UpdateAt,
 		)
@@ -64,7 +64,7 @@ func (qs *userQueryService) QueryUser(id int) (entity.User, error) {
 	err := qs.db.QueryRow(
 		`SELECT 
 			USER_ID, 
-			USERNAME, 
+			USER_NAME, 
 			CREATE_AT, 
 			UPDATE_AT 
 		 FROM USERS 
@@ -72,7 +72,7 @@ func (qs *userQueryService) QueryUser(id int) (entity.User, error) {
 		 id,
 	).Scan(
 		&ret.UserId, 
-		&ret.Username, 
+		&ret.UserName, 
 		&ret.CreateAt, 
 		&ret.UpdateAt,
 	)
@@ -87,16 +87,16 @@ func (qs *userQueryService) QueryUserByName(name string) (entity.User, error) {
 	err := qs.db.QueryRow(
 		`SELECT 
 			USER_ID, 
-			USERNAME, 
+			USER_NAME, 
 			PASSWORD, 
 			CREATE_AT, 
 			UPDATE_AT 
 		 FROM USERS 
-		 WHERE USERNAME = ?`, 
+		 WHERE USER_NAME = ?`, 
 		 name,
 	).Scan(
 		&ret.UserId, 
-		&ret.Username, 
+		&ret.UserName, 
 		&ret.Password, 
 		&ret.CreateAt, 
 		&ret.UpdateAt,
