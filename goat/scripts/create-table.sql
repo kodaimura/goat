@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS user (
+CREATE TABLE IF NOT EXISTS users (
 	user_id INTEGER PRIMARY KEY AUTOINCREMENT,
 	user_name TEXT NOT NULL UNIQUE,
 	password TEXT NOT NULL,
@@ -6,9 +6,9 @@ CREATE TABLE IF NOT EXISTS user (
 	update_at TEXT NOT NULL DEFAULT (DATETIME('now', 'localtime'))
 );
 
-CREATE TRIGGER IF NOT EXISTS trigger_user_updated_at AFTER UPDATE ON user
+CREATE TRIGGER IF NOT EXISTS trigger_users_updated_at AFTER UPDATE ON users
 BEGIN
-    UPDATE user 
+    UPDATE users 
     	SET update_at = DATETIME('now', 'localtime') 
     	WHERE rowid == NEW.rowid;
 END;

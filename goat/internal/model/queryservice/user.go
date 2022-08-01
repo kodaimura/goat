@@ -33,7 +33,7 @@ func (qs *userQueryService) QueryUsers() ([]entity.User, error){
 			user_name, 
 			create_at, 
 			update_at 
-		 FROM user`,
+		 FROM users`,
 	)
 
 	if err != nil {
@@ -67,7 +67,7 @@ func (qs *userQueryService) QueryUser(id int) (entity.User, error) {
 			user_name, 
 			create_at, 
 			update_at 
-		 FROM user 
+		 FROM users 
 		 WHERE user_id = ?`, 
 		 id,
 	).Scan(
@@ -91,7 +91,7 @@ func (qs *userQueryService) QueryUserByName(name string) (entity.User, error) {
 			password, 
 			create_at, 
 			update_at 
-		 FROM user 
+		 FROM users 
 		 WHERE user_name = ?`, 
 		 name,
 	).Scan(

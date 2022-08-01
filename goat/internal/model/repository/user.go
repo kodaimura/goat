@@ -31,7 +31,7 @@ func NewUserRepository() UserRepository {
 
 func (rep *userRepository) Insert(user *entity.User) error {
 	_, err := rep.db.Exec(
-		`INSERT INTO user (
+		`INSERT INTO users (
 			user_name, 
 			password
 		 ) VALUES(?,?)`,
@@ -44,7 +44,7 @@ func (rep *userRepository) Insert(user *entity.User) error {
 
 func (rep *userRepository) Update(id int, user *entity.User) error {
 	_, err := rep.db.Exec(
-		`UPDATE user 
+		`UPDATE users 
 		 SET user_name = ? 
 		 WHERE user_id = ?`,
 		user.UserName, 
@@ -56,7 +56,7 @@ func (rep *userRepository) Update(id int, user *entity.User) error {
 
 func (rep *userRepository) Delete(id int) error {
 	_, err := rep.db.Exec(
-		`DELETE FROM user WHERE user_id = ?`, 
+		`DELETE FROM users WHERE user_id = ?`, 
 		id,
 	)
 
@@ -66,7 +66,7 @@ func (rep *userRepository) Delete(id int) error {
 
 func (rep *userRepository) UpdatePassword(id int, password string) error {
 	_, err := rep.db.Exec(
-		`UPDATE user 
+		`UPDATE users 
 		 SET password = ? 
 		 WHERE user_id = ?`, 
 		 password, 
@@ -78,7 +78,7 @@ func (rep *userRepository) UpdatePassword(id int, password string) error {
 
 func (rep *userRepository) UpdateName(id int, name string) error {
 	_, err := rep.db.Exec(
-		`UPDATE user
+		`UPDATE users
 		 SET user_name = ? 
 		 WHERE user_id = ?`, 
 		name, 
