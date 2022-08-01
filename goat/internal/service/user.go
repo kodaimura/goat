@@ -20,15 +20,15 @@ type UserService interface {
 
 
 type userService struct {
-	ur repository.UserRepository
-	uq queryservice.UserQueryService
+	uRep repository.UserRepository
+	uQue queryservice.UserQueryService
 }
 
 
 func NewUserService() UserService {
-	ur := repository.NewUserRepository()
-	uq := queryservice.NewUserQueryService()
-	return &userService{ur, uq}
+	uRep := repository.NewUserRepository()
+	uQue := queryservice.NewUserQueryService()
+	return &userService{uRep, uQue}
 }
 
 
@@ -40,7 +40,7 @@ const SIGNUP_ERROR_INT = 2
 /*----------------------------------------*/
 
 func (serv *userService) Signup(username, password string) int {
-	_, err := serv.uq.QueryUserByName(username)
+	_, err := serv.uQue.QueryUserByName(username)
 
 	if err == nil {
 		return SIGNUP_CONFLICT_INT
@@ -57,7 +57,7 @@ func (serv *userService) Signup(username, password string) int {
 	user.UserName = username
 	user.Password = string(hashed)
 
-	err = serv.ur.Insert(&user)
+	err = serv.uRep.Insert(&user)
 
 	if err != nil {
 		logger.LogError(err.Error())
@@ -75,7 +75,7 @@ const LOGIN_FAILURE_INT = -1
 /*----------------------------------------*/
 
 func (serv *userService) Login(username, password string) int {
-	user, err := serv.uq.QueryUserByName(username)
+	user, err := serv.uQue.QueryUserByName(username)
 
 	if err != nil || bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)) != nil {
 		return LOGIN_FAILURE_INT
@@ -92,7 +92,7 @@ const GENERATE_JWT_FAILURE_STR = ""
 /*----------------------------------------*/
 
 func (serv *userService) GenerateJWT(userId int) string {
-	user, err := serv.uq.QueryUser(userId)
+	user, err := serv.uQue.QueryUser(userId)
 	
 	if err != nil {
 		logger.LogError(err.Error())

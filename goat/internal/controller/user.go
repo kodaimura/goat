@@ -31,15 +31,15 @@ func setUserRoute(r *gin.Engine) {
 
 
 type userController struct {
-    us service.UserService
-    uq queryservice.UserQueryService
+    uServ service.UserService
+    uQue queryservice.UserQueryService
 }
 
 
 func newUserController() *userController {
-    us := service.NewUserService()
-    uq := queryservice.NewUserQueryService()
-    return &userController{us, uq}
+    uServ := service.NewUserService()
+    uQue := queryservice.NewUserQueryService()
+    return &userController{uServ, uQue}
 }
 
 
@@ -63,7 +63,7 @@ func (ctr *userController) signup(c *gin.Context) {
     name := c.PostForm("user_name")
     pass := c.PostForm("password")
 
-    result := ctr.us.Signup(name, pass)
+    result := ctr.uServ.Signup(name, pass)
 
     if result == service.SIGNUP_SUCCESS_INT {
         c.Redirect(303, "/login")
@@ -88,7 +88,7 @@ func (ctr *userController) login(c *gin.Context) {
     name := c.PostForm("user_name")
     pass := c.PostForm("password")
 
-    userId := ctr.us.Login(name, pass)
+    userId := ctr.uServ.Login(name, pass)
 
     if userId == service.LOGIN_FAILURE_INT {
         c.HTML(401, "login.html", gin.H{
@@ -99,7 +99,7 @@ func (ctr *userController) login(c *gin.Context) {
         return
     }
 
-    jwtStr := ctr.us.GenerateJWT(userId)
+    jwtStr := ctr.uServ.GenerateJWT(userId)
 
     if jwtStr == service.GENERATE_JWT_FAILURE_STR {
         c.HTML(500, "login.html", gin.H{
@@ -127,7 +127,7 @@ func (ctr *userController) logout(c *gin.Context) {
 //GET /api/profile
 func (ctr *userController) getProfile(c *gin.Context) {
     userId, _ := jwt.GetUserId(c)
-    user, err := ctr.uq.QueryUser(userId)
+    user, err := ctr.uQue.QueryUser(userId)
 
     if err != nil {
         c.JSON(500, gin.H{"error": http.StatusText(500)})
