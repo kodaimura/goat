@@ -1,10 +1,10 @@
-CREATE TABLE IF NOT EXISTS USERS (
-	USER_ID SERIAL PRIMARY KEY,
-	USER_NAME TEXT NOT NULL UNIQUE,
-	PASSWORD TEXT NOT NULL,
-	CREATE_AT TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	UPDATE_AT TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE IF NOT EXISTS user (
+	user_id SERIAL PRIMARY KEY,
+	user_name TEXT NOT NULL UNIQUE,
+	password TEXT NOT NULL,
+	create_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	update_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-create trigger users_update_trg before update on users for each row
+create trigger user_update_trg before update on user for each row
   	execute procedure set_update_time();

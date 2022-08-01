@@ -29,11 +29,11 @@ func (qs *userQueryService) QueryUsers() ([]entity.User, error){
 
 	rows, err := qs.db.Query(
 		`SELECT 
-			USER_ID,
-			USER_NAME, 
-			CREATE_AT, 
-			UPDATE_AT 
-		 FROM USERS`,
+			user_id,
+			user_name, 
+			create_at, 
+			update_at 
+		 FROM user`,
 	)
 
 	if err != nil {
@@ -63,12 +63,12 @@ func (qs *userQueryService) QueryUser(id int) (entity.User, error) {
 
 	err := qs.db.QueryRow(
 		`SELECT 
-			USER_ID, 
-			USER_NAME, 
-			CREATE_AT, 
-			UPDATE_AT 
-		 FROM USERS 
-		 WHERE USER_ID = $1`, 
+			user_id, 
+			user_name, 
+			create_at, 
+			update_at 
+		 FROM user 
+		 WHERE user_id = $1`, 
 		 id,
 	).Scan(
 		&ret.UserId, 
@@ -86,13 +86,13 @@ func (qs *userQueryService) QueryUserByName(name string) (entity.User, error) {
 
 	err := qs.db.QueryRow(
 		`SELECT 
-			USER_ID, 
-			USER_NAME, 
-			PASSWORD, 
-			CREATE_AT, 
-			UPDATE_AT 
-		 FROM USERS 
-		 WHERE USER_NAME = $1`, 
+			user_id, 
+			user_name, 
+			password, 
+			create_at, 
+			update_at 
+		 FROM user 
+		 WHERE user_name = $1`, 
 		 name,
 	).Scan(
 		&ret.UserId, 
