@@ -123,9 +123,9 @@ func (ctr *userController) logout(c *gin.Context) {
 
 //GET /api/profile
 func (ctr *userController) getProfile(c *gin.Context) {
-    user, result := ctr.uServ.GetProfile(jwt.GetUserId(c))
+    user, err := ctr.uServ.GetProfile(jwt.GetUserId(c))
 
-    if result != service.GET_PROFILE_SUCCESS_INT {
+    if err != nil {
         c.JSON(500, gin.H{"error": http.StatusText(500)})
         c.Abort()
         return
