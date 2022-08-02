@@ -16,6 +16,7 @@ type UserService interface {
 	Signup(username, password string) int
 	Login(username, password string) int
 	GenerateJWT(userId int) string
+	GetProfile(userId int) (entity.User, int)
 }
 
 
@@ -110,4 +111,22 @@ func (serv *userService) GenerateJWT(userId int) string {
 	}
 
 	return jwtStr
+}
+
+
+// GetProfile() Return value
+/*----------------------------------------*/
+const GET_PROFILE_SUCCESS_INT = 0
+const GET_PROFILE_ERROR_INT = 1
+/*----------------------------------------*/
+
+func (serv *userService) GetProfile(userId int) (entity.User, int) {
+	user, err := serv.uQue.QueryUser(userId)
+
+	if err != nil {
+		logger.LogError(err.Error())
+		return user, GET_PROFILE_ERROR_INT
+	}
+
+	return user, GET_PROFILE_SUCCESS_INT
 }

@@ -26,12 +26,7 @@ func newRootController() *rootController {
 
 //GET /
 func (ctr *rootController) indexPage(c *gin.Context) {
-    username, err := jwt.GetUserName(c)
-
-    if err != nil {
-        c.Redirect(303, "/login")
-        return
-    }
+    username := jwt.GetUserName(c)
 
     c.HTML(200, "index.html", gin.H{
         "commons": constant.Commons,

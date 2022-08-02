@@ -1,8 +1,7 @@
 package jwt
 
 import (
-	"errors"
-
+	"log"
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,20 +15,22 @@ type CustomClaims struct {
 }
 
 
-func GetUserId (c *gin.Context) (int, error) {
+func GetUserId (c *gin.Context) int {
 	pl := c.Keys[CONTEXT_KEY_PAYLOAD]
 	if pl == nil {
-		return -1, errors.New("GetUserId error")
+		log.Panic("Error: GetUserId")
+		return -1
 	} else {
-		return pl.(JwtPayload).UserId, nil
+		return pl.(JwtPayload).UserId
 	}	
 }
 
-func GetUserName (c *gin.Context) (string, error) {
+func GetUserName (c *gin.Context) string {
 	pl := c.Keys[CONTEXT_KEY_PAYLOAD]
 	if pl == nil {
-		return "", errors.New("GetUserName error")
+		log.Panic("Error: GetUserName")
+		return ""
 	} else {
-		return pl.(JwtPayload).UserName, nil
+		return pl.(JwtPayload).UserName
 	}
 }

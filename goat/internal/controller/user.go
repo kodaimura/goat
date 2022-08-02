@@ -9,7 +9,6 @@ import (
     "goat/internal/core/jwt"
     "goat/internal/constant"
     "goat/internal/service"
-    "goat/internal/model/queryservice"
 )
 
 
@@ -32,14 +31,12 @@ func setUserRoute(r *gin.Engine) {
 
 type userController struct {
     uServ service.UserService
-    uQue queryservice.UserQueryService
 }
 
 
 func newUserController() *userController {
     uServ := service.NewUserService()
-    uQue := queryservice.NewUserQueryService()
-    return &userController{uServ, uQue}
+    return &userController{uServ}
 }
 
 
@@ -126,10 +123,9 @@ func (ctr *userController) logout(c *gin.Context) {
 
 //GET /api/profile
 func (ctr *userController) getProfile(c *gin.Context) {
-    userId, _ := jwt.GetUserId(c)
-    user, err := ctr.uQue.QueryUser(userId)
+    user, result := ctr.uServ.GetProfile(jwt.GetUserId(c))
 
-    if err != nil {
+    if result != service.GET_PROFILE_SUCCESS_INT {
         c.JSON(500, gin.H{"error": http.StatusText(500)})
         c.Abort()
         return
