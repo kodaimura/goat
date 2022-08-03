@@ -8,14 +8,6 @@ import (
 )
 
 
-func setRootRoute(r *gin.Engine) {
-    auth := r.Group("/", jwt.JwtAuthMiddleware())
-
-    rc := newRootController()
-    auth.GET("/", rc.indexPage)
-}
-
-
 type rootController struct {}
 
 
