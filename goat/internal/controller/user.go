@@ -7,7 +7,7 @@ import (
 
     "goat/config"
     "goat/internal/core/jwt"
-    "goat/internal/constant"
+    "goat/internal/shared/constant"
     "goat/internal/service"
 )
 
