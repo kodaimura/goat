@@ -1,0 +1,40 @@
+[GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
+
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] Loaded HTML Templates (9): 
+	- _header.html
+	- signup.html
+	- 500error.html
+	- _footer.html
+	- header
+	- index.html
+	- login.html
+	- 
+	- footer
+
+[GIN-debug] GET    /css/*filepath            --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (3 handlers)
+[GIN-debug] HEAD   /css/*filepath            --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (3 handlers)
+[GIN-debug] GET    /js/*filepath             --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (3 handlers)
+[GIN-debug] HEAD   /js/*filepath             --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (3 handlers)
+[GIN-debug] GET    /signup                   --> goat/internal/controller.(*userController).signupPage-fm (3 handlers)
+[GIN-debug] GET    /login                    --> goat/internal/controller.(*userController).loginPage-fm (3 handlers)
+[GIN-debug] GET    /logout                   --> goat/internal/controller.(*userController).logout-fm (3 handlers)
+[GIN-debug] POST   /signup                   --> goat/internal/controller.(*userController).signup-fm (3 handlers)
+[GIN-debug] POST   /login                    --> goat/internal/controller.(*userController).login-fm (3 handlers)
+[GIN-debug] GET    /                         --> goat/internal/controller.(*rootController).indexPage-fm (4 handlers)
+[GIN-debug] GET    /api/profile              --> goat/internal/controller.(*userController).getProfile-fm (4 handlers)
+[GIN-debug] [WARNING] You trusted all proxies, this is NOT safe. We recommend you to set a value.
+Please check https://pkg.go.dev/github.com/gin-gonic/gin#readme-don-t-trust-all-proxies for details.
+[GIN-debug] Listening and serving HTTP on :8080
+[GIN] 2022/08/06 - 19:39:36 | 200 |    1.898685ms |             ::1 | GET      "/"
+[GIN] 2022/08/06 - 19:39:36 | 304 |      80.562µs |             ::1 | GET      "/css/style.css"
+[GIN] 2022/08/06 - 19:39:42 | 303 |      23.935µs |             ::1 | GET      "/logout"
+[GIN] 2022/08/06 - 19:39:42 | 200 |     475.844µs |             ::1 | GET      "/login"
+[GIN] 2022/08/06 - 19:39:48 | 303 |   63.986513ms |             ::1 | POST     "/login"
+[GIN] 2022/08/06 - 19:39:48 | 200 |     410.209µs |             ::1 | GET      "/"
+[GIN] 2022/08/06 - 19:39:53 | 200 |     580.418µs |             ::1 | GET      "/signup"
+[GIN] 2022/08/06 - 19:40:00 | 303 |   73.153756ms |             ::1 | POST     "/signup"
+[GIN] 2022/08/06 - 19:40:00 | 200 |     744.202µs |             ::1 | GET      "/login"

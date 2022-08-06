@@ -10,9 +10,15 @@ import (
 
 type UserRepository interface {
 	Insert(u *entity.User) error
+	Select(id int) (entity.User, error)
+	SelectBy(cond string) ([]entity.User, error)
 	Update(id int, u *entity.User) error
+	UpdateBy(cond string, u *entity.User) error
 	Delete(id int) error
-
+	DeleteBy(cond string) error
+	
+	/* 以降に追加 */
+	SelectByName(name string) (entity.User, error)
 	UpdatePassword(id int, password string) error
 	UpdateName(id int, name string) error
 }
@@ -26,6 +32,64 @@ type userRepository struct {
 func NewUserRepository() UserRepository {
 	db := db.GetDB()
 	return &userRepository{db}
+}
+
+
+func (rep *userRepository) Select(id int) (entity.User, error){
+	var ret entity.User
+
+	err := rep.db.QueryRow(
+		`SELECT 
+			user_id, 
+			user_name, 
+			create_at, 
+			update_at 
+		 FROM users 
+		 WHERE user_id = $1`, 
+		 id,
+	).Scan(
+		&ret.UserId, 
+		&ret.UserName, 
+		&ret.CreateAt, 
+		&ret.UpdateAt,
+	)
+
+	return ret, err
+}
+
+
+func (rep *userRepository) SelectBy(cond string) ([]entity.User, error){
+	var ret []entity.User
+
+	rows, err := rep.db.Query(
+		`SELECT 
+			user_id,
+			user_name, 
+			create_at, 
+			update_at 
+		 FROM users 
+		 WHERE ` + cond,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		u := entity.User{}
+		err = rows.Scan(
+			&u.UserId, 
+			&u.UserName, 
+			&u.CreateAt, 
+			&u.UpdateAt,
+		)
+		if err != nil {
+			break
+		}
+		ret = append(ret, u)
+	}
+
+	return ret, err
 }
 
 
@@ -46,9 +110,23 @@ func (rep *userRepository) Update(id int, u *entity.User) error {
 	_, err := rep.db.Exec(
 		`UPDATE users 
 		 SET user_name = $1 
-		 WHERE user_id = $2`,
-		u.UserName, 
+		 	 password = $2
+		 WHERE user_id = $3`,
+		u.UserName,
+		u.Password, 
 		id,
+	)
+	return err
+}
+
+
+func (rep *userRepository) UpdateBy(cond string, u *entity.User) error {
+	_, err := rep.db.Exec(
+		`UPDATE users 
+		 SET user_name = $1 
+		 	 password = $2 ` + cond,
+		u.UserName,
+		u.Password,
 	)
 	return err
 }
@@ -58,6 +136,15 @@ func (rep *userRepository) Delete(id int) error {
 	_, err := rep.db.Exec(
 		`DELETE FROM users WHERE user_id = $1`, 
 		id,
+	)
+
+	return err
+}
+
+
+func (rep *userRepository) DeleteBy(cond string) error {
+	_, err := rep.db.Exec(
+		`DELETE FROM users ` + cond,
 	)
 
 	return err
@@ -78,11 +165,37 @@ func (rep *userRepository) UpdatePassword(id int, password string) error {
 
 func (rep *userRepository) UpdateName(id int, name string) error {
 	_, err := rep.db.Exec(
-		`UPDATE users 
+		`UPDATE users
 		 SET user_name = $1 
 		 WHERE user_id = $2`, 
 		name, 
 		id,
 	)
 	return err
+}
+
+
+
+func (rep *userRepository) SelectByName(name string) (entity.User, error) {
+	var ret entity.User
+
+	err := rep.db.QueryRow(
+		`SELECT 
+			user_id, 
+			user_name, 
+			password, 
+			create_at, 
+			update_at 
+		 FROM users 
+		 WHERE user_name = $1`, 
+		 name,
+	).Scan(
+		&ret.UserId, 
+		&ret.UserName, 
+		&ret.Password, 
+		&ret.CreateAt, 
+		&ret.UpdateAt,
+	)
+
+	return ret, err
 }
