@@ -41,7 +41,7 @@ func (rep *userRepository) Select(id int) (entity.User, error){
 			user_name, 
 			create_at, 
 			update_at 
-		 FROM users 
+		 FROM user 
 		 WHERE user_id = ?`, 
 		 id,
 	).Scan(
@@ -57,7 +57,7 @@ func (rep *userRepository) Select(id int) (entity.User, error){
 
 func (rep *userRepository) Insert(u *entity.User) error {
 	_, err := rep.db.Exec(
-		`INSERT INTO users (
+		`INSERT INTO user (
 			user_name, 
 			password
 		 ) VALUES(?,?)`,
@@ -70,7 +70,7 @@ func (rep *userRepository) Insert(u *entity.User) error {
 
 func (rep *userRepository) Update(id int, u *entity.User) error {
 	_, err := rep.db.Exec(
-		`UPDATE users 
+		`UPDATE user 
 		 SET user_name = ? 
 		 	 password = ?
 		 WHERE user_id = ?`,
@@ -84,7 +84,7 @@ func (rep *userRepository) Update(id int, u *entity.User) error {
 
 func (rep *userRepository) Delete(id int) error {
 	_, err := rep.db.Exec(
-		`DELETE FROM users WHERE user_id = ?`, 
+		`DELETE FROM user WHERE user_id = ?`, 
 		id,
 	)
 
@@ -94,7 +94,7 @@ func (rep *userRepository) Delete(id int) error {
 
 func (rep *userRepository) UpdatePassword(id int, password string) error {
 	_, err := rep.db.Exec(
-		`UPDATE users 
+		`UPDATE user 
 		 SET password = ? 
 		 WHERE user_id = ?`, 
 		 password, 
@@ -106,7 +106,7 @@ func (rep *userRepository) UpdatePassword(id int, password string) error {
 
 func (rep *userRepository) UpdateName(id int, name string) error {
 	_, err := rep.db.Exec(
-		`UPDATE users
+		`UPDATE user
 		 SET user_name = ? 
 		 WHERE user_id = ?`, 
 		name, 
@@ -127,7 +127,7 @@ func (rep *userRepository) SelectByName(name string) (entity.User, error) {
 			password, 
 			create_at, 
 			update_at 
-		 FROM users 
+		 FROM user 
 		 WHERE user_name = ?`, 
 		 name,
 	).Scan(
