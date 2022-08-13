@@ -1,6 +1,6 @@
-create function set_update_time() returns opaque as '
-  	begin
+create function set_update_time() returns opaque AS '
+  	BEGIN
     	new.updated_at := ''now'';
     	return new;
-  	end;
+  	END;
 ' language 'plpgsql';

@@ -6,5 +6,5 @@ CREATE TABLE IF NOT EXISTS users (
 	update_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-create trigger users_update_trg before update on users for each row
+create trigger users_update_trg AFTER UPDATE ON users FOR EACH ROW
   	execute procedure set_update_time();

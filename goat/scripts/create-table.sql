@@ -6,9 +6,9 @@ CREATE TABLE IF NOT EXISTS users (
 	update_at TEXT NOT NULL DEFAULT (DATETIME('now', 'localtime'))
 );
 
-CREATE TRIGGER IF NOT EXISTS trigger_users_updated_at AFTER UPDATE ON users
+CREATE TRIGGER IF NOT EXISTS users_update_trg AFTER UPDATE ON users
 BEGIN
     UPDATE users 
-    	SET update_at = DATETIME('now', 'localtime') 
-    	WHERE rowid == NEW.rowid;
+    SET update_at = DATETIME('now', 'localtime') 
+    WHERE rowid == NEW.rowid;
 END;
