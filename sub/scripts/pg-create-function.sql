@@ -1,4 +1,4 @@
-create function set_update_time() returns opaque AS '
+create function set_update_time() returns trigger AS '
   	BEGIN
     	new.updated_at := ''now'';
     	return new;
