@@ -53,7 +53,7 @@ cp -r $GOAT_DIR/web .
 
 mkdir log
 
-#sqlite3の場合はsubで置換
+#pgの場合はsubで置換
 if [ $DB = "pg" ]; then
   rm -r scripts
   cp -r $SUB_DIR/scripts .
@@ -62,12 +62,12 @@ if [ $DB = "pg" ]; then
 fi
 
 #.goファイル内のgoatを全て置換
-for fpass in `find . -name "*.go"`
-do sed -i "" s/goat/$APP_NAME/g $fpass
+for fpath in `find . -name "*.go"`
+do sed -i "" s/goat/$APP_NAME/g $fpath
 done
 
-for fpass in `find . -name "*.DS_Store"`
-do rm $fpass
+for fpath in `find . -name "*.DS_Store"`
+do rm $fpath
 done
 
 cat <<EOF > .gitignore
