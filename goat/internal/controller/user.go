@@ -1,8 +1,6 @@
 package controller
 
 import (
-    "net/http"
-
     "github.com/gin-gonic/gin"
 
     "goat/config"
@@ -101,18 +99,4 @@ func (ctr *userController) logout(c *gin.Context) {
     cf := config.GetConfig()
     c.SetCookie(jwt.COOKIE_KEY_JWT, "", 0, "/", cf.AppHost, false, true)
     c.Redirect(303, "/login")
-}
-
-
-//GET /api/profile
-func (ctr *userController) getProfile(c *gin.Context) {
-    user, err := ctr.uServ.GetProfile(jwt.GetUserId(c))
-
-    if err != nil {
-        c.JSON(500, gin.H{"error": http.StatusText(500)})
-        c.Abort()
-        return
-    }
-
-    c.JSON(200, user)
 }
