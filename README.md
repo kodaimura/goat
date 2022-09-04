@@ -3,9 +3,22 @@
 Go(Gin)のWebアプリケーション雛形作成スクリプト。\
 ディレクトリ構成 + Signup/Login/Logout 機能を画面およびサーバプログラム自動生成。
 
-* インストール後 ~ /goat/bin にPATHを通し、下記コマンド実行
+## Install
 ```
-goat <appname> [-db sqlite3 or pg]
+$ git clone https://github.com/kodaimura/goat
+```
+
+* goat/bin にPATHを通す。
+* 生成用スクリプトに実行権限付与。
+
+```
+$ chmod +x [省略]/goat/bin/goat
+```
+
+## Usage
+
+```
+$ goat <appname> [-db sqlite3 or pg]
 ```
 
 * オプションについては下記にも対応
@@ -15,14 +28,14 @@ goat <appname> [-db sqlite3 or pg]
  --db=sqlite3 [pg]
 ```
 
-## 初期設定
+## Setting
 ### appname/config/env 内のファイルを修正
 
 ```
 # local.env (開発環境用の設定ファイル)
 
 APP_HOST=localhost (必須)
-APP_PORT=8080      (必須)
+APP_PORT=3000      (必須)
 DB_NAME=           (必須)
 DB_HOST=localhost  (pg の場合必須)
 DB_PORT=5432       (pg の場合必須)
@@ -30,7 +43,6 @@ DB_USER=           (pg の場合必須)
 DB_PASSWORD=       (pg の場合必須)
 JWT_SECRET_KEY=    (必須)
 ```
-
 ```
 # .env (本番環境用の設定ファイル)
 
