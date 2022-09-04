@@ -27,24 +27,22 @@ func SetRouter(r *gin.Engine) {
     //response JSON
     api := r.Group("/api")
     {
+        uac := newUserApiController()
 
-        /* --------------------------------------------*/
-        // when you use user.api.go(signup,login,logout)
-        /* --------------------------------------------*/
-        //api.POST("/signup", uc.signup)
-        //api.POST("/login", uc.login)
-        //api.GET("/logout", uc.logout)
+        api.POST("/signup", uac.signup)
+        api.POST("/login", uac.login)
+        api.GET("/logout", uac.logout)
 
 
         //response JSON (Authorized request)
         a := api.Group("/", jwt.JwtAuthApiMiddleware())
         {
-            a.GET("/profile", uc.getProfile)
-            a.PUT("/username", uc.changeUsername)
-            a.POST("/username", uc.changeUsername)
-            a.PUT("/password", uc.changePassword)
-            a.POST("/password", uc.changePassword)
-            a.DELETE("/account", uc.deleteUser)
+            a.GET("/profile", uac.getProfile)
+            a.PUT("/username", uac.changeUsername)
+            a.POST("/username", uac.changeUsername)
+            a.PUT("/password", uac.changePassword)
+            a.POST("/password", uac.changePassword)
+            a.DELETE("/account", uac.deleteUser)
         }
     }
 }
