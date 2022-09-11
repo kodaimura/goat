@@ -9,7 +9,6 @@ import (
 
 func SetRouter(r *gin.Engine) {
     uc := newUserController()
-    rc := newRootController()
 
     //render HTML or redirect
     r.GET("/signup", uc.signupPage)
@@ -21,6 +20,8 @@ func SetRouter(r *gin.Engine) {
     //render HTML or redirect (Authorized request)
     a := r.Group("/", jwt.JwtAuthMiddleware())
     {
+        rc := newRootController()
+        
         a.GET("/", rc.indexPage)
     }
 
