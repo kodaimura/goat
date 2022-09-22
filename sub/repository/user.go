@@ -107,7 +107,7 @@ func (rep *userRepository) Update(id int, u *entity.User) error {
 	_, err := rep.db.Exec(
 		`UPDATE users 
 		 SET user_name = $1 
-		 	 password = $2
+			  password = $2
 		 WHERE user_id = $3`,
 		u.UserName,
 		u.Password, 

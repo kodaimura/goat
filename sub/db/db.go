@@ -1,34 +1,34 @@
 package db
 
 import (
-    "log"
-    "database/sql"
-    
-    _ "github.com/lib/pq"
+	"log"
+	"database/sql"
+	
+	_ "github.com/lib/pq"
 
-    "goat/config"
+	"goat/config"
 )
 
 
 var db *sql.DB
 
 func init() {
-    var err error
+	var err error
 
-    cf := config.GetConfig()
+	cf := config.GetConfig()
 
-    db, err = sql.Open(
-        "postgres",
-        "host=" + cf.DbHost + " port=" + cf.DbPort +
-        " user=" + cf.DbUser + " password=" + cf.DbPassword +
-        " dbname=" + cf.DbName + " sslmode=disable",
-    )
+	db, err = sql.Open(
+		"postgres",
+		"host=" + cf.DbHost + " port=" + cf.DbPort +
+		" user=" + cf.DbUser + " password=" + cf.DbPassword +
+		" dbname=" + cf.DbName + " sslmode=disable",
+	)
 
-    if err != nil {
-        log.Panic(err)
-    }
+	if err != nil {
+		log.Panic(err)
+	}
 }
 
 func GetDB() *sql.DB {
-    return db
+	return db
 }
