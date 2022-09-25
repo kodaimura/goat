@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS users (
 	update_at TEXT NOT NULL DEFAULT (DATETIME('now', 'localtime'))
 );
 
-CREATE TRIGGER IF NOT EXISTS user_update_trg AFTER UPDATE ON users
+CREATE TRIGGER IF NOT EXISTS trg_users_upd AFTER UPDATE ON users
 BEGIN
     UPDATE users
     SET update_at = DATETIME('now', 'localtime') 
