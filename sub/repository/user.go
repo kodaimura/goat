@@ -9,7 +9,7 @@ import (
 
 
 type UserRepository interface {
-	SelectAll(id int) ([]entity.User, error)
+	SelectAll() ([]entity.User, error)
 	Select(id int) (entity.User, error)
 	Insert(u *entity.User) error
 	Update(id int, u *entity.User) error
@@ -33,7 +33,7 @@ func NewUserRepository() UserRepository {
 }
 
 
-func (rep *userRepository) SelectAll(id int) ([]entity.User, error) {
+func (rep *userRepository) SelectAll() ([]entity.User, error) {
 	var ret []entity.User
 
 	rows, err := rep.db.Query(
