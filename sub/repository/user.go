@@ -9,14 +9,14 @@ import (
 
 
 type UserRepository interface {
-	SelectAll() ([]entity.User, error)
-	Select(id int) (entity.User, error)
+	GetAll() ([]entity.User, error)
+	GetByPk(id int) (entity.User, error)
 	Insert(u *entity.User) error
 	Update(id int, u *entity.User) error
 	Delete(id int) error
 	
 	/* 以降に追加 */
-	SelectByName(name string) (entity.User, error)
+	GetByName(name string) (entity.User, error)
 	UpdatePassword(id int, password string) error
 	UpdateName(id int, name string) error
 }
@@ -33,7 +33,7 @@ func NewUserRepository() UserRepository {
 }
 
 
-func (rep *userRepository) SelectAll() ([]entity.User, error) {
+func (rep *userRepository) GetAll() ([]entity.User, error) {
 	var ret []entity.User
 
 	rows, err := rep.db.Query(
@@ -67,7 +67,7 @@ func (rep *userRepository) SelectAll() ([]entity.User, error) {
 }
 
 
-func (rep *userRepository) Select(id int) (entity.User, error){
+func (rep *userRepository) GetByPk(id int) (entity.User, error){
 	var ret entity.User
 
 	err := rep.db.QueryRow(
@@ -151,7 +151,7 @@ func (rep *userRepository) UpdateName(id int, name string) error {
 }
 
 
-func (rep *userRepository) SelectByName(name string) (entity.User, error) {
+func (rep *userRepository) GetByName(name string) (entity.User, error) {
 	var ret entity.User
 
 	err := rep.db.QueryRow(

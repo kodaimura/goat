@@ -41,7 +41,7 @@ const SIGNUP_ERROR_INT = 2
 /*----------------------------------------*/
 
 func (serv *userService) Signup(username, password string) int {
-	_, err := serv.uRep.SelectByName(username)
+	_, err := serv.uRep.GetByName(username)
 
 	if err == nil {
 		return SIGNUP_CONFLICT_INT
@@ -76,7 +76,7 @@ const LOGIN_FAILURE_INT = -1
 /*----------------------------------------*/
 
 func (serv *userService) Login(username, password string) int {
-	user, err := serv.uRep.SelectByName(username)
+	user, err := serv.uRep.GetByName(username)
 
 	if err != nil || bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)) != nil {
 		return LOGIN_FAILURE_INT
@@ -93,7 +93,7 @@ const GENERATE_JWT_FAILURE_STR = ""
 /*----------------------------------------*/
 
 func (serv *userService) GenerateJWT(userId int) string {
-	user, err := serv.uRep.Select(userId)
+	user, err := serv.uRep.GetByPk(userId)
 	
 	if err != nil {
 		logger.LogError(err.Error())
@@ -115,7 +115,7 @@ func (serv *userService) GenerateJWT(userId int) string {
 
 
 func (serv *userService) GetProfile(userId int) (entity.User, error) {
-	user, err := serv.uRep.Select(userId)
+	user, err := serv.uRep.GetByPk(userId)
 
 	if err != nil {
 		logger.LogError(err.Error())
