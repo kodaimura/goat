@@ -4,7 +4,6 @@ import (
 	"github.com/gin-gonic/gin"
 	
 	"goat/internal/core/jwt"
-	"goat/internal/shared/constant"
 )
 
 
@@ -21,7 +20,6 @@ func (ctr *rootController) indexPage(c *gin.Context) {
 	username := jwt.GetUserName(c)
 
 	c.HTML(200, "index.html", gin.H{
-		"commons": constant.Commons,
 		"username": username,
 	})
 }

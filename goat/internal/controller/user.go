@@ -5,7 +5,6 @@ import (
 
 	"goat/config"
 	"goat/internal/core/jwt"
-	"goat/internal/shared/constant"
 	"goat/internal/service"
 )
 
@@ -23,16 +22,12 @@ func newUserController() *userController {
 
 //GET /signup
 func (ctr *userController) signupPage(c *gin.Context) {
-	c.HTML(200, "signup.html", gin.H{
-		"commons": constant.Commons,
-	})
+	c.HTML(200, "signup.html", gin.H{})
 }
 
 //GET /login
 func (ctr *userController) loginPage(c *gin.Context) {
-	c.HTML(200, "login.html", gin.H{
-		"commons": constant.Commons,
-	})
+	c.HTML(200, "login.html", gin.H{})
 }
 
 
@@ -48,13 +43,11 @@ func (ctr *userController) signup(c *gin.Context) {
 
 	} else if result == service.SIGNUP_CONFLICT_INT {
 		c.HTML(409, "signup.html", gin.H{
-			"commons": constant.Commons,
 			"error": "Usernameが既に使われています。",
 		})
 
 	} else {
 		c.HTML(500, "signup.html", gin.H{
-			"commons": constant.Commons,
 			"error": "登録に失敗しました。",
 		})
 	}
@@ -70,7 +63,6 @@ func (ctr *userController) login(c *gin.Context) {
 
 	if userId == service.LOGIN_FAILURE_INT {
 		c.HTML(401, "login.html", gin.H{
-			"commons": constant.Commons,
 			"error": "UserNameまたはPasswordが異なります。",
 		})
 		c.Abort()
@@ -81,7 +73,6 @@ func (ctr *userController) login(c *gin.Context) {
 
 	if jwtStr == service.GENERATE_JWT_FAILURE_STR {
 		c.HTML(500, "login.html", gin.H{
-			"commons": constant.Commons,
 			"error": "ログインに失敗しました。",
 		})
 		c.Abort()
