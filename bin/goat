@@ -71,7 +71,7 @@ do rm $fpath
 done
 
 cat <<EOF > .gitignore
-log/
+*.log
 *.db
 *.sqlite3
 .env
