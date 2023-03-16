@@ -12,7 +12,7 @@ do
       if [[ $1 =~ ^--db= ]]; then
         DB=$2
       elif [ -z $2 ]; then
-        echo "'db' requires an argument. (sqlite3 or pg)" 1>&2
+        echo "'db' requires an argument. (sqlite3 or pg or mysql)" 1>&2
         exit 1
       else
         DB=$2
@@ -22,8 +22,8 @@ do
   shift
 done
 
-if [ $DB != "sqlite3" ] && [ $DB != "pg" ]; then
-	echo "'db' requires an argument. (sqlite3 or pg)" 1>&2
+if [ $DB != "sqlite3" ] && [ $DB != "pg" ] && [ $DB != "mysql" ]; then
+	echo "'db' requires an argument. (sqlite3 or pg or mysql)" 1>&2
   exit 1
 fi
 
@@ -53,12 +53,18 @@ cp -r $GOAT_DIR/web .
 
 mkdir log
 
-#pgの場合はsubで置換
 if [ $DB = "pg" ]; then
   rm -r scripts
-  cp -r $SUB_DIR/scripts .
-  cp -r $SUB_DIR/dao internal/model/
-  cp -r $SUB_DIR/db internal/core/
+  cp -r $SUB_DIR/postgresql/scripts .
+  cp -r $SUB_DIR/postgresql/dao internal/model/
+  cp -r $SUB_DIR/postgresql/db internal/core/
+fi
+
+if [ $DB = "mysql" ]; then
+  rm -r scripts
+  cp -r $SUB_DIR/mysql/scripts .
+  cp -r $SUB_DIR/mysql/dao internal/model/
+  cp -r $SUB_DIR/mysql/db internal/core/
 fi
 
 #.goファイル内のgoatを全て置換

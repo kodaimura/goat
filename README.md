@@ -18,15 +18,10 @@ $ chmod +x [省略]/goat/bin/goat
 ## Usage
 
 ```
-$ goat <appname> [-db sqlite3 or pg]
+$ goat <appname> [-db sqlite3| pg | mysql]
 ```
 
-* オプションについては下記にも対応
 * オプションを省略した場合は sqlite3 が選択される
-```
- --db sqlite3 [pg]
- --db=sqlite3 [pg]
-```
 
 ## Setting
 ### appname/config/env 内のファイルを修正
@@ -37,22 +32,10 @@ $ goat <appname> [-db sqlite3 or pg]
 APP_HOST=localhost (必須)
 APP_PORT=3000      (必須)
 DB_NAME=           (必須)
-DB_HOST=localhost  (pg の場合必須)
-DB_PORT=5432       (pg の場合必須)
-DB_USER=           (pg の場合必須)
-DB_PASSWORD=       (pg の場合必須)
-JWT_SECRET_KEY=    (必須)
-```
-```
-# .env (本番環境用の設定ファイル)
-
-APP_HOST=          (必須) 
-APP_PORT=          (必須)
-DB_NAME=           (必須)
-DB_HOST=           (pg の場合必須)
-DB_PORT=           (pg の場合必須)
-DB_USER=           (pg の場合必須)
-DB_PASSWORD=       (pg の場合必須)
+DB_HOST=localhost
+DB_PORT=
+DB_USER=
+DB_PASSWORD=
 JWT_SECRET_KEY=    (必須)
 ```
 
@@ -61,22 +44,22 @@ JWT_SECRET_KEY=    (必須)
 
 ```
 appname/ 配下にファイル作成
-> sqlite3 [DB_NAME(←local.env)].db
+$ sqlite3 [DB_NAME].db
 
-DB_NAME> .read scripts/create-table.sql を実行
+DB_NAME> .read scripts/create-table.sql
 ```
 
 * postgresql
 ```
-> psql -d postgres
+$ psql -d postgres
 
-postgres=# CREATE DATABASE [DB_NAME(←local.env)]
+postgres=# CREATE DATABASE [DB_NAME]
 CREATE DATABASE
 
 postgres=# \c [DB_NAME]
 
-DB_NAME=# scripts/pg-create-function.sql を実行
-DB_NAME=# scripts/pg-create-table.sql を実行
+DB_NAME=# scripts/create-function.sql
+DB_NAME=# scripts/create-table.sql
 ```
 
 ### 実行
