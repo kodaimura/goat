@@ -8,26 +8,12 @@ import (
 )
 
 
-type UserDao interface {
-	SelectAll() ([]entity.User, error)
-	Select(id int) (entity.User, error)
-	Insert(u *entity.User) error
-	Update(id int, u *entity.User) error
-	Delete(id int) error
-	
-	/* 以降に追加 */
-	SelectByName(name string) (entity.User, error)
-	UpdatePassword(id int, password string) error
-	UpdateName(id int, name string) error
-}
-
-
 type userDao struct {
 	db *sql.DB
 }
 
 
-func NewUserDao() UserDao {
+func NewUserDao() *userDao {
 	db := db.GetDB()
 	return &userDao{db}
 }
@@ -67,7 +53,7 @@ func (rep *userDao) SelectAll() ([]entity.User, error) {
 }
 
 
-func (rep *userDao) Select(id int) (entity.User, error){
+func (rep *userDao) Select(u *entity.User) (entity.User, error){
 	var ret entity.User
 
 	err := rep.db.QueryRow(
@@ -78,7 +64,7 @@ func (rep *userDao) Select(id int) (entity.User, error){
 			updated_at 
 		 FROM users 
 		 WHERE user_id = $1`, 
-		 id,
+		 u.UserId,
 	).Scan(
 		&ret.UserId, 
 		&ret.UserName, 
@@ -103,7 +89,7 @@ func (rep *userDao) Insert(u *entity.User) error {
 }
 
 
-func (rep *userDao) Update(id int, u *entity.User) error {
+func (rep *userDao) Update(u *entity.User) error {
 	_, err := rep.db.Exec(
 		`UPDATE users 
 		 SET user_name = $1 
@@ -111,41 +97,41 @@ func (rep *userDao) Update(id int, u *entity.User) error {
 		 WHERE user_id = $3`,
 		u.UserName,
 		u.Password, 
-		id,
+		u.UserId,
 	)
 	return err
 }
 
 
-func (rep *userDao) Delete(id int) error {
+func (rep *userDao) Delete(u *entity.User) error {
 	_, err := rep.db.Exec(
 		`DELETE FROM users WHERE user_id = $1`, 
-		id,
+		u.UserId,
 	)
 
 	return err
 }
 
 
-func (rep *userDao) UpdatePassword(id int, password string) error {
+func (rep *userDao) UpdatePassword(u *entity.User) error {
 	_, err := rep.db.Exec(
 		`UPDATE users 
 		 SET password = $1 
 		 WHERE user_id = $2`, 
-		 password, 
-		 id,
+		 u.Password, 
+		 u.UserId,
 	)
 	return err
 }
 
 
-func (rep *userDao) UpdateName(id int, name string) error {
+func (rep *userDao) UpdateName(u *entity.User) error {
 	_, err := rep.db.Exec(
 		`UPDATE users
 		 SET user_name = $1 
 		 WHERE user_id = $2`, 
-		name, 
-		id,
+		u.UserName, 
+		u.UserId,
 	)
 	return err
 }

@@ -39,11 +39,13 @@ DB_PASSWORD=
 JWT_SECRET_KEY=    (必須)
 ```
 
+* sqlite3 の場合 DB_NAME にはdbファイルの絶対パスまたは、プロジェクトのルートフォルダからの相対パスを記載する。
+
 ### DB作成
 * sqlite3
 
 ```
-appname/ 配下にファイル作成
+任意の場所にdb作成
 $ sqlite3 [DB_NAME].db
 
 DB_NAME> .read scripts/create-table.sql
