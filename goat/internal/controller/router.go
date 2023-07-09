@@ -8,7 +8,7 @@ import (
 
 
 func SetRouter(r *gin.Engine) {
-	uc := newUserController()
+	uc := NewUserController()
 
 	//render HTML or redirect
 	r.GET("/signup", uc.signupPage)
@@ -20,7 +20,7 @@ func SetRouter(r *gin.Engine) {
 	//render HTML or redirect (Authorized request)
 	a := r.Group("/", jwt.JwtAuthMiddleware())
 	{
-		rc := newRootController()
+		rc := NewRootController()
 		
 		a.GET("/", rc.indexPage)
 	}
@@ -28,7 +28,7 @@ func SetRouter(r *gin.Engine) {
 	//response JSON
 	api := r.Group("/api")
 	{
-		uac := newUserApiController()
+		uac := NewUserApiController()
 
 		api.POST("/signup", uac.signup)
 		api.POST("/login", uac.login)

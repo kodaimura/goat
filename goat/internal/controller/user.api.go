@@ -12,11 +12,11 @@ import (
 
 
 type userApiController struct {
-	uServ service.UserService
+	uServ UserService
 }
 
 
-func newUserApiController() *userApiController {
+func NewUserApiController() *userApiController {
 	uServ := service.NewUserService()
 	return &userApiController{uServ}
 }

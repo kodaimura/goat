@@ -11,23 +11,24 @@ import (
 )
 
 
-type UserService interface {
-	Signup(username, password string) int
-	Login(username, password string) int
-	GenerateJWT(userId int) string
-	GetProfile(userId int) (entity.User, error)
-	ChangeUsername(userId int, username string) int
-	ChangePassword(userId int, password string) int
-	DeleteUser(userId int) int
+type UserDao interface {
+	SelectAll() ([]entity.User, error)
+	Select(u *entity.User) (entity.User, error)
+	Insert(u *entity.User) error
+	Update(u *entity.User) error
+	Delete(u *entity.User) error
+	UpdatePassword(u *entity.User) error
+	UpdateName(u *entity.User) error
+	SelectByName(name string) (entity.User, error)
 }
 
 
 type userService struct {
-	uDao dao.UserDao
+	uDao UserDao
 }
 
 
-func NewUserService() UserService {
+func NewUserService() *userService {
 	uDao := dao.NewUserDao()
 	return &userService{uDao}
 }
@@ -93,7 +94,9 @@ const GENERATE_JWT_FAILURE_STR = ""
 /*----------------------------------------*/
 
 func (serv *userService) GenerateJWT(userId int) string {
-	user, err := serv.uDao.Select(userId)
+	var user entity.User
+	user.UserId = userId
+	user, err := serv.uDao.Select(&user)
 	
 	if err != nil {
 		logger.LogError(err.Error())
@@ -115,7 +118,9 @@ func (serv *userService) GenerateJWT(userId int) string {
 
 
 func (serv *userService) GetProfile(userId int) (entity.User, error) {
-	user, err := serv.uDao.Select(userId)
+	var user entity.User
+	user.UserId = userId
+	user, err := serv.uDao.Select(&user)
 
 	if err != nil {
 		logger.LogError(err.Error())
@@ -131,7 +136,10 @@ const CHANGE_USERNAME_SUCCESS_INT = 0
 const CHANGE_USERNAME_FAILURE_INT = 1
 /*----------------------------------------*/
 func (serv *userService) ChangeUsername(userId int, username string) int {
-	err := serv.uDao.UpdateName(userId, username)
+	var user entity.User
+	user.UserId = userId
+	user.UserName = username
+	err := serv.uDao.UpdateName(&user)
 
 	if err != nil {
 		logger.LogError(err.Error())
@@ -155,7 +163,10 @@ func (serv *userService) ChangePassword(userId int, password string) int {
 		return CHANGE_PASSWORD_FAILURE_INT
 	}
 
-	err = serv.uDao.UpdatePassword(userId, string(hashed))
+	var user entity.User
+	user.UserId = userId
+	user.Password = string(hashed)
+	err = serv.uDao.UpdatePassword(&user)
 	
 	if err != nil {
 		logger.LogError(err.Error())
@@ -172,7 +183,9 @@ const DELETE_USER_SUCCESS_INT = 0
 const DELETE_USER_FAILURE_INT = 1
 /*----------------------------------------*/
 func (serv *userService) DeleteUser(userId int) int {
-	err := serv.uDao.Delete(userId)
+	var user entity.User
+	user.UserId = userId
+	err := serv.uDao.Delete(&user)
 
 	if err != nil {
 		logger.LogError(err.Error())

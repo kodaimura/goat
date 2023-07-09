@@ -6,15 +6,26 @@ import (
 	"goat/config"
 	"goat/internal/core/jwt"
 	"goat/internal/service"
+	"goat/internal/model/entity"
 )
 
 
+type UserService interface {
+	Signup(username, password string) int
+	Login(username, password string) int
+	GenerateJWT(userId int) string
+	GetProfile(userId int) (entity.User, error)
+	ChangeUsername(userId int, username string) int
+	ChangePassword(userId int, password string) int
+	DeleteUser(userId int) int
+}
+
 type userController struct {
-	uServ service.UserService
+	uServ UserService
 }
 
 
-func newUserController() *userController {
+func NewUserController() *userController {
 	uServ := service.NewUserService()
 	return &userController{uServ}
 }

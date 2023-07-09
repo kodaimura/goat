@@ -10,7 +10,7 @@ import (
 type rootController struct {}
 
 
-func newRootController() *rootController {
+func NewRootController() *rootController {
 	return &rootController{}
 }
 
