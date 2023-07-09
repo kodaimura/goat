@@ -32,18 +32,18 @@ func NewUserController() *userController {
 
 
 //GET /signup
-func (ctr *userController) signupPage(c *gin.Context) {
+func (ctr *userController) SignupPage(c *gin.Context) {
 	c.HTML(200, "signup.html", gin.H{})
 }
 
 //GET /login
-func (ctr *userController) loginPage(c *gin.Context) {
+func (ctr *userController) LoginPage(c *gin.Context) {
 	c.HTML(200, "login.html", gin.H{})
 }
 
 
 //POST /signup
-func (ctr *userController) signup(c *gin.Context) {
+func (ctr *userController) Signup(c *gin.Context) {
 	name := c.PostForm("user_name")
 	pass := c.PostForm("password")
 
@@ -66,7 +66,7 @@ func (ctr *userController) signup(c *gin.Context) {
 
 
 //POST /login
-func (ctr *userController) login(c *gin.Context) {
+func (ctr *userController) Login(c *gin.Context) {
 	name := c.PostForm("user_name")
 	pass := c.PostForm("password")
 
@@ -97,7 +97,7 @@ func (ctr *userController) login(c *gin.Context) {
 
 
 //GET /logout
-func (ctr *userController) logout(c *gin.Context) {
+func (ctr *userController) Logout(c *gin.Context) {
 	cf := config.GetConfig()
 	c.SetCookie(jwt.COOKIE_KEY_JWT, "", 0, "/", cf.AppHost, false, true)
 	c.Redirect(303, "/login")

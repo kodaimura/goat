@@ -11,18 +11,18 @@ func SetRouter(r *gin.Engine) {
 	uc := NewUserController()
 
 	//render HTML or redirect
-	r.GET("/signup", uc.signupPage)
-	r.GET("/login", uc.loginPage)
-	r.GET("/logout", uc.logout)
-	r.POST("/signup", uc.signup)
-	r.POST("/login", uc.login)
+	r.GET("/signup", uc.SignupPage)
+	r.GET("/login", uc.LoginPage)
+	r.GET("/logout", uc.Logout)
+	r.POST("/signup", uc.Signup)
+	r.POST("/login", uc.Login)
 
 	//render HTML or redirect (Authorized request)
 	a := r.Group("/", jwt.JwtAuthMiddleware())
 	{
 		rc := NewRootController()
 		
-		a.GET("/", rc.indexPage)
+		a.GET("/", rc.IndexPage)
 	}
 
 	//response JSON
@@ -30,20 +30,18 @@ func SetRouter(r *gin.Engine) {
 	{
 		uac := NewUserApiController()
 
-		api.POST("/signup", uac.signup)
-		api.POST("/login", uac.login)
-		api.GET("/logout", uac.logout)
+		api.POST("/signup", uac.Signup)
+		api.POST("/login", uac.Login)
+		api.GET("/logout", uac.Logout)
 
 
 		//response JSON (Authorized request)
 		a := api.Group("/", jwt.JwtAuthApiMiddleware())
 		{
-			a.GET("/profile", uac.getProfile)
-			a.PUT("/username", uac.changeUsername)
-			a.POST("/username", uac.changeUsername)
-			a.PUT("/password", uac.changePassword)
-			a.POST("/password", uac.changePassword)
-			a.DELETE("/account", uac.deleteUser)
+			a.GET("/profile", uac.GetProfile)
+			a.PUT("/username", uac.ChangeUsername)
+			a.PUT("/password", uac.ChangePassword)
+			a.DELETE("/account", uac.DeleteUser)
 		}
 	}
 }

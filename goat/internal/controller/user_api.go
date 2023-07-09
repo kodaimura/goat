@@ -23,7 +23,7 @@ func NewUserApiController() *userApiController {
 
 
 //GET /api/profile
-func (ctr *userApiController) getProfile(c *gin.Context) {
+func (ctr *userApiController) GetProfile(c *gin.Context) {
 	user, err := ctr.uServ.GetProfile(jwt.GetUserId(c))
 
 	if err != nil {
@@ -36,8 +36,8 @@ func (ctr *userApiController) getProfile(c *gin.Context) {
 }
 
 
-//PUT[POST] /api/password
-func (ctr *userApiController) changePassword(c *gin.Context) {
+//PUT /api/password
+func (ctr *userApiController) ChangePassword(c *gin.Context) {
 	userId := jwt.GetUserId(c)
 
 	m := map[string]string{}
@@ -54,8 +54,8 @@ func (ctr *userApiController) changePassword(c *gin.Context) {
 }
 
 
-//PUT[POST] /api/username
-func (ctr *userApiController) changeUsername(c *gin.Context) {
+//PUT /api/username
+func (ctr *userApiController) ChangeUsername(c *gin.Context) {
 	userId := jwt.GetUserId(c)
 
 	m := map[string]string{}
@@ -73,7 +73,7 @@ func (ctr *userApiController) changeUsername(c *gin.Context) {
 
 
 //DELETE /api/account
-func (ctr *userApiController) deleteUser(c *gin.Context) {
+func (ctr *userApiController) DeleteUser(c *gin.Context) {
 	userId := jwt.GetUserId(c)
 
 	if ctr.uServ.DeleteUser(userId) != service.DELETE_USER_SUCCESS_INT {
@@ -87,7 +87,7 @@ func (ctr *userApiController) deleteUser(c *gin.Context) {
 
 
 //POST /api/signup
-func (ctr *userApiController) signup(c *gin.Context) {
+func (ctr *userApiController) Signup(c *gin.Context) {
 	m := map[string]string{}
 	c.BindJSON(&m)
 	name := m["user_name"]
@@ -112,7 +112,7 @@ func (ctr *userApiController) signup(c *gin.Context) {
 
 
 //POST /api/login
-func (ctr *userApiController) login(c *gin.Context) {
+func (ctr *userApiController) Login(c *gin.Context) {
 	m := map[string]string{}
 	c.BindJSON(&m)
 	name := m["user_name"]
@@ -147,7 +147,7 @@ func (ctr *userApiController) login(c *gin.Context) {
 
 
 //GET /api/logout
-func (ctr *userApiController) logout(c *gin.Context) {
+func (ctr *userApiController) Logout(c *gin.Context) {
 	cf := config.GetConfig()
 	c.SetCookie(jwt.COOKIE_KEY_JWT, "", 0, "/", cf.AppHost, false, true)
 	c.JSON(200, gin.H{})
