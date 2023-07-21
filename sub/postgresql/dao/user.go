@@ -24,8 +24,8 @@ func (rep *userDao) SelectAll() ([]entity.User, error) {
 
 	rows, err := rep.db.Query(
 		`SELECT 
-			user_id, 
-			user_name, 
+			id, 
+			username, 
 			created_at, 
 			updated_at 
 		 FROM users`,
@@ -39,7 +39,7 @@ func (rep *userDao) SelectAll() ([]entity.User, error) {
 		u := entity.User{}
 		err = rows.Scan(
 			&u.UserId, 
-			&u.UserName,
+			&u.Username,
 			&u.CreatedAt, 
 			&u.UpdatedAt,
 		)
@@ -58,16 +58,16 @@ func (rep *userDao) Select(u *entity.User) (entity.User, error){
 
 	err := rep.db.QueryRow(
 		`SELECT 
-			user_id, 
-			user_name, 
+			id, 
+			username, 
 			created_at, 
 			updated_at 
 		 FROM users 
-		 WHERE user_id = $1`, 
+		 WHERE id = $1`, 
 		 u.UserId,
 	).Scan(
 		&ret.UserId, 
-		&ret.UserName, 
+		&ret.Username, 
 		&ret.CreatedAt, 
 		&ret.UpdatedAt,
 	)
@@ -79,10 +79,10 @@ func (rep *userDao) Select(u *entity.User) (entity.User, error){
 func (rep *userDao) Insert(u *entity.User) error {
 	_, err := rep.db.Exec(
 		`INSERT INTO users (
-			user_name, 
+			username, 
 			password
 		 ) VALUES($1,$2)`,
-		u.UserName, 
+		u.Username, 
 		u.Password,
 	)
 	return err
@@ -92,10 +92,10 @@ func (rep *userDao) Insert(u *entity.User) error {
 func (rep *userDao) Update(u *entity.User) error {
 	_, err := rep.db.Exec(
 		`UPDATE users 
-		 SET user_name = $1 
+		 SET username = $1 
 			  password = $2
-		 WHERE user_id = $3`,
-		u.UserName,
+		 WHERE id = $3`,
+		u.Username,
 		u.Password, 
 		u.UserId,
 	)
@@ -105,7 +105,7 @@ func (rep *userDao) Update(u *entity.User) error {
 
 func (rep *userDao) Delete(u *entity.User) error {
 	_, err := rep.db.Exec(
-		`DELETE FROM users WHERE user_id = $1`, 
+		`DELETE FROM users WHERE id = $1`, 
 		u.UserId,
 	)
 
@@ -117,7 +117,7 @@ func (rep *userDao) UpdatePassword(u *entity.User) error {
 	_, err := rep.db.Exec(
 		`UPDATE users 
 		 SET password = $1 
-		 WHERE user_id = $2`, 
+		 WHERE id = $2`, 
 		 u.Password, 
 		 u.UserId,
 	)
@@ -128,9 +128,9 @@ func (rep *userDao) UpdatePassword(u *entity.User) error {
 func (rep *userDao) UpdateName(u *entity.User) error {
 	_, err := rep.db.Exec(
 		`UPDATE users
-		 SET user_name = $1 
-		 WHERE user_id = $2`, 
-		u.UserName, 
+		 SET username = $1 
+		 WHERE id = $2`, 
+		u.Username, 
 		u.UserId,
 	)
 	return err
@@ -142,17 +142,17 @@ func (rep *userDao) SelectByName(name string) (entity.User, error) {
 
 	err := rep.db.QueryRow(
 		`SELECT 
-			user_id, 
-			user_name, 
+			id, 
+			username, 
 			password, 
 			created_at, 
 			updated_at 
 		 FROM users 
-		 WHERE user_name = $1`, 
+		 WHERE username = $1`, 
 		 name,
 	).Scan(
 		&ret.UserId, 
-		&ret.UserName, 
+		&ret.Username, 
 		&ret.Password, 
 		&ret.CreatedAt, 
 		&ret.UpdatedAt,

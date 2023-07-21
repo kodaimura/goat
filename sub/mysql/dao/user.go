@@ -24,8 +24,8 @@ func (rep *userDao) SelectAll() ([]entity.User, error) {
 
 	rows, err := rep.db.Query(
 		`SELECT 
-			user_id, 
-			user_name, 
+			id, 
+			username, 
 			created_at, 
 			updated_at 
 		 FROM users`,
@@ -39,7 +39,7 @@ func (rep *userDao) SelectAll() ([]entity.User, error) {
 		u := entity.User{}
 		err = rows.Scan(
 			&u.UserId, 
-			&u.UserName,
+			&u.Username,
 			&u.CreatedAt, 
 			&u.UpdatedAt,
 		)
@@ -58,8 +58,8 @@ func (rep *userDao) Select(u *entity.User) (entity.User, error){
 
 	err := rep.db.QueryRow(
 		`SELECT 
-			user_id, 
-			user_name, 
+			id, 
+			username, 
 			created_at, 
 			updated_at 
 		 FROM users 
