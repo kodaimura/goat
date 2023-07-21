@@ -1,14 +1,21 @@
 package service
 
 import (
+	"fmt"
+
 	"golang.org/x/crypto/bcrypt"
 
 	"goat/internal/core/jwt"
-	
 	"goat/internal/core/logger"
 	"goat/internal/model/entity"
 	"goat/internal/model/dao"
 )
+
+type SignupConflictError struct {}
+
+func (e *SignupConflictError) Error() string {
+	return fmt.Sprintf("SignupConflictError")
+}
 
 
 type UserDao interface {
@@ -34,25 +41,18 @@ func NewUserService() *userService {
 }
 
 
-// Signup() Return value
-/*----------------------------------------*/
-const SIGNUP_SUCCESS_INT = 0
-const SIGNUP_CONFLICT_INT = 1
-const SIGNUP_ERROR_INT = 2
-/*----------------------------------------*/
-
-func (serv *userService) Signup(username, password string) int {
+func (serv *userService) Signup(username, password string) error {
 	_, err := serv.uDao.SelectByName(username)
 
 	if err == nil {
-		return SIGNUP_CONFLICT_INT
+		return &SignupConflictError{}
 	}
 
 	hashed, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 
 	if err != nil {
 		logger.LogError(err.Error())
-		return SIGNUP_ERROR_INT
+		return err
 	}
 
 	var user entity.User
@@ -63,44 +63,31 @@ func (serv *userService) Signup(username, password string) int {
 
 	if err != nil {
 		logger.LogError(err.Error())
-		return SIGNUP_ERROR_INT
 	}
 
-	return SIGNUP_SUCCESS_INT
+	return err
 }
 
 
-// Login() Return value
-/*----------------------------------------*/
-const LOGIN_FAILURE_INT = -1
-// 正常時: ユーザ識別ID
-/*----------------------------------------*/
-
-func (serv *userService) Login(username, password string) int {
+func (serv *userService) Login(username, password string) (entity.User, error) {
 	user, err := serv.uDao.SelectByName(username)
 
 	if err != nil || bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)) != nil {
-		return LOGIN_FAILURE_INT
+		return entity.User{}, err
 	}
 
-	return user.UserId
+	return user, nil
 }
 
 
-// GenerateJWT() Return value
-/*----------------------------------------*/
-const GENERATE_JWT_FAILURE_STR = ""
-// 正常時: jwt文字列
-/*----------------------------------------*/
-
-func (serv *userService) GenerateJWT(userId int) string {
+func (serv *userService) GenerateJWT(userId int) (string, error) {
 	var user entity.User
 	user.UserId = userId
 	user, err := serv.uDao.Select(&user)
 	
 	if err != nil {
 		logger.LogError(err.Error())
-		return GENERATE_JWT_FAILURE_STR
+		return "", err
 	}
 
 	var cc jwt.CustomClaims
@@ -110,10 +97,10 @@ func (serv *userService) GenerateJWT(userId int) string {
 
 	if err != nil {
 		logger.LogError(err.Error())
-		return GENERATE_JWT_FAILURE_STR
+		return "", err
 	}
 
-	return jwtStr
+	return jwtStr, nil
 }
 
 
@@ -130,12 +117,7 @@ func (serv *userService) GetProfile(userId int) (entity.User, error) {
 }
 
 
-// ChangeUsername() Return value
-/*----------------------------------------*/
-const CHANGE_USERNAME_SUCCESS_INT = 0
-const CHANGE_USERNAME_FAILURE_INT = 1
-/*----------------------------------------*/
-func (serv *userService) ChangeUsername(userId int, username string) int {
+func (serv *userService) ChangeUsername(userId int, username string) error {
 	var user entity.User
 	user.UserId = userId
 	user.UserName = username
@@ -143,24 +125,18 @@ func (serv *userService) ChangeUsername(userId int, username string) int {
 
 	if err != nil {
 		logger.LogError(err.Error())
-		return CHANGE_USERNAME_FAILURE_INT
 	}
 
-	return CHANGE_USERNAME_SUCCESS_INT
+	return err
 }
 
 
-// ChangePassword() Return value
-/*----------------------------------------*/
-const CHANGE_PASSWORD_SUCCESS_INT = 0
-const CHANGE_PASSWORD_FAILURE_INT = 1
-/*----------------------------------------*/
-func (serv *userService) ChangePassword(userId int, password string) int {
+func (serv *userService) ChangePassword(userId int, password string) error {
 	hashed, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 
 	if err != nil {
 		logger.LogError(err.Error())
-		return CHANGE_PASSWORD_FAILURE_INT
+		return err
 	}
 
 	var user entity.User
@@ -170,27 +146,20 @@ func (serv *userService) ChangePassword(userId int, password string) int {
 	
 	if err != nil {
 		logger.LogError(err.Error())
-		return CHANGE_PASSWORD_FAILURE_INT
 	}
 
-	return CHANGE_PASSWORD_SUCCESS_INT
+	return err
 }
 
 
-// DeleteUser() Return value
-/*----------------------------------------*/
-const DELETE_USER_SUCCESS_INT = 0
-const DELETE_USER_FAILURE_INT = 1
-/*----------------------------------------*/
-func (serv *userService) DeleteUser(userId int) int {
+func (serv *userService) DeleteUser(userId int) error {
 	var user entity.User
 	user.UserId = userId
 	err := serv.uDao.Delete(&user)
 
 	if err != nil {
 		logger.LogError(err.Error())
-		return DELETE_USER_FAILURE_INT
 	}
 
-	return DELETE_USER_SUCCESS_INT
+	return err
 }

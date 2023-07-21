@@ -23,25 +23,10 @@ func SetRouter(r *gin.Engine) {
 		rc := NewRootController()
 		
 		a.GET("/", rc.IndexPage)
-	}
 
-	//response JSON
-	api := r.Group("/api")
-	{
-		uac := NewUserApiController()
-
-		api.POST("/signup", uac.Signup)
-		api.POST("/login", uac.Login)
-		api.GET("/logout", uac.Logout)
-
-
-		//response JSON (Authorized request)
-		a := api.Group("/", jwt.JwtAuthApiMiddleware())
-		{
-			a.GET("/profile", uac.GetProfile)
-			a.PUT("/username", uac.ChangeUsername)
-			a.PUT("/password", uac.ChangePassword)
-			a.DELETE("/account", uac.DeleteUser)
-		}
+		a.GET("/api/account/profile", uc.GetAccountProfile)
+		a.PUT("/api/account/username", uc.ChangeUsername)
+		a.PUT("/api/account/password", uc.ChangePassword)
+		a.DELETE("/api/account", uc.DeleteAccount)
 	}
 }

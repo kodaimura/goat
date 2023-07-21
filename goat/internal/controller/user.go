@@ -11,13 +11,13 @@ import (
 
 
 type UserService interface {
-	Signup(username, password string) int
-	Login(username, password string) int
-	GenerateJWT(userId int) string
+	Signup(username, password string) error
+	Login(username, password string) (entity.User, error)
+	GenerateJWT(userId int) (string, error)
 	GetProfile(userId int) (entity.User, error)
-	ChangeUsername(userId int, username string) int
-	ChangePassword(userId int, password string) int
-	DeleteUser(userId int) int
+	ChangeUsername(userId int, username string) error
+	ChangePassword(userId int, password string) error
+	DeleteUser(userId int) error
 }
 
 type userController struct {
@@ -47,21 +47,23 @@ func (ctr *userController) Signup(c *gin.Context) {
 	name := c.PostForm("user_name")
 	pass := c.PostForm("password")
 
-	result := ctr.uServ.Signup(name, pass)
+	err := ctr.uServ.Signup(name, pass)
 
-	if result == service.SIGNUP_SUCCESS_INT {
-		c.Redirect(303, "/login")
-
-	} else if result == service.SIGNUP_CONFLICT_INT {
-		c.HTML(409, "signup.html", gin.H{
-			"error": "Usernameが既に使われています。",
-		})
-
-	} else {
-		c.HTML(500, "signup.html", gin.H{
-			"error": "登録に失敗しました。",
-		})
+	if err != nil {
+		if _, ok := err.(*service.SignupConflictError); ok {
+			c.HTML(409, "signup.html", gin.H{
+				"error": "Usernameが既に使われています。",
+			})
+		} else {
+			c.HTML(500, "signup.html", gin.H{
+				"error": "登録に失敗しました。",
+			})
+		}
+		c.Abort()
+		return
 	}
+
+	c.Redirect(303, "/login")
 }
 
 
@@ -70,9 +72,9 @@ func (ctr *userController) Login(c *gin.Context) {
 	name := c.PostForm("user_name")
 	pass := c.PostForm("password")
 
-	userId := ctr.uServ.Login(name, pass)
+	user, err := ctr.uServ.Login(name, pass)
 
-	if userId == service.LOGIN_FAILURE_INT {
+	if err != nil {
 		c.HTML(401, "login.html", gin.H{
 			"error": "UserNameまたはPasswordが異なります。",
 		})
@@ -80,9 +82,9 @@ func (ctr *userController) Login(c *gin.Context) {
 		return
 	}
 
-	jwtStr := ctr.uServ.GenerateJWT(userId)
+	jwtStr, err := ctr.uServ.GenerateJWT(user.UserId)
 
-	if jwtStr == service.GENERATE_JWT_FAILURE_STR {
+	if err != nil {
 		c.HTML(500, "login.html", gin.H{
 			"error": "ログインに失敗しました。",
 		})
@@ -101,4 +103,68 @@ func (ctr *userController) Logout(c *gin.Context) {
 	cf := config.GetConfig()
 	c.SetCookie(jwt.COOKIE_KEY_JWT, "", 0, "/", cf.AppHost, false, true)
 	c.Redirect(303, "/login")
+}
+
+
+//GET /api/account/profile
+func (ctr *userController) GetAccountProfile(c *gin.Context) {
+	user, err := ctr.uServ.GetProfile(jwt.GetUserId(c))
+
+	if err != nil {
+		c.JSON(500, gin.H{})
+		c.Abort()
+		return
+	}
+
+	c.JSON(200, user)
+}
+
+
+//PUT /api/account/password
+func (ctr *userController) ChangePassword(c *gin.Context) {
+	userId := jwt.GetUserId(c)
+
+	m := map[string]string{}
+	c.BindJSON(&m)
+	pass := m["password"]
+
+	if ctr.uServ.ChangePassword(userId, pass) != nil {
+		c.JSON(500, gin.H{"error": "登録に失敗しました。"})
+		c.Abort()
+		return
+	}
+
+	c.JSON(200, gin.H{})
+}
+
+
+//PUT /api/account/username
+func (ctr *userController) ChangeUsername(c *gin.Context) {
+	userId := jwt.GetUserId(c)
+
+	m := map[string]string{}
+	c.BindJSON(&m)
+	name := m["user_name"]
+
+	if ctr.uServ.ChangeUsername(userId, name) != nil {
+		c.JSON(500, gin.H{"error": "登録に失敗しました。"})
+		c.Abort()
+		return
+	}
+
+	c.JSON(200, gin.H{})
+}
+
+
+//DELETE /api/account
+func (ctr *userController) DeleteAccount(c *gin.Context) {
+	userId := jwt.GetUserId(c)
+
+	if ctr.uServ.DeleteUser(userId) != nil {
+		c.JSON(500, gin.H{"error": "削除に失敗しました。"})
+		c.Abort()
+		return
+	}
+
+	c.JSON(200, gin.H{})
 }
