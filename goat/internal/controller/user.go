@@ -13,11 +13,11 @@ import (
 type UserService interface {
 	Signup(username, password string) error
 	Login(username, password string) (entity.User, error)
-	GenerateJWT(userId int) (string, error)
-	GetProfile(userId int) (entity.User, error)
-	ChangeUsername(userId int, username string) error
-	ChangePassword(userId int, password string) error
-	DeleteUser(userId int) error
+	GenerateJWT(id int) (string, error)
+	GetProfile(id int) (entity.User, error)
+	ChangeUsername(id int, username string) error
+	ChangePassword(id int, password string) error
+	DeleteUser(id int) error
 }
 
 type userController struct {
@@ -44,7 +44,7 @@ func (ctr *userController) LoginPage(c *gin.Context) {
 
 //POST /signup
 func (ctr *userController) Signup(c *gin.Context) {
-	name := c.PostForm("user_name")
+	name := c.PostForm("username")
 	pass := c.PostForm("password")
 
 	err := ctr.uServ.Signup(name, pass)
@@ -69,7 +69,7 @@ func (ctr *userController) Signup(c *gin.Context) {
 
 //POST /login
 func (ctr *userController) Login(c *gin.Context) {
-	name := c.PostForm("user_name")
+	name := c.PostForm("username")
 	pass := c.PostForm("password")
 
 	user, err := ctr.uServ.Login(name, pass)
@@ -122,13 +122,13 @@ func (ctr *userController) GetAccountProfile(c *gin.Context) {
 
 //PUT /api/account/password
 func (ctr *userController) ChangePassword(c *gin.Context) {
-	userId := jwt.GetUserId(c)
+	id := jwt.GetUserId(c)
 
 	m := map[string]string{}
 	c.BindJSON(&m)
 	pass := m["password"]
 
-	if ctr.uServ.ChangePassword(userId, pass) != nil {
+	if ctr.uServ.ChangePassword(id, pass) != nil {
 		c.JSON(500, gin.H{"error": "登録に失敗しました。"})
 		c.Abort()
 		return
@@ -140,13 +140,13 @@ func (ctr *userController) ChangePassword(c *gin.Context) {
 
 //PUT /api/account/username
 func (ctr *userController) ChangeUsername(c *gin.Context) {
-	userId := jwt.GetUserId(c)
+	id := jwt.GetUserId(c)
 
 	m := map[string]string{}
 	c.BindJSON(&m)
-	name := m["user_name"]
+	name := m["username"]
 
-	if ctr.uServ.ChangeUsername(userId, name) != nil {
+	if ctr.uServ.ChangeUsername(id, name) != nil {
 		c.JSON(500, gin.H{"error": "登録に失敗しました。"})
 		c.Abort()
 		return
@@ -158,9 +158,9 @@ func (ctr *userController) ChangeUsername(c *gin.Context) {
 
 //DELETE /api/account
 func (ctr *userController) DeleteAccount(c *gin.Context) {
-	userId := jwt.GetUserId(c)
+	id := jwt.GetUserId(c)
 
-	if ctr.uServ.DeleteUser(userId) != nil {
+	if ctr.uServ.DeleteUser(id) != nil {
 		c.JSON(500, gin.H{"error": "削除に失敗しました。"})
 		c.Abort()
 		return

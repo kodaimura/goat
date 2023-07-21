@@ -17,7 +17,7 @@ func NewRootController() *rootController {
 
 //GET /
 func (ctr *rootController) IndexPage(c *gin.Context) {
-	username := jwt.GetUserName(c)
+	username := jwt.GetUsername(c)
 
 	c.HTML(200, "index.html", gin.H{
 		"username": username,

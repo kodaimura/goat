@@ -56,7 +56,7 @@ func (serv *userService) Signup(username, password string) error {
 	}
 
 	var user entity.User
-	user.UserName = username
+	user.Username = username
 	user.Password = string(hashed)
 
 	err = serv.uDao.Insert(&user)
@@ -80,9 +80,9 @@ func (serv *userService) Login(username, password string) (entity.User, error) {
 }
 
 
-func (serv *userService) GenerateJWT(userId int) (string, error) {
+func (serv *userService) GenerateJWT(id int) (string, error) {
 	var user entity.User
-	user.UserId = userId
+	user.UserId = id
 	user, err := serv.uDao.Select(&user)
 	
 	if err != nil {
@@ -92,7 +92,7 @@ func (serv *userService) GenerateJWT(userId int) (string, error) {
 
 	var cc jwt.CustomClaims
 	cc.UserId = user.UserId
-	cc.UserName = user.UserName
+	cc.Username = user.Username
 	jwtStr, err := jwt.GenerateJWT(cc)
 
 	if err != nil {
@@ -104,9 +104,9 @@ func (serv *userService) GenerateJWT(userId int) (string, error) {
 }
 
 
-func (serv *userService) GetProfile(userId int) (entity.User, error) {
+func (serv *userService) GetProfile(id int) (entity.User, error) {
 	var user entity.User
-	user.UserId = userId
+	user.UserId = id
 	user, err := serv.uDao.Select(&user)
 
 	if err != nil {
@@ -117,10 +117,10 @@ func (serv *userService) GetProfile(userId int) (entity.User, error) {
 }
 
 
-func (serv *userService) ChangeUsername(userId int, username string) error {
+func (serv *userService) ChangeUsername(id int, username string) error {
 	var user entity.User
-	user.UserId = userId
-	user.UserName = username
+	user.UserId = id
+	user.Username = username
 	err := serv.uDao.UpdateName(&user)
 
 	if err != nil {
@@ -131,7 +131,7 @@ func (serv *userService) ChangeUsername(userId int, username string) error {
 }
 
 
-func (serv *userService) ChangePassword(userId int, password string) error {
+func (serv *userService) ChangePassword(id int, password string) error {
 	hashed, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 
 	if err != nil {
@@ -140,7 +140,7 @@ func (serv *userService) ChangePassword(userId int, password string) error {
 	}
 
 	var user entity.User
-	user.UserId = userId
+	user.UserId = id
 	user.Password = string(hashed)
 	err = serv.uDao.UpdatePassword(&user)
 	
@@ -152,9 +152,9 @@ func (serv *userService) ChangePassword(userId int, password string) error {
 }
 
 
-func (serv *userService) DeleteUser(userId int) error {
+func (serv *userService) DeleteUser(id int) error {
 	var user entity.User
-	user.UserId = userId
+	user.UserId = id
 	err := serv.uDao.Delete(&user)
 
 	if err != nil {
