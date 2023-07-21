@@ -52,7 +52,7 @@ func (ctr *userController) Signup(c *gin.Context) {
 	if err != nil {
 		if _, ok := err.(*service.SignupConflictError); ok {
 			c.HTML(409, "signup.html", gin.H{
-				"error": "Usernameが既に使われています。",
+				"error": "ユーザ名が既に使われています。",
 			})
 		} else {
 			c.HTML(500, "signup.html", gin.H{
@@ -76,7 +76,7 @@ func (ctr *userController) Login(c *gin.Context) {
 
 	if err != nil {
 		c.HTML(401, "login.html", gin.H{
-			"error": "UserNameまたはPasswordが異なります。",
+			"error": "ユーザ名またはパスワードが異なります。",
 		})
 		c.Abort()
 		return
