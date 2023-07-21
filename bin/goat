@@ -47,7 +47,6 @@ mv cmd/goat cmd/$APP_NAME
 cp -r $GOAT_DIR/config .
 cp -r $GOAT_DIR/docs .
 cp -r $GOAT_DIR/internal .
-cp -r $GOAT_DIR/pkg .
 cp -r $GOAT_DIR/scripts .
 cp -r $GOAT_DIR/web .
 

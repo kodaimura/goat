@@ -4,6 +4,7 @@ import (
 	"strconv"
 )
 
+
 func AtoiSlice(sl []string) ([]int, error) {
 	isl := make([]int, len(sl))
 	for i, v := range sl {
@@ -25,3 +26,15 @@ func ItoaSlice(sl []int) []string {
 
 	return asl
 } 
+
+
+func RandomString(length int) string {
+	charset := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	rand.Seed(time.Now().UnixNano())
+
+	b := make([]byte, length)
+	for i := range b {
+		b[i] = charset[rand.Intn(len(charset))]
+	}
+	return string(b)
+}
