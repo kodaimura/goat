@@ -31,7 +31,7 @@ func NewUserService() *UserService {
 
 
 func (us *UserService) Signup(username, password string) error {
-	_, err := us.userRepository.SelectByName(username)
+	_, err := us.userRepository.GetByName(username)
 
 	if err == nil {
 		return &SignupConflictError{}
@@ -59,7 +59,7 @@ func (us *UserService) Signup(username, password string) error {
 
 
 func (us *UserService) Login(username, password string) (model.User, error) {
-	user, err := us.userRepository.SelectByName(username)
+	user, err := us.userRepository.GetByName(username)
 
 	if err != nil || bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)) != nil {
 		return model.User{}, err
@@ -70,9 +70,7 @@ func (us *UserService) Login(username, password string) (model.User, error) {
 
 
 func (us *UserService) GenerateJWT(id int) (string, error) {
-	var user model.User
-	user.UserId = id
-	user, err := us.userRepository.Select(&user)
+	user, err := us.userRepository.GetById(id)
 	
 	if err != nil {
 		logger.Error(err.Error())
@@ -94,9 +92,7 @@ func (us *UserService) GenerateJWT(id int) (string, error) {
 
 
 func (us *UserService) GetProfile(id int) (model.User, error) {
-	var user model.User
-	user.UserId = id
-	user, err := us.userRepository.Select(&user)
+	user, err := us.userRepository.GetById(id)
 
 	if err != nil {
 		logger.Error(err.Error())

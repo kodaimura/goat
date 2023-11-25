@@ -19,7 +19,7 @@ func NewUserRepository() *UserRepository {
 }
 
 
-func (ur *UserRepository) SelectAll() ([]model.User, error) {
+func (ur *UserRepository) Get() ([]model.User, error) {
 	var ret []model.User
 
 	rows, err := ur.db.Query(
@@ -53,7 +53,7 @@ func (ur *UserRepository) SelectAll() ([]model.User, error) {
 }
 
 
-func (ur *UserRepository) Select(u *model.User) (model.User, error){
+func (ur *UserRepository) GetById(id int) (model.User, error){
 	var ret model.User
 
 	err := ur.db.QueryRow(
@@ -64,7 +64,7 @@ func (ur *UserRepository) Select(u *model.User) (model.User, error){
 			updated_at 
 		 FROM users 
 		 WHERE id = ?`, 
-		 u.UserId,
+		 id,
 	).Scan(
 		&ret.UserId, 
 		&ret.Username, 
@@ -93,7 +93,7 @@ func (ur *UserRepository) Update(u *model.User) error {
 	_, err := ur.db.Exec(
 		`UPDATE users 
 		 SET username = ? 
-			  password = ?
+			 password = ?
 		 WHERE id = ?`,
 		u.Username,
 		u.Password, 
@@ -137,7 +137,7 @@ func (ur *UserRepository) UpdateName(u *model.User) error {
 }
 
 
-func (ur *UserRepository) SelectByName(name string) (model.User, error) {
+func (ur *UserRepository) GetByName(name string) (model.User, error) {
 	var ret model.User
 
 	err := ur.db.QueryRow(
