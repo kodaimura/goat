@@ -22,7 +22,7 @@ func init() {
 		"mysql",
 		fmt.Sprintf(
 			"%s:%s@tcp(%s:%s)/%s",
-			cf.DbUser, cf.DbPassword, cf.DbHost, cf.DbPort, cf.DbName,
+			cf.DBUser, cf.DBPass, cf.DBHost, cf.DBPort, cf.DBName,
 		),
 	)
 
