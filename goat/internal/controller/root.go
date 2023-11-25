@@ -7,16 +7,16 @@ import (
 )
 
 
-type rootController struct {}
+type RootController struct {}
 
 
-func NewRootController() *rootController {
-	return &rootController{}
+func NewRootController() *RootController {
+	return &RootController{}
 }
 
 
 //GET /
-func (ctr *rootController) IndexPage(c *gin.Context) {
+func (rc *RootController) IndexPage(c *gin.Context) {
 	username := jwt.GetUsername(c)
 
 	c.HTML(200, "index.html", gin.H{

@@ -17,7 +17,7 @@ func init() {
 
 	cf := config.GetConfig()
 
-	db, err = sql.Open("sqlite3", cf.DbName)
+	db, err = sql.Open("sqlite3", cf.DBName)
 
 	if err != nil {
 		log.Panic(err)

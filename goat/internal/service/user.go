@@ -7,8 +7,8 @@ import (
 
 	"goat/internal/core/jwt"
 	"goat/internal/core/logger"
-	"goat/internal/model/entity"
-	"goat/internal/model/dao"
+	"goat/internal/model"
+	"goat/internal/repository"
 )
 
 type SignupConflictError struct {}
@@ -18,31 +18,20 @@ func (e *SignupConflictError) Error() string {
 }
 
 
-type UserDao interface {
-	SelectAll() ([]entity.User, error)
-	Select(u *entity.User) (entity.User, error)
-	Insert(u *entity.User) error
-	Update(u *entity.User) error
-	Delete(u *entity.User) error
-	UpdatePassword(u *entity.User) error
-	UpdateName(u *entity.User) error
-	SelectByName(name string) (entity.User, error)
+type UserService struct {
+	userRepository *dao.UserRepository
 }
 
 
-type userService struct {
-	uDao UserDao
+func NewUserService() *UserService {
+	return &UserService{
+		userRepository: dao.NewUserRepository(),
+	}
 }
 
 
-func NewUserService() *userService {
-	uDao := dao.NewUserDao()
-	return &userService{uDao}
-}
-
-
-func (serv *userService) Signup(username, password string) error {
-	_, err := serv.uDao.SelectByName(username)
+func (us *UserService) Signup(username, password string) error {
+	_, err := us.userRepository.GetByName(username)
 
 	if err == nil {
 		return &SignupConflictError{}
@@ -51,42 +40,40 @@ func (serv *userService) Signup(username, password string) error {
 	hashed, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 
 	if err != nil {
-		logger.LogError(err.Error())
+		logger.Error(err.Error())
 		return err
 	}
 
-	var user entity.User
+	var user model.User
 	user.Username = username
 	user.Password = string(hashed)
 
-	err = serv.uDao.Insert(&user)
+	err = us.userRepository.Insert(&user)
 
 	if err != nil {
-		logger.LogError(err.Error())
+		logger.Error(err.Error())
 	}
 
 	return err
 }
 
 
-func (serv *userService) Login(username, password string) (entity.User, error) {
-	user, err := serv.uDao.SelectByName(username)
+func (us *UserService) Login(username, password string) (model.User, error) {
+	user, err := us.userRepository.GetByName(username)
 
 	if err != nil || bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)) != nil {
-		return entity.User{}, err
+		return model.User{}, err
 	}
 
 	return user, nil
 }
 
 
-func (serv *userService) GenerateJWT(id int) (string, error) {
-	var user entity.User
-	user.UserId = id
-	user, err := serv.uDao.Select(&user)
+func (us *UserService) GenerateJWT(id int) (string, error) {
+	user, err := us.userRepository.GetById(id)
 	
 	if err != nil {
-		logger.LogError(err.Error())
+		logger.Error(err.Error())
 		return "", err
 	}
 
@@ -96,7 +83,7 @@ func (serv *userService) GenerateJWT(id int) (string, error) {
 	jwtStr, err := jwt.GenerateJWT(cc)
 
 	if err != nil {
-		logger.LogError(err.Error())
+		logger.Error(err.Error())
 		return "", err
 	}
 
@@ -104,61 +91,59 @@ func (serv *userService) GenerateJWT(id int) (string, error) {
 }
 
 
-func (serv *userService) GetProfile(id int) (entity.User, error) {
-	var user entity.User
-	user.UserId = id
-	user, err := serv.uDao.Select(&user)
+func (us *UserService) GetProfile(id int) (model.User, error) {
+	user, err := us.userRepository.GetById(id)
 
 	if err != nil {
-		logger.LogError(err.Error())
+		logger.Error(err.Error())
 	}
 
 	return user, err
 }
 
 
-func (serv *userService) ChangeUsername(id int, username string) error {
-	var user entity.User
+func (us *UserService) ChangeUsername(id int, username string) error {
+	var user model.User
 	user.UserId = id
 	user.Username = username
-	err := serv.uDao.UpdateName(&user)
+	err := us.userRepository.UpdateName(&user)
 
 	if err != nil {
-		logger.LogError(err.Error())
+		logger.Error(err.Error())
 	}
 
 	return err
 }
 
 
-func (serv *userService) ChangePassword(id int, password string) error {
+func (us *UserService) ChangePassword(id int, password string) error {
 	hashed, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 
 	if err != nil {
-		logger.LogError(err.Error())
+		logger.Error(err.Error())
 		return err
 	}
 
-	var user entity.User
+	var user model.User
 	user.UserId = id
 	user.Password = string(hashed)
-	err = serv.uDao.UpdatePassword(&user)
+	err = us.userRepository.UpdatePassword(&user)
 	
 	if err != nil {
-		logger.LogError(err.Error())
+		logger.Error(err.Error())
 	}
 
 	return err
 }
 
 
-func (serv *userService) DeleteUser(id int) error {
-	var user entity.User
+func (us *UserService) DeleteUser(id int) error {
+	var user model.User
 	user.UserId = id
-	err := serv.uDao.Delete(&user)
+	err := us.userRepository.Delete(&user)
 
 	if err != nil {
-		logger.LogError(err.Error())
+		logger.Error(err.Error())
 	}
 
 	return err

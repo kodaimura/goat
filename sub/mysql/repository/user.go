@@ -4,25 +4,25 @@ import (
 	"database/sql"
 
 	"goat/internal/core/db"
-	"goat/internal/model/entity"
+	"goat/internal/model/model"
 )
 
 
-type userDao struct {
+type UserRepository struct {
 	db *sql.DB
 }
 
 
-func NewUserDao() *userDao {
+func NewUserRepository() *UserRepository {
 	db := db.GetDB()
-	return &userDao{db}
+	return &UserRepository{db}
 }
 
 
-func (rep *userDao) SelectAll() ([]entity.User, error) {
-	var ret []entity.User
+func (ur *UserRepository) Get() ([]model.User, error) {
+	var ret []model.User
 
-	rows, err := rep.db.Query(
+	rows, err := ur.db.Query(
 		`SELECT 
 			id, 
 			username, 
@@ -36,7 +36,7 @@ func (rep *userDao) SelectAll() ([]entity.User, error) {
 	}
 
 	for rows.Next() {
-		u := entity.User{}
+		u := model.User{}
 		err = rows.Scan(
 			&u.UserId, 
 			&u.Username,
@@ -53,10 +53,10 @@ func (rep *userDao) SelectAll() ([]entity.User, error) {
 }
 
 
-func (rep *userDao) Select(u *entity.User) (entity.User, error){
-	var ret entity.User
+func (ur *UserRepository) GetById(id int) (model.User, error){
+	var ret model.User
 
-	err := rep.db.QueryRow(
+	err := ur.db.QueryRow(
 		`SELECT 
 			id, 
 			username, 
@@ -64,10 +64,10 @@ func (rep *userDao) Select(u *entity.User) (entity.User, error){
 			updated_at 
 		 FROM users 
 		 WHERE id = ?`, 
-		 u.UserId,
+		 id,
 	).Scan(
 		&ret.UserId, 
-		&ret.Username, 
+		&ret.UserName, 
 		&ret.CreatedAt, 
 		&ret.UpdatedAt,
 	)
@@ -76,26 +76,26 @@ func (rep *userDao) Select(u *entity.User) (entity.User, error){
 }
 
 
-func (rep *userDao) Insert(u *entity.User) error {
-	_, err := rep.db.Exec(
+func (ur *UserRepository) Insert(u *model.User) error {
+	_, err := ur.db.Exec(
 		`INSERT INTO users (
 			username, 
 			password
 		 ) VALUES(?,?)`,
-		u.Username, 
+		u.UserName, 
 		u.Password,
 	)
 	return err
 }
 
 
-func (rep *userDao) Update(u *entity.User) error {
-	_, err := rep.db.Exec(
+func (ur *UserRepository) Update(u *model.User) error {
+	_, err := ur.db.Exec(
 		`UPDATE users 
 		 SET username = ? 
 			  password = ?
 		 WHERE id = ?`,
-		u.Username,
+		u.UserName,
 		u.Password, 
 		u.UserId,
 	)
@@ -103,8 +103,8 @@ func (rep *userDao) Update(u *entity.User) error {
 }
 
 
-func (rep *userDao) Delete(u *entity.User) error {
-	_, err := rep.db.Exec(
+func (ur *UserRepository) Delete(u *model.User) error {
+	_, err := ur.db.Exec(
 		`DELETE FROM users WHERE id = ?`, 
 		u.UserId,
 	)
@@ -113,8 +113,8 @@ func (rep *userDao) Delete(u *entity.User) error {
 }
 
 
-func (rep *userDao) UpdatePassword(u *entity.User) error {
-	_, err := rep.db.Exec(
+func (ur *UserRepository) UpdatePassword(u *model.User) error {
+	_, err := ur.db.Exec(
 		`UPDATE users 
 		 SET password = ? 
 		 WHERE id = ?`, 
@@ -125,22 +125,22 @@ func (rep *userDao) UpdatePassword(u *entity.User) error {
 }
 
 
-func (rep *userDao) UpdateName(u *entity.User) error {
-	_, err := rep.db.Exec(
+func (ur *UserRepository) UpdateName(u *model.User) error {
+	_, err := ur.db.Exec(
 		`UPDATE users
 		 SET username = ? 
 		 WHERE id = ?`, 
-		u.Username, 
+		u.UserName, 
 		u.UserId,
 	)
 	return err
 }
 
 
-func (rep *userDao) SelectByName(name string) (entity.User, error) {
-	var ret entity.User
+func (ur *UserRepository) GetByName(name string) (model.User, error) {
+	var ret model.User
 
-	err := rep.db.QueryRow(
+	err := ur.db.QueryRow(
 		`SELECT 
 			id, 
 			username, 
@@ -152,7 +152,7 @@ func (rep *userDao) SelectByName(name string) (entity.User, error) {
 		 name,
 	).Scan(
 		&ret.UserId, 
-		&ret.Username, 
+		&ret.UserName, 
 		&ret.Password, 
 		&ret.CreatedAt, 
 		&ret.UpdatedAt,

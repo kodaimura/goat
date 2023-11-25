@@ -55,14 +55,14 @@ mkdir log
 if [ $DB = "pg" ]; then
   rm -r scripts
   cp -r $SUB_DIR/postgresql/scripts .
-  cp -r $SUB_DIR/postgresql/dao internal/model/
+  cp -r $SUB_DIR/postgresql/repository internal/
   cp -r $SUB_DIR/postgresql/db internal/core/
 fi
 
 if [ $DB = "mysql" ]; then
   rm -r scripts
   cp -r $SUB_DIR/mysql/scripts .
-  cp -r $SUB_DIR/mysql/dao internal/model/
+  cp -r $SUB_DIR/mysql/repository internal/
   cp -r $SUB_DIR/mysql/db internal/core/
 fi
 

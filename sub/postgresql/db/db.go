@@ -21,8 +21,8 @@ func init() {
 	db, err = sql.Open(
 		"postgres",
 		fmt.Sprintf(
-			"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-			cf.DbHost, cf.DbPort, cf.DbUser, cf.DbPassword, cf.DbName,
+			"host=%s port=%s user=%s password=%s DBName=%s sslmode=disable",
+			cf.DBHost, cf.DBPort, cf.DBUser, cf.DBPass, cf.DBName,
 		),
 	)
 
