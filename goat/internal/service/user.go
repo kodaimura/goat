@@ -40,7 +40,7 @@ func (us *UserService) Signup(username, password string) error {
 	hashed, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 
 	if err != nil {
-		logger.LogError(err.Error())
+		logger.Error(err.Error())
 		return err
 	}
 
@@ -51,7 +51,7 @@ func (us *UserService) Signup(username, password string) error {
 	err = us.userRepository.Insert(&user)
 
 	if err != nil {
-		logger.LogError(err.Error())
+		logger.Error(err.Error())
 	}
 
 	return err
@@ -75,7 +75,7 @@ func (us *UserService) GenerateJWT(id int) (string, error) {
 	user, err := us.userRepository.Select(&user)
 	
 	if err != nil {
-		logger.LogError(err.Error())
+		logger.Error(err.Error())
 		return "", err
 	}
 
@@ -85,7 +85,7 @@ func (us *UserService) GenerateJWT(id int) (string, error) {
 	jwtStr, err := jwt.GenerateJWT(cc)
 
 	if err != nil {
-		logger.LogError(err.Error())
+		logger.Error(err.Error())
 		return "", err
 	}
 
@@ -99,7 +99,7 @@ func (us *UserService) GetProfile(id int) (model.User, error) {
 	user, err := us.userRepository.Select(&user)
 
 	if err != nil {
-		logger.LogError(err.Error())
+		logger.Error(err.Error())
 	}
 
 	return user, err
@@ -113,7 +113,7 @@ func (us *UserService) ChangeUsername(id int, username string) error {
 	err := us.userRepository.UpdateName(&user)
 
 	if err != nil {
-		logger.LogError(err.Error())
+		logger.Error(err.Error())
 	}
 
 	return err
@@ -124,7 +124,7 @@ func (us *UserService) ChangePassword(id int, password string) error {
 	hashed, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 
 	if err != nil {
-		logger.LogError(err.Error())
+		logger.Error(err.Error())
 		return err
 	}
 
@@ -134,7 +134,7 @@ func (us *UserService) ChangePassword(id int, password string) error {
 	err = us.userRepository.UpdatePassword(&user)
 	
 	if err != nil {
-		logger.LogError(err.Error())
+		logger.Error(err.Error())
 	}
 
 	return err
@@ -147,7 +147,7 @@ func (us *UserService) DeleteUser(id int) error {
 	err := us.userRepository.Delete(&user)
 
 	if err != nil {
-		logger.LogError(err.Error())
+		logger.Error(err.Error())
 	}
 
 	return err
