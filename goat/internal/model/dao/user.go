@@ -8,18 +8,18 @@ import (
 )
 
 
-type userDao struct {
+type UserDao struct {
 	db *sql.DB
 }
 
 
-func NewUserDao() *userDao {
+func NewUserDao() *UserDao {
 	db := db.GetDB()
-	return &userDao{db}
+	return &UserDao{db}
 }
 
 
-func (rep *userDao) SelectAll() ([]entity.User, error) {
+func (rep *UserDao) SelectAll() ([]entity.User, error) {
 	var ret []entity.User
 
 	rows, err := rep.db.Query(
@@ -53,7 +53,7 @@ func (rep *userDao) SelectAll() ([]entity.User, error) {
 }
 
 
-func (rep *userDao) Select(u *entity.User) (entity.User, error){
+func (rep *UserDao) Select(u *entity.User) (entity.User, error){
 	var ret entity.User
 
 	err := rep.db.QueryRow(
@@ -76,7 +76,7 @@ func (rep *userDao) Select(u *entity.User) (entity.User, error){
 }
 
 
-func (rep *userDao) Insert(u *entity.User) error {
+func (rep *UserDao) Insert(u *entity.User) error {
 	_, err := rep.db.Exec(
 		`INSERT INTO users (
 			username, 
@@ -89,7 +89,7 @@ func (rep *userDao) Insert(u *entity.User) error {
 }
 
 
-func (rep *userDao) Update(u *entity.User) error {
+func (rep *UserDao) Update(u *entity.User) error {
 	_, err := rep.db.Exec(
 		`UPDATE users 
 		 SET username = ? 
@@ -103,7 +103,7 @@ func (rep *userDao) Update(u *entity.User) error {
 }
 
 
-func (rep *userDao) Delete(u *entity.User) error {
+func (rep *UserDao) Delete(u *entity.User) error {
 	_, err := rep.db.Exec(
 		`DELETE FROM users WHERE id = ?`, 
 		u.UserId,
@@ -113,7 +113,7 @@ func (rep *userDao) Delete(u *entity.User) error {
 }
 
 
-func (rep *userDao) UpdatePassword(u *entity.User) error {
+func (rep *UserDao) UpdatePassword(u *entity.User) error {
 	_, err := rep.db.Exec(
 		`UPDATE users 
 		 SET password = ? 
@@ -125,7 +125,7 @@ func (rep *userDao) UpdatePassword(u *entity.User) error {
 }
 
 
-func (rep *userDao) UpdateName(u *entity.User) error {
+func (rep *UserDao) UpdateName(u *entity.User) error {
 	_, err := rep.db.Exec(
 		`UPDATE users
 		 SET username = ? 
@@ -137,7 +137,7 @@ func (rep *userDao) UpdateName(u *entity.User) error {
 }
 
 
-func (rep *userDao) SelectByName(name string) (entity.User, error) {
+func (rep *UserDao) SelectByName(name string) (entity.User, error) {
 	var ret entity.User
 
 	err := rep.db.QueryRow(

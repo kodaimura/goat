@@ -6,48 +6,37 @@ import (
 	"goat/config"
 	"goat/internal/core/jwt"
 	"goat/internal/service"
-	"goat/internal/model/entity"
 )
 
-
-type UserService interface {
-	Signup(username, password string) error
-	Login(username, password string) (entity.User, error)
-	GenerateJWT(id int) (string, error)
-	GetProfile(id int) (entity.User, error)
-	ChangeUsername(id int, username string) error
-	ChangePassword(id int, password string) error
-	DeleteUser(id int) error
-}
-
-type userController struct {
-	uServ UserService
+type UserController struct {
+	userService *service.UserService
 }
 
 
-func NewUserController() *userController {
-	uServ := service.NewUserService()
-	return &userController{uServ}
+func NewUserController() *UserController {
+	return &UserController{
+		userService: service.NewUserService(),
+	}
 }
 
 
 //GET /signup
-func (ctr *userController) SignupPage(c *gin.Context) {
+func (uc *UserController) SignupPage(c *gin.Context) {
 	c.HTML(200, "signup.html", gin.H{})
 }
 
 //GET /login
-func (ctr *userController) LoginPage(c *gin.Context) {
+func (uc *UserController) LoginPage(c *gin.Context) {
 	c.HTML(200, "login.html", gin.H{})
 }
 
 
 //POST /signup
-func (ctr *userController) Signup(c *gin.Context) {
+func (uc *UserController) Signup(c *gin.Context) {
 	name := c.PostForm("username")
 	pass := c.PostForm("password")
 
-	err := ctr.uServ.Signup(name, pass)
+	err := uc.userService.Signup(name, pass)
 
 	if err != nil {
 		if _, ok := err.(*service.SignupConflictError); ok {
@@ -68,11 +57,11 @@ func (ctr *userController) Signup(c *gin.Context) {
 
 
 //POST /login
-func (ctr *userController) Login(c *gin.Context) {
+func (uc *UserController) Login(c *gin.Context) {
 	name := c.PostForm("username")
 	pass := c.PostForm("password")
 
-	user, err := ctr.uServ.Login(name, pass)
+	user, err := uc.userService.Login(name, pass)
 
 	if err != nil {
 		c.HTML(401, "login.html", gin.H{
@@ -82,7 +71,7 @@ func (ctr *userController) Login(c *gin.Context) {
 		return
 	}
 
-	jwtStr, err := ctr.uServ.GenerateJWT(user.UserId)
+	jwtStr, err := uc.userService.GenerateJWT(user.UserId)
 
 	if err != nil {
 		c.HTML(500, "login.html", gin.H{
@@ -99,7 +88,7 @@ func (ctr *userController) Login(c *gin.Context) {
 
 
 //GET /logout
-func (ctr *userController) Logout(c *gin.Context) {
+func (uc *UserController) Logout(c *gin.Context) {
 	cf := config.GetConfig()
 	c.SetCookie(jwt.COOKIE_KEY_JWT, "", 0, "/", cf.AppHost, false, true)
 	c.Redirect(303, "/login")
@@ -107,8 +96,8 @@ func (ctr *userController) Logout(c *gin.Context) {
 
 
 //GET /api/account/profile
-func (ctr *userController) GetAccountProfile(c *gin.Context) {
-	user, err := ctr.uServ.GetProfile(jwt.GetUserId(c))
+func (uc *UserController) GetAccountProfile(c *gin.Context) {
+	user, err := uc.userService.GetProfile(jwt.GetUserId(c))
 
 	if err != nil {
 		c.JSON(500, gin.H{})
@@ -121,14 +110,14 @@ func (ctr *userController) GetAccountProfile(c *gin.Context) {
 
 
 //PUT /api/account/password
-func (ctr *userController) ChangePassword(c *gin.Context) {
+func (uc *UserController) ChangePassword(c *gin.Context) {
 	id := jwt.GetUserId(c)
 
 	m := map[string]string{}
 	c.BindJSON(&m)
 	pass := m["password"]
 
-	if ctr.uServ.ChangePassword(id, pass) != nil {
+	if uc.userService.ChangePassword(id, pass) != nil {
 		c.JSON(500, gin.H{"error": "登録に失敗しました。"})
 		c.Abort()
 		return
@@ -139,14 +128,14 @@ func (ctr *userController) ChangePassword(c *gin.Context) {
 
 
 //PUT /api/account/username
-func (ctr *userController) ChangeUsername(c *gin.Context) {
+func (uc *UserController) ChangeUsername(c *gin.Context) {
 	id := jwt.GetUserId(c)
 
 	m := map[string]string{}
 	c.BindJSON(&m)
 	name := m["username"]
 
-	if ctr.uServ.ChangeUsername(id, name) != nil {
+	if uc.userService.ChangeUsername(id, name) != nil {
 		c.JSON(500, gin.H{"error": "登録に失敗しました。"})
 		c.Abort()
 		return
@@ -157,10 +146,10 @@ func (ctr *userController) ChangeUsername(c *gin.Context) {
 
 
 //DELETE /api/account
-func (ctr *userController) DeleteAccount(c *gin.Context) {
+func (uc *UserController) DeleteAccount(c *gin.Context) {
 	id := jwt.GetUserId(c)
 
-	if ctr.uServ.DeleteUser(id) != nil {
+	if uc.userService.DeleteUser(id) != nil {
 		c.JSON(500, gin.H{"error": "削除に失敗しました。"})
 		c.Abort()
 		return
