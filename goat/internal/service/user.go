@@ -7,8 +7,8 @@ import (
 
 	"goat/internal/core/jwt"
 	"goat/internal/core/logger"
-	"goat/internal/model/entity"
-	"goat/internal/model/dao"
+	"goat/internal/model"
+	"goat/internal/repository"
 )
 
 type SignupConflictError struct {}
@@ -19,19 +19,19 @@ func (e *SignupConflictError) Error() string {
 
 
 type UserService struct {
-	userDao *dao.UserDao
+	userRepository *dao.UserRepository
 }
 
 
 func NewUserService() *UserService {
 	return &UserService{
-		userDao: dao.NewUserDao(),
+		userRepository: dao.NewUserRepository(),
 	}
 }
 
 
 func (us *UserService) Signup(username, password string) error {
-	_, err := us.userDao.SelectByName(username)
+	_, err := us.userRepository.SelectByName(username)
 
 	if err == nil {
 		return &SignupConflictError{}
@@ -44,11 +44,11 @@ func (us *UserService) Signup(username, password string) error {
 		return err
 	}
 
-	var user entity.User
+	var user model.User
 	user.Username = username
 	user.Password = string(hashed)
 
-	err = us.userDao.Insert(&user)
+	err = us.userRepository.Insert(&user)
 
 	if err != nil {
 		logger.LogError(err.Error())
@@ -58,11 +58,11 @@ func (us *UserService) Signup(username, password string) error {
 }
 
 
-func (us *UserService) Login(username, password string) (entity.User, error) {
-	user, err := us.userDao.SelectByName(username)
+func (us *UserService) Login(username, password string) (model.User, error) {
+	user, err := us.userRepository.SelectByName(username)
 
 	if err != nil || bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)) != nil {
-		return entity.User{}, err
+		return model.User{}, err
 	}
 
 	return user, nil
@@ -70,9 +70,9 @@ func (us *UserService) Login(username, password string) (entity.User, error) {
 
 
 func (us *UserService) GenerateJWT(id int) (string, error) {
-	var user entity.User
+	var user model.User
 	user.UserId = id
-	user, err := us.userDao.Select(&user)
+	user, err := us.userRepository.Select(&user)
 	
 	if err != nil {
 		logger.LogError(err.Error())
@@ -93,10 +93,10 @@ func (us *UserService) GenerateJWT(id int) (string, error) {
 }
 
 
-func (us *UserService) GetProfile(id int) (entity.User, error) {
-	var user entity.User
+func (us *UserService) GetProfile(id int) (model.User, error) {
+	var user model.User
 	user.UserId = id
-	user, err := us.userDao.Select(&user)
+	user, err := us.userRepository.Select(&user)
 
 	if err != nil {
 		logger.LogError(err.Error())
@@ -107,10 +107,10 @@ func (us *UserService) GetProfile(id int) (entity.User, error) {
 
 
 func (us *UserService) ChangeUsername(id int, username string) error {
-	var user entity.User
+	var user model.User
 	user.UserId = id
 	user.Username = username
-	err := us.userDao.UpdateName(&user)
+	err := us.userRepository.UpdateName(&user)
 
 	if err != nil {
 		logger.LogError(err.Error())
@@ -128,10 +128,10 @@ func (us *UserService) ChangePassword(id int, password string) error {
 		return err
 	}
 
-	var user entity.User
+	var user model.User
 	user.UserId = id
 	user.Password = string(hashed)
-	err = us.userDao.UpdatePassword(&user)
+	err = us.userRepository.UpdatePassword(&user)
 	
 	if err != nil {
 		logger.LogError(err.Error())
@@ -142,9 +142,9 @@ func (us *UserService) ChangePassword(id int, password string) error {
 
 
 func (us *UserService) DeleteUser(id int) error {
-	var user entity.User
+	var user model.User
 	user.UserId = id
-	err := us.userDao.Delete(&user)
+	err := us.userRepository.Delete(&user)
 
 	if err != nil {
 		logger.LogError(err.Error())

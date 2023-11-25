@@ -4,25 +4,25 @@ import (
 	"database/sql"
 
 	"goat/internal/core/db"
-	"goat/internal/model/entity"
+	"goat/internal/model"
 )
 
 
-type UserDao struct {
+type UserRepository struct {
 	db *sql.DB
 }
 
 
-func NewUserDao() *UserDao {
+func NewUserRepository() *UserRepository {
 	db := db.GetDB()
-	return &UserDao{db}
+	return &UserRepository{db}
 }
 
 
-func (rep *UserDao) SelectAll() ([]entity.User, error) {
-	var ret []entity.User
+func (ur *UserRepository) SelectAll() ([]model.User, error) {
+	var ret []model.User
 
-	rows, err := rep.db.Query(
+	rows, err := ur.db.Query(
 		`SELECT 
 			id, 
 			username, 
@@ -36,7 +36,7 @@ func (rep *UserDao) SelectAll() ([]entity.User, error) {
 	}
 
 	for rows.Next() {
-		u := entity.User{}
+		u := model.User{}
 		err = rows.Scan(
 			&u.UserId, 
 			&u.Username,
@@ -53,10 +53,10 @@ func (rep *UserDao) SelectAll() ([]entity.User, error) {
 }
 
 
-func (rep *UserDao) Select(u *entity.User) (entity.User, error){
-	var ret entity.User
+func (ur *UserRepository) Select(u *model.User) (model.User, error){
+	var ret model.User
 
-	err := rep.db.QueryRow(
+	err := ur.db.QueryRow(
 		`SELECT 
 			id, 
 			username, 
@@ -76,8 +76,8 @@ func (rep *UserDao) Select(u *entity.User) (entity.User, error){
 }
 
 
-func (rep *UserDao) Insert(u *entity.User) error {
-	_, err := rep.db.Exec(
+func (ur *UserRepository) Insert(u *model.User) error {
+	_, err := ur.db.Exec(
 		`INSERT INTO users (
 			username, 
 			password
@@ -89,8 +89,8 @@ func (rep *UserDao) Insert(u *entity.User) error {
 }
 
 
-func (rep *UserDao) Update(u *entity.User) error {
-	_, err := rep.db.Exec(
+func (ur *UserRepository) Update(u *model.User) error {
+	_, err := ur.db.Exec(
 		`UPDATE users 
 		 SET username = ? 
 			  password = ?
@@ -103,8 +103,8 @@ func (rep *UserDao) Update(u *entity.User) error {
 }
 
 
-func (rep *UserDao) Delete(u *entity.User) error {
-	_, err := rep.db.Exec(
+func (ur *UserRepository) Delete(u *model.User) error {
+	_, err := ur.db.Exec(
 		`DELETE FROM users WHERE id = ?`, 
 		u.UserId,
 	)
@@ -113,8 +113,8 @@ func (rep *UserDao) Delete(u *entity.User) error {
 }
 
 
-func (rep *UserDao) UpdatePassword(u *entity.User) error {
-	_, err := rep.db.Exec(
+func (ur *UserRepository) UpdatePassword(u *model.User) error {
+	_, err := ur.db.Exec(
 		`UPDATE users 
 		 SET password = ? 
 		 WHERE id = ?`, 
@@ -125,8 +125,8 @@ func (rep *UserDao) UpdatePassword(u *entity.User) error {
 }
 
 
-func (rep *UserDao) UpdateName(u *entity.User) error {
-	_, err := rep.db.Exec(
+func (ur *UserRepository) UpdateName(u *model.User) error {
+	_, err := ur.db.Exec(
 		`UPDATE users
 		 SET username = ? 
 		 WHERE id = ?`, 
@@ -137,10 +137,10 @@ func (rep *UserDao) UpdateName(u *entity.User) error {
 }
 
 
-func (rep *UserDao) SelectByName(name string) (entity.User, error) {
-	var ret entity.User
+func (ur *UserRepository) SelectByName(name string) (model.User, error) {
+	var ret model.User
 
-	err := rep.db.QueryRow(
+	err := ur.db.QueryRow(
 		`SELECT 
 			id, 
 			username, 
