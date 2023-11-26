@@ -1,4 +1,4 @@
-package dao
+package repository
 
 import (
 	"database/sql"
@@ -8,18 +8,29 @@ import (
 )
 
 
-type UserRepository struct {
+type UserRepository interface {
+	Get() ([]model.User, error)
+	GetById(id int) (model.User, error)
+	GetByName(name string) (model.User, error)
+	Insert(u *model.User) error
+	Update(u *model.User) error
+	UpdatePassword(u *model.User) error
+	UpdateName(u *model.User) error
+	Delete(u *model.User) error
+}
+
+
+type userRepository struct {
 	db *sql.DB
 }
 
-
-func NewUserRepository() *UserRepository {
+func NewUserRepository() UserRepository {
 	db := db.GetDB()
-	return &UserRepository{db}
+	return &userRepository{db}
 }
 
 
-func (ur *UserRepository) Get() ([]model.User, error) {
+func (ur *userRepository) Get() ([]model.User, error) {
 	var ret []model.User
 
 	rows, err := ur.db.Query(
@@ -53,7 +64,7 @@ func (ur *UserRepository) Get() ([]model.User, error) {
 }
 
 
-func (ur *UserRepository) GetById(id int) (model.User, error){
+func (ur *userRepository) GetById(id int) (model.User, error) {
 	var ret model.User
 
 	err := ur.db.QueryRow(
@@ -76,7 +87,7 @@ func (ur *UserRepository) GetById(id int) (model.User, error){
 }
 
 
-func (ur *UserRepository) Insert(u *model.User) error {
+func (ur *userRepository) Insert(u *model.User) error {
 	_, err := ur.db.Exec(
 		`INSERT INTO users (
 			username, 
@@ -89,11 +100,11 @@ func (ur *UserRepository) Insert(u *model.User) error {
 }
 
 
-func (ur *UserRepository) Update(u *model.User) error {
+func (ur *userRepository) Update(u *model.User) error {
 	_, err := ur.db.Exec(
 		`UPDATE users 
 		 SET username = ? 
-			 password = ?
+			  password = ?
 		 WHERE id = ?`,
 		u.Username,
 		u.Password, 
@@ -103,7 +114,7 @@ func (ur *UserRepository) Update(u *model.User) error {
 }
 
 
-func (ur *UserRepository) Delete(u *model.User) error {
+func (ur *userRepository) Delete(u *model.User) error {
 	_, err := ur.db.Exec(
 		`DELETE FROM users WHERE id = ?`, 
 		u.UserId,
@@ -113,7 +124,7 @@ func (ur *UserRepository) Delete(u *model.User) error {
 }
 
 
-func (ur *UserRepository) UpdatePassword(u *model.User) error {
+func (ur *userRepository) UpdatePassword(u *model.User) error {
 	_, err := ur.db.Exec(
 		`UPDATE users 
 		 SET password = ? 
@@ -125,7 +136,7 @@ func (ur *UserRepository) UpdatePassword(u *model.User) error {
 }
 
 
-func (ur *UserRepository) UpdateName(u *model.User) error {
+func (ur *userRepository) UpdateName(u *model.User) error {
 	_, err := ur.db.Exec(
 		`UPDATE users
 		 SET username = ? 
@@ -137,7 +148,7 @@ func (ur *UserRepository) UpdateName(u *model.User) error {
 }
 
 
-func (ur *UserRepository) GetByName(name string) (model.User, error) {
+func (ur *userRepository) GetByName(name string) (model.User, error) {
 	var ret model.User
 
 	err := ur.db.QueryRow(
