@@ -9,7 +9,7 @@ import (
 )
 
 type UserController struct {
-	userService *service.UserService
+	userService service.UserService
 }
 
 

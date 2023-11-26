@@ -11,26 +11,36 @@ import (
 	"goat/internal/repository"
 )
 
+
+type UserService interface {
+	Signup(username, password string) error
+	Login(username, password string) (model.User, error)
+	GenerateJWT(id int) (string, error)
+	GetProfile(id int) (model.User, error)
+	ChangeUsername(id int, username string) error
+	ChangePassword(id int, password string) error
+	DeleteUser(id int) error
+}
+
+
+type userService struct {
+	userRepository repository.UserRepository
+}
+
+func NewUserService() UserService {
+	return &userService{
+		userRepository: repository.NewUserRepository(),
+	}
+}
+
+
 type SignupConflictError struct {}
 
 func (e *SignupConflictError) Error() string {
 	return fmt.Sprintf("SignupConflictError")
 }
 
-
-type UserService struct {
-	userRepository *dao.UserRepository
-}
-
-
-func NewUserService() *UserService {
-	return &UserService{
-		userRepository: dao.NewUserRepository(),
-	}
-}
-
-
-func (us *UserService) Signup(username, password string) error {
+func (us *userService) Signup(username, password string) error {
 	_, err := us.userRepository.GetByName(username)
 
 	if err == nil {
@@ -58,7 +68,7 @@ func (us *UserService) Signup(username, password string) error {
 }
 
 
-func (us *UserService) Login(username, password string) (model.User, error) {
+func (us *userService) Login(username, password string) (model.User, error) {
 	user, err := us.userRepository.GetByName(username)
 
 	if err != nil || bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)) != nil {
@@ -69,7 +79,7 @@ func (us *UserService) Login(username, password string) (model.User, error) {
 }
 
 
-func (us *UserService) GenerateJWT(id int) (string, error) {
+func (us *userService) GenerateJWT(id int) (string, error) {
 	user, err := us.userRepository.GetById(id)
 	
 	if err != nil {
@@ -91,7 +101,7 @@ func (us *UserService) GenerateJWT(id int) (string, error) {
 }
 
 
-func (us *UserService) GetProfile(id int) (model.User, error) {
+func (us *userService) GetProfile(id int) (model.User, error) {
 	user, err := us.userRepository.GetById(id)
 
 	if err != nil {
@@ -102,7 +112,7 @@ func (us *UserService) GetProfile(id int) (model.User, error) {
 }
 
 
-func (us *UserService) ChangeUsername(id int, username string) error {
+func (us *userService) ChangeUsername(id int, username string) error {
 	var user model.User
 	user.UserId = id
 	user.Username = username
@@ -116,7 +126,7 @@ func (us *UserService) ChangeUsername(id int, username string) error {
 }
 
 
-func (us *UserService) ChangePassword(id int, password string) error {
+func (us *userService) ChangePassword(id int, password string) error {
 	hashed, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 
 	if err != nil {
@@ -137,7 +147,7 @@ func (us *UserService) ChangePassword(id int, password string) error {
 }
 
 
-func (us *UserService) DeleteUser(id int) error {
+func (us *userService) DeleteUser(id int) error {
 	var user model.User
 	user.UserId = id
 	err := us.userRepository.Delete(&user)
