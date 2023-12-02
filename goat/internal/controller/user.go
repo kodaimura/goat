@@ -5,6 +5,7 @@ import (
 
 	"goat/config"
 	"goat/internal/core/jwt"
+	"goat/internal/core/errs"
 	"goat/internal/service"
 )
 
@@ -39,7 +40,7 @@ func (uc *UserController) Signup(c *gin.Context) {
 	err := uc.userService.Signup(name, pass)
 
 	if err != nil {
-		if _, ok := err.(*service.SignupConflictError); ok {
+		if _, ok := err.(errs.UniqueConstraintError); ok {
 			c.HTML(409, "signup.html", gin.H{
 				"error": "ユーザ名が既に使われています。",
 			})

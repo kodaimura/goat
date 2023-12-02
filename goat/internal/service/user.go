@@ -1,12 +1,11 @@
 package service
 
 import (
-	"fmt"
-
 	"golang.org/x/crypto/bcrypt"
 
 	"goat/internal/core/jwt"
 	"goat/internal/core/logger"
+	"goat/internal/core/errs"
 	"goat/internal/model"
 	"goat/internal/repository"
 )
@@ -34,17 +33,11 @@ func NewUserService() UserService {
 }
 
 
-type SignupConflictError struct {}
-
-func (e *SignupConflictError) Error() string {
-	return fmt.Sprintf("SignupConflictError")
-}
-
 func (us *userService) Signup(username, password string) error {
 	_, err := us.userRepository.GetByName(username)
 
 	if err == nil {
-		return &SignupConflictError{}
+		return errs.NewUniqueConstraintError("username")
 	}
 
 	hashed, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
@@ -113,10 +106,16 @@ func (us *userService) GetProfile(id int) (model.User, error) {
 
 
 func (us *userService) ChangeUsername(id int, username string) error {
+	u, err := us.userRepository.GetByName(username)
+
+	if err == nil && u.UserId != id{
+		return errs.NewUniqueConstraintError("username")
+	}
+
 	var user model.User
 	user.UserId = id
 	user.Username = username
-	err := us.userRepository.UpdateName(&user)
+	err = us.userRepository.UpdateName(&user)
 
 	if err != nil {
 		logger.Error(err.Error())
