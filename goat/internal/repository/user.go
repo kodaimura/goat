@@ -9,13 +9,13 @@ import (
 
 
 type UserRepository interface {
+	Insert(u *model.User) error
 	Get() ([]model.User, error)
 	GetById(id int) (model.User, error)
 	GetByName(name string) (model.User, error)
-	Insert(u *model.User) error
 	Update(u *model.User) error
-	UpdatePassword(u *model.User) error
 	UpdateName(u *model.User) error
+	UpdatePassword(u *model.User) error
 	Delete(u *model.User) error
 }
 
@@ -27,6 +27,19 @@ type userRepository struct {
 func NewUserRepository() UserRepository {
 	db := db.GetDB()
 	return &userRepository{db}
+}
+
+
+func (ur *userRepository) Insert(u *model.User) error {
+	_, err := ur.db.Exec(
+		`INSERT INTO users (
+			username, 
+			password
+		 ) VALUES(?,?)`,
+		u.Username, 
+		u.Password,
+	)
+	return err
 }
 
 
@@ -87,67 +100,6 @@ func (ur *userRepository) GetById(id int) (model.User, error) {
 }
 
 
-func (ur *userRepository) Insert(u *model.User) error {
-	_, err := ur.db.Exec(
-		`INSERT INTO users (
-			username, 
-			password
-		 ) VALUES(?,?)`,
-		u.Username, 
-		u.Password,
-	)
-	return err
-}
-
-
-func (ur *userRepository) Update(u *model.User) error {
-	_, err := ur.db.Exec(
-		`UPDATE users 
-		 SET username = ? 
-			  password = ?
-		 WHERE id = ?`,
-		u.Username,
-		u.Password, 
-		u.UserId,
-	)
-	return err
-}
-
-
-func (ur *userRepository) Delete(u *model.User) error {
-	_, err := ur.db.Exec(
-		`DELETE FROM users WHERE id = ?`, 
-		u.UserId,
-	)
-
-	return err
-}
-
-
-func (ur *userRepository) UpdatePassword(u *model.User) error {
-	_, err := ur.db.Exec(
-		`UPDATE users 
-		 SET password = ? 
-		 WHERE id = ?`, 
-		 u.Password, 
-		 u.UserId,
-	)
-	return err
-}
-
-
-func (ur *userRepository) UpdateName(u *model.User) error {
-	_, err := ur.db.Exec(
-		`UPDATE users
-		 SET username = ? 
-		 WHERE id = ?`, 
-		u.Username, 
-		u.UserId,
-	)
-	return err
-}
-
-
 func (ur *userRepository) GetByName(name string) (model.User, error) {
 	var ret model.User
 
@@ -170,4 +122,52 @@ func (ur *userRepository) GetByName(name string) (model.User, error) {
 	)
 
 	return ret, err
+}
+
+
+func (ur *userRepository) Update(u *model.User) error {
+	_, err := ur.db.Exec(
+		`UPDATE users 
+		 SET username = ? 
+			 password = ?
+		 WHERE id = ?`,
+		u.Username,
+		u.Password, 
+		u.UserId,
+	)
+	return err
+}
+
+
+func (ur *userRepository) UpdateName(u *model.User) error {
+	_, err := ur.db.Exec(
+		`UPDATE users
+		 SET username = ? 
+		 WHERE id = ?`, 
+		u.Username, 
+		u.UserId,
+	)
+	return err
+}
+
+
+func (ur *userRepository) UpdatePassword(u *model.User) error {
+	_, err := ur.db.Exec(
+		`UPDATE users 
+		 SET password = ? 
+		 WHERE id = ?`, 
+		 u.Password, 
+		 u.UserId,
+	)
+	return err
+}
+
+
+func (ur *userRepository) Delete(u *model.User) error {
+	_, err := ur.db.Exec(
+		`DELETE FROM users WHERE id = ?`, 
+		u.UserId,
+	)
+
+	return err
 }
