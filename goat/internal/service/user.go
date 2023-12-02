@@ -16,8 +16,8 @@ type UserService interface {
 	Login(username, password string) (model.User, error)
 	GenerateJWT(id int) (string, error)
 	GetProfile(id int) (model.User, error)
-	ChangeUsername(id int, username string) error
-	ChangePassword(id int, password string) error
+	UpdateUsername(id int, username string) error
+	UpdatePassword(id int, password string) error
 	DeleteUser(id int) error
 }
 
@@ -105,7 +105,7 @@ func (us *userService) GetProfile(id int) (model.User, error) {
 }
 
 
-func (us *userService) ChangeUsername(id int, username string) error {
+func (us *userService) UpdateUsername(id int, username string) error {
 	u, err := us.userRepository.GetByName(username)
 
 	if err == nil && u.UserId != id{
@@ -125,7 +125,7 @@ func (us *userService) ChangeUsername(id int, username string) error {
 }
 
 
-func (us *userService) ChangePassword(id int, password string) error {
+func (us *userService) UpdatePassword(id int, password string) error {
 	hashed, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 
 	if err != nil {
