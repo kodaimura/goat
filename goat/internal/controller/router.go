@@ -12,10 +12,10 @@ func SetRouter(r *gin.Engine) {
 
 	//render HTML or redirect
 	r.GET("/signup", uc.SignupPage)
-	r.GET("/login", uc.LoginPage)
-	r.GET("/logout", uc.Logout)
 	r.POST("/signup", uc.Signup)
+	r.GET("/login", uc.LoginPage)
 	r.POST("/login", uc.Login)
+	r.GET("/logout", uc.Logout)
 
 	//render HTML or redirect (Authorized request)
 	a := r.Group("/", jwt.JwtAuthMiddleware())
@@ -23,10 +23,14 @@ func SetRouter(r *gin.Engine) {
 		rc := NewRootController()
 		
 		a.GET("/", rc.IndexPage)
+	}
 
-		a.GET("/api/account/profile", uc.GetAccountProfile)
-		a.PUT("/api/account/username", uc.ChangeUsername)
-		a.PUT("/api/account/password", uc.ChangePassword)
-		a.DELETE("/api/account", uc.DeleteAccount)
+	//response JSON (Authorized request)
+	api := r.Group("/api", jwt.JwtAuthApiMiddleware())
+	{
+		api.GET("/account/profile", uc.GetProfile)
+		api.PUT("/account/username", uc.UpdateUsername)
+		api.PUT("/account/password", uc.UpdatePassword)
+		api.DELETE("/account", uc.DeleteAccount)
 	}
 }

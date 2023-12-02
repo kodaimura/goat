@@ -97,7 +97,7 @@ func (uc *UserController) Logout(c *gin.Context) {
 
 
 //GET /api/account/profile
-func (uc *UserController) GetAccountProfile(c *gin.Context) {
+func (uc *UserController) GetProfile(c *gin.Context) {
 	user, err := uc.userService.GetProfile(jwt.GetUserId(c))
 
 	if err != nil {
@@ -111,14 +111,14 @@ func (uc *UserController) GetAccountProfile(c *gin.Context) {
 
 
 //PUT /api/account/password
-func (uc *UserController) ChangePassword(c *gin.Context) {
+func (uc *UserController) UpdatePassword(c *gin.Context) {
 	id := jwt.GetUserId(c)
 
 	m := map[string]string{}
 	c.BindJSON(&m)
 	pass := m["password"]
 
-	if uc.userService.ChangePassword(id, pass) != nil {
+	if uc.userService.UpdatePassword(id, pass) != nil {
 		c.JSON(500, gin.H{"error": "登録に失敗しました。"})
 		c.Abort()
 		return
@@ -129,14 +129,14 @@ func (uc *UserController) ChangePassword(c *gin.Context) {
 
 
 //PUT /api/account/username
-func (uc *UserController) ChangeUsername(c *gin.Context) {
+func (uc *UserController) UpdateUsername(c *gin.Context) {
 	id := jwt.GetUserId(c)
 
 	m := map[string]string{}
 	c.BindJSON(&m)
 	name := m["username"]
 
-	if uc.userService.ChangeUsername(id, name) != nil {
+	if uc.userService.UpdateUsername(id, name) != nil {
 		c.JSON(500, gin.H{"error": "登録に失敗しました。"})
 		c.Abort()
 		return
