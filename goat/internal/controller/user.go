@@ -41,13 +41,9 @@ func (uc *UserController) Signup(c *gin.Context) {
 
 	if err != nil {
 		if _, ok := err.(errs.UniqueConstraintError); ok {
-			c.HTML(409, "signup.html", gin.H{
-				"error": "ユーザ名が既に使われています。",
-			})
+			c.HTML(409, "signup.html", gin.H{"error": "ユーザ名が既に使われています。"})
 		} else {
-			c.HTML(500, "signup.html", gin.H{
-				"error": "登録に失敗しました。",
-			})
+			c.HTML(500, "signup.html", gin.H{"error": "登録に失敗しました。"})
 		}
 		c.Abort()
 		return
@@ -65,9 +61,7 @@ func (uc *UserController) Login(c *gin.Context) {
 	user, err := uc.userService.Login(name, pass)
 
 	if err != nil {
-		c.HTML(401, "login.html", gin.H{
-			"error": "ユーザ名またはパスワードが異なります。",
-		})
+		c.HTML(401, "login.html", gin.H{"error": "ユーザ名またはパスワードが異なります。"})
 		c.Abort()
 		return
 	}
@@ -75,9 +69,7 @@ func (uc *UserController) Login(c *gin.Context) {
 	jwtStr, err := uc.userService.GenerateJWT(user.UserId)
 
 	if err != nil {
-		c.HTML(500, "login.html", gin.H{
-			"error": "ログインに失敗しました。",
-		})
+		c.HTML(500, "login.html", gin.H{"error": "ログインに失敗しました。"})
 		c.Abort()
 		return
 	}
@@ -119,7 +111,7 @@ func (uc *UserController) UpdatePassword(c *gin.Context) {
 	pass := m["password"]
 
 	if uc.userService.UpdatePassword(id, pass) != nil {
-		c.JSON(500, gin.H{"error": "登録に失敗しました。"})
+		c.JSON(500, gin.H{"error": "変更に失敗しました。"})
 		c.Abort()
 		return
 	}
@@ -136,12 +128,16 @@ func (uc *UserController) UpdateUsername(c *gin.Context) {
 	c.BindJSON(&m)
 	name := m["username"]
 
-	if uc.userService.UpdateUsername(id, name) != nil {
-		c.JSON(500, gin.H{"error": "登録に失敗しました。"})
+	err := uc.userService.UpdateUsername(id, name)
+	if err != nil {
+		if _, ok := err.(errs.UniqueConstraintError); ok {
+			c.JSON(409, gin.H{"error": "ユーザ名が既に使われています。"})
+		} else {
+			c.JSON(500, gin.H{"error": "変更に失敗しました。"})
+		}
 		c.Abort()
 		return
 	}
-
 	c.JSON(200, gin.H{})
 }
 
