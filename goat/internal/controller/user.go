@@ -43,13 +43,13 @@ func (uc *UserController) Signup(c *gin.Context) {
 		if _, ok := err.(errs.UniqueConstraintError); ok {
 			c.HTML(409, "signup.html", gin.H{
 				"username": name,
-				"password":pass,
+				"password": pass,
 				"error": "ユーザ名が既に使われています。",
 			})
 		} else {
 			c.HTML(500, "signup.html", gin.H{
 				"username": name,
-				"password":pass,
+				"password": pass,
 				"error": "登録に失敗しました。",
 			})
 		}
@@ -71,7 +71,7 @@ func (uc *UserController) Login(c *gin.Context) {
 	if err != nil {
 		c.HTML(401, "login.html", gin.H{
 			"username": name,
-			"password":pass,
+			"password": pass,
 			"error": "ユーザ名またはパスワードが異なります。",
 		})
 		c.Abort()
@@ -83,7 +83,7 @@ func (uc *UserController) Login(c *gin.Context) {
 	if err != nil {
 		c.HTML(500, "login.html", gin.H{
 			"username": name,
-			"password":pass,
+			"password": pass,
 			"error": "ログインに失敗しました。",
 		})
 		c.Abort()
