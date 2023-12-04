@@ -25,11 +25,11 @@
 				<form method="POST">
 					<div class="input-group mb-3">
 						<span class="input-group-text"><i class="bi bi-person-fill"></i></span>
-						<input type="text" name="username" required="required" class="form-control" placeholder="ユーザ名">
+						<input type="text" name="username" value="{{.username}}" class="form-control" placeholder="ユーザ名">
 					</div>
 					<div class="input-group mb-3">
 						<span class="input-group-text"><i class="bi bi-key-fill"></i></span>
-						<input type="password" name="password" required="required" class="form-control" placeholder="パスワード">
+						<input type="password" name="password" value="{{.password}}" class="form-control" placeholder="パスワード">
 					</div>
 					<button type="submit" id="signin" class="btn btn-primary w-100">ログイン</button>
 				</form>
