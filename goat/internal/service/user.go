@@ -53,9 +53,10 @@ func (us *userService) Signup(username, password string) error {
 
 	if err = us.userRepository.Insert(&user); err != nil {
 		logger.Error(err.Error())
+		return err
 	}
 
-	return err
+	return nil
 }
 
 
@@ -120,9 +121,10 @@ func (us *userService) UpdateUsername(id int, username string) error {
 
 	if err = us.userRepository.UpdateName(&user); err != nil {
 		logger.Error(err.Error())
+		return err
 	}
 
-	return err
+	return nil
 }
 
 
@@ -140,9 +142,10 @@ func (us *userService) UpdatePassword(id int, password string) error {
 	
 	if err = us.userRepository.UpdatePassword(&user); err != nil {
 		logger.Error(err.Error())
+		return err
 	}
 
-	return err
+	return nil
 }
 
 
@@ -152,7 +155,8 @@ func (us *userService) DeleteUser(id int) error {
 
 	if err := us.userRepository.Delete(&user); err != nil {
 		logger.Error(err.Error())
+		return err
 	}
 
-	return err
+	return nil
 }
