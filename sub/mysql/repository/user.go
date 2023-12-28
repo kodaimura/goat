@@ -48,7 +48,7 @@ func (ur *userRepository) Get() ([]model.User, error) {
 
 	rows, err := ur.db.Query(
 		`SELECT 
-			id, 
+			user_id, 
 			username, 
 			created_at, 
 			updated_at 
@@ -82,12 +82,12 @@ func (ur *userRepository) GetById(id int) (model.User, error) {
 
 	err := ur.db.QueryRow(
 		`SELECT 
-			id, 
+			user_id, 
 			username, 
 			created_at, 
 			updated_at 
 		 FROM users 
-		 WHERE id = ?`, 
+		 WHERE user_id = ?`, 
 		 id,
 	).Scan(
 		&ret.UserId, 
@@ -105,7 +105,7 @@ func (ur *userRepository) GetByName(name string) (model.User, error) {
 
 	err := ur.db.QueryRow(
 		`SELECT 
-			id, 
+			user_id, 
 			username, 
 			password, 
 			created_at, 
@@ -130,7 +130,7 @@ func (ur *userRepository) Update(u *model.User) error {
 		`UPDATE users 
 		 SET username = ? 
 			 password = ?
-		 WHERE id = ?`,
+		 WHERE user_id = ?`,
 		u.Username,
 		u.Password, 
 		u.UserId,
@@ -143,7 +143,7 @@ func (ur *userRepository) UpdateName(u *model.User) error {
 	_, err := ur.db.Exec(
 		`UPDATE users
 		 SET username = ? 
-		 WHERE id = ?`, 
+		 WHERE user_id = ?`, 
 		u.Username, 
 		u.UserId,
 	)
@@ -155,7 +155,7 @@ func (ur *userRepository) UpdatePassword(u *model.User) error {
 	_, err := ur.db.Exec(
 		`UPDATE users 
 		 SET password = ? 
-		 WHERE id = ?`, 
+		 WHERE user_id = ?`, 
 		 u.Password, 
 		 u.UserId,
 	)
@@ -165,7 +165,7 @@ func (ur *userRepository) UpdatePassword(u *model.User) error {
 
 func (ur *userRepository) Delete(u *model.User) error {
 	_, err := ur.db.Exec(
-		`DELETE FROM users WHERE id = ?`, 
+		`DELETE FROM users WHERE user_id = ?`, 
 		u.UserId,
 	)
 
