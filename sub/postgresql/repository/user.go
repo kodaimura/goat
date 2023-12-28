@@ -33,7 +33,7 @@ func NewUserRepository() UserRepository {
 func (ur *userRepository) Insert(u *model.User) error {
 	_, err := ur.db.Exec(
 		`INSERT INTO users (
-			username, 
+			user_name, 
 			password
 		 ) VALUES($1,$2)`,
 		u.Username, 
@@ -49,7 +49,7 @@ func (ur *userRepository) Get() ([]model.User, error) {
 	rows, err := ur.db.Query(
 		`SELECT 
 			user_id, 
-			username, 
+			user_name, 
 			created_at, 
 			updated_at 
 		 FROM users`,
@@ -83,7 +83,7 @@ func (ur *userRepository) GetById(id int) (model.User, error) {
 	err := ur.db.QueryRow(
 		`SELECT 
 			user_id, 
-			username, 
+			user_name, 
 			created_at, 
 			updated_at 
 		 FROM users 
@@ -106,12 +106,12 @@ func (ur *userRepository) GetByName(name string) (model.User, error) {
 	err := ur.db.QueryRow(
 		`SELECT 
 			user_id, 
-			username, 
+			user_name, 
 			password, 
 			created_at, 
 			updated_at 
 		 FROM users 
-		 WHERE username = $1`, 
+		 WHERE user_name = $1`, 
 		 name,
 	).Scan(
 		&ret.UserId, 
@@ -128,7 +128,7 @@ func (ur *userRepository) GetByName(name string) (model.User, error) {
 func (ur *userRepository) Update(u *model.User) error {
 	_, err := ur.db.Exec(
 		`UPDATE users 
-		 SET username = $1 
+		 SET user_name = $1 
 			 password = $2
 		 WHERE user_id = $3`,
 		u.Username,
@@ -142,7 +142,7 @@ func (ur *userRepository) Update(u *model.User) error {
 func (ur *userRepository) UpdateName(u *model.User) error {
 	_, err := ur.db.Exec(
 		`UPDATE users
-		 SET username = $1 
+		 SET user_name = $1 
 		 WHERE user_id = $2`, 
 		u.Username, 
 		u.UserId,
