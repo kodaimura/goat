@@ -136,7 +136,7 @@ func (uc *UserController) UpdatePassword(c *gin.Context) {
 }
 
 
-//PUT /api/account/username
+//PUT /api/account/name
 func (uc *UserController) UpdateName(c *gin.Context) {
 	id := jwt.GetUserId(c)
 
