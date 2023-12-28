@@ -128,7 +128,7 @@ func (ur *userRepository) GetByName(name string) (model.User, error) {
 func (ur *userRepository) Update(u *model.User) error {
 	_, err := ur.db.Exec(
 		`UPDATE users 
-		 SET username = ? 
+		 SET username = ?, 
 			 password = ?
 		 WHERE id = ?`,
 		u.Username,
