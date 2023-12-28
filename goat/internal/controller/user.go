@@ -78,7 +78,7 @@ func (uc *UserController) Login(c *gin.Context) {
 		return
 	}
 
-	jwtStr, err := uc.userService.GenerateJWT(user.UserId)
+	jwtStr, err := uc.userService.GenerateJWT(user.Id)
 
 	if err != nil {
 		c.HTML(500, "login.html", gin.H{

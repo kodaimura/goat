@@ -84,7 +84,7 @@ func (us *userService) GenerateJWT(id int) (string, error) {
 	}
 
 	var cc jwt.CustomClaims
-	cc.UserId = user.UserId
+	cc.UserId = user.Id
 	cc.Username = user.Username
 	jwtStr, err := jwt.GenerateJWT(cc)
 
@@ -111,12 +111,12 @@ func (us *userService) GetProfile(id int) (model.User, error) {
 func (us *userService) UpdateUsername(id int, username string) error {
 	u, err := us.userRepository.GetByName(username)
 
-	if err == nil && u.UserId != id{
+	if err == nil && u.Id != id{
 		return errs.NewUniqueConstraintError("username")
 	}
 
 	var user model.User
-	user.UserId = id
+	user.Id = id
 	user.Username = username
 
 	if err = us.userRepository.UpdateName(&user); err != nil {
@@ -137,7 +137,7 @@ func (us *userService) UpdatePassword(id int, password string) error {
 	}
 
 	var user model.User
-	user.UserId = id
+	user.Id = id
 	user.Password = string(hashed)
 	
 	if err = us.userRepository.UpdatePassword(&user); err != nil {
@@ -151,7 +151,7 @@ func (us *userService) UpdatePassword(id int, password string) error {
 
 func (us *userService) DeleteUser(id int) error {
 	var user model.User
-	user.UserId = id
+	user.Id = id
 
 	if err := us.userRepository.Delete(&user); err != nil {
 		logger.Error(err.Error())
