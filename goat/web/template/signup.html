@@ -10,18 +10,18 @@
 		<h2 class="text-center">アカウント作成</h2>
 		<div class="col-md-6">
 			<div class="text-danger" id="error">{{.error}}</div>
-			<form method="POST" onsubmit="return checkPassword();">
+			<form method="POST" onsubmit="return comparePasswords();">
 				<div class="input-group mb-3">
 					<span class="input-group-text"><i class="bi bi-person-fill"></i></span>
 					<input type="text" name="user_name" value="{{.user_name}}" class="form-control" placeholder="ユーザ名" required>
 				</div>
 				<div class="input-group mb-3">
 					<span class="input-group-text"><i class="bi bi-key-fill"></i></span>
-					<input type="password" name="user_password" value="{{.user_password}}" class="form-control" placeholder="パスワード" id="pw1" required>
+					<input type="password" name="user_password" value="{{.user_password}}" class="form-control" placeholder="パスワード" id="pw" required>
 				</div>
 				<div class="input-group mb-3">
 					<span class="input-group-text"><i class="bi bi-key-fill"></i></span>
-					<input type="password" name="user_password" value="{{.user_password}}" class="form-control" placeholder="パスワード（再）" id="pw2" required>
+					<input type="password" name="user_password" value="{{.user_password}}" class="form-control" placeholder="パスワード（再）" id="pwc" required>
 				</div>
 				<button type="submit" id="signup" class="btn btn-success w-100">サインアップ</button>
 			</form>
@@ -32,10 +32,10 @@
 {{template "footer" .}}
 
 <script>
-const checkPassword = () => {
-	let pw1 = document.getElementById("pw1").value
-	let pw2 = document.getElementById("pw2").value
-	if (pw1 !== pw2) {
+const comparePasswords = () => {
+	let pw = document.getElementById("pw").value
+	let pwc = document.getElementById("pwc").value
+	if (pw !== pwc) {
 		document.getElementById("error").innerHTML = "パスワードが一致していません。"
 		return false
 	} else {
