@@ -35,7 +35,7 @@ func (uc *UserController) LoginPage(c *gin.Context) {
 //POST /signup
 func (uc *UserController) Signup(c *gin.Context) {
 	name := c.PostForm("user_name")
-	pass := c.PostForm("password")
+	pass := c.PostForm("user_password")
 
 	err := uc.userService.Signup(name, pass)
 
@@ -43,13 +43,13 @@ func (uc *UserController) Signup(c *gin.Context) {
 		if _, ok := err.(errs.UniqueConstraintError); ok {
 			c.HTML(409, "signup.html", gin.H{
 				"user_name": name,
-				"password": pass,
+				"user_password": pass,
 				"error": "ユーザ名が既に使われています。",
 			})
 		} else {
 			c.HTML(500, "signup.html", gin.H{
 				"user_name": name,
-				"password": pass,
+				"user_password": pass,
 				"error": "登録に失敗しました。",
 			})
 		}
@@ -64,14 +64,14 @@ func (uc *UserController) Signup(c *gin.Context) {
 //POST /login
 func (uc *UserController) Login(c *gin.Context) {
 	name := c.PostForm("user_name")
-	pass := c.PostForm("password")
+	pass := c.PostForm("user_password")
 
 	user, err := uc.userService.Login(name, pass)
 
 	if err != nil {
 		c.HTML(401, "login.html", gin.H{
 			"user_name": name,
-			"password": pass,
+			"user_password": pass,
 			"error": "ユーザ名またはパスワードが異なります。",
 		})
 		c.Abort()
@@ -83,7 +83,7 @@ func (uc *UserController) Login(c *gin.Context) {
 	if err != nil {
 		c.HTML(500, "login.html", gin.H{
 			"user_name": name,
-			"password": pass,
+			"user_password": pass,
 			"error": "ログインに失敗しました。",
 		})
 		c.Abort()
@@ -124,7 +124,7 @@ func (uc *UserController) UpdatePassword(c *gin.Context) {
 
 	m := map[string]string{}
 	c.BindJSON(&m)
-	pass := m["password"]
+	pass := m["user_password"]
 
 	if uc.userService.UpdatePassword(id, pass) != nil {
 		c.JSON(500, gin.H{"error": "変更に失敗しました。"})

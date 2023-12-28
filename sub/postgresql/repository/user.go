@@ -107,7 +107,7 @@ func (ur *userRepository) GetByName(name string) (model.User, error) {
 		`SELECT 
 			user_id, 
 			user_name, 
-			password, 
+			user_password, 
 			created_at, 
 			updated_at 
 		 FROM users 
@@ -128,8 +128,8 @@ func (ur *userRepository) GetByName(name string) (model.User, error) {
 func (ur *userRepository) Update(u *model.User) error {
 	_, err := ur.db.Exec(
 		`UPDATE users 
-		 SET user_name = $1 
-			 password = $2
+		 SET user_name = $1,
+		 	user_password = $2
 		 WHERE user_id = $3`,
 		u.Username,
 		u.Password, 
@@ -154,7 +154,7 @@ func (ur *userRepository) UpdateName(u *model.User) error {
 func (ur *userRepository) UpdatePassword(u *model.User) error {
 	_, err := ur.db.Exec(
 		`UPDATE users 
-		 SET password = $1 
+		 SET user_password = $1 
 		 WHERE user_id = $2`, 
 		 u.Password, 
 		 u.UserId,

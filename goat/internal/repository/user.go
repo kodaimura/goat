@@ -34,7 +34,7 @@ func (ur *userRepository) Insert(u *model.User) error {
 	_, err := ur.db.Exec(
 		`INSERT INTO users (
 			user_name, 
-			password
+			user_password
 		 ) VALUES(?,?)`,
 		u.Username, 
 		u.Password,
@@ -107,7 +107,7 @@ func (ur *userRepository) GetByName(name string) (model.User, error) {
 		`SELECT 
 			user_id, 
 			user_name, 
-			password, 
+			user_password, 
 			created_at, 
 			updated_at 
 		 FROM users 
@@ -128,8 +128,8 @@ func (ur *userRepository) GetByName(name string) (model.User, error) {
 func (ur *userRepository) Update(u *model.User) error {
 	_, err := ur.db.Exec(
 		`UPDATE users 
-		 SET user_name = ? 
-			 password = ?
+		 SET user_name = ?,
+		 	user_password = ?
 		 WHERE user_id = ?`,
 		u.Username,
 		u.Password, 
@@ -154,7 +154,7 @@ func (ur *userRepository) UpdateName(u *model.User) error {
 func (ur *userRepository) UpdatePassword(u *model.User) error {
 	_, err := ur.db.Exec(
 		`UPDATE users 
-		 SET password = ? 
+		 SET user_password = ? 
 		 WHERE user_id = ?`, 
 		 u.Password, 
 		 u.UserId,
