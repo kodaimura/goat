@@ -85,7 +85,7 @@ func (us *userService) GenerateJWT(id int) (string, error) {
 
 	var cc jwt.CustomClaims
 	cc.UserId = user.Id
-	cc.Username = user.Username
+	cc.UserName = user.Username
 	jwtStr, err := jwt.GenerateJWT(cc)
 
 	if err != nil {

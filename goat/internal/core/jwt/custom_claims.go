@@ -11,7 +11,7 @@ JwtPayload拡張
 
 type CustomClaims struct {
 	UserId int
-	Username string
+	UserName string
 }
 
 
@@ -31,6 +31,6 @@ func GetUserName (c *gin.Context) string {
 		log.Panic("Error: GetUserName")
 		return ""
 	} else {
-		return pl.(JwtPayload).Username
+		return pl.(JwtPayload).UserName
 	}
 }
