@@ -25,10 +25,10 @@ func GetUserId (c *gin.Context) int {
 	}	
 }
 
-func GetUsername (c *gin.Context) string {
+func GetUserName (c *gin.Context) string {
 	pl := c.Keys[CONTEXT_KEY_PAYLOAD]
 	if pl == nil {
-		log.Panic("Error: GetUsername")
+		log.Panic("Error: GetUserName")
 		return ""
 	} else {
 		return pl.(JwtPayload).Username
