@@ -29,7 +29,7 @@ func SetRouter(r *gin.Engine) {
 	api := r.Group("/api", jwt.JwtAuthApiMiddleware())
 	{
 		api.GET("/account/profile", uc.GetProfile)
-		api.PUT("/account/username", uc.UpdateUsername)
+		api.PUT("/account/username", uc.UpdateName)
 		api.PUT("/account/password", uc.UpdatePassword)
 		api.DELETE("/account", uc.DeleteAccount)
 	}

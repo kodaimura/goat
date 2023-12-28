@@ -36,7 +36,7 @@ func (ur *userRepository) Insert(u *model.User) error {
 			user_name, 
 			password
 		 ) VALUES($1,$2)`,
-		u.Username, 
+		u.Name, 
 		u.Password,
 	)
 	return err
@@ -63,7 +63,7 @@ func (ur *userRepository) Get() ([]model.User, error) {
 		u := model.User{}
 		err = rows.Scan(
 			&u.Id, 
-			&u.Username,
+			&u.Name,
 			&u.CreatedAt, 
 			&u.UpdatedAt,
 		)
@@ -91,7 +91,7 @@ func (ur *userRepository) GetById(id int) (model.User, error) {
 		 id,
 	).Scan(
 		&ret.Id, 
-		&ret.Username, 
+		&ret.Name, 
 		&ret.CreatedAt, 
 		&ret.UpdatedAt,
 	)
@@ -115,7 +115,7 @@ func (ur *userRepository) GetByName(name string) (model.User, error) {
 		 name,
 	).Scan(
 		&ret.Id, 
-		&ret.Username, 
+		&ret.Name, 
 		&ret.Password, 
 		&ret.CreatedAt, 
 		&ret.UpdatedAt,
@@ -131,7 +131,7 @@ func (ur *userRepository) Update(u *model.User) error {
 		 SET user_name = $1,
 		 	user_password = $2
 		 WHERE user_id = $3`,
-		u.Username,
+		u.Name,
 		u.Password, 
 		u.Id,
 	)
@@ -144,7 +144,7 @@ func (ur *userRepository) UpdateName(u *model.User) error {
 		`UPDATE users
 		 SET user_name = $1 
 		 WHERE user_id = $2`, 
-		u.Username, 
+		u.Name, 
 		u.Id,
 	)
 	return err

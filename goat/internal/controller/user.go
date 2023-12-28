@@ -137,14 +137,14 @@ func (uc *UserController) UpdatePassword(c *gin.Context) {
 
 
 //PUT /api/account/username
-func (uc *UserController) UpdateUsername(c *gin.Context) {
+func (uc *UserController) UpdateName(c *gin.Context) {
 	id := jwt.GetUserId(c)
 
 	m := map[string]string{}
 	c.BindJSON(&m)
 	name := m["user_name"]
 
-	err := uc.userService.UpdateUsername(id, name)
+	err := uc.userService.UpdateName(id, name)
 	if err != nil {
 		if _, ok := err.(errs.UniqueConstraintError); ok {
 			c.JSON(409, gin.H{"error": "ユーザ名が既に使われています。"})

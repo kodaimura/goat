@@ -16,7 +16,7 @@ type UserService interface {
 	Login(username, password string) (model.User, error)
 	GenerateJWT(id int) (string, error)
 	GetProfile(id int) (model.User, error)
-	UpdateUsername(id int, username string) error
+	UpdateName(id int, username string) error
 	UpdatePassword(id int, password string) error
 	DeleteUser(id int) error
 }
@@ -48,7 +48,7 @@ func (us *userService) Signup(username, password string) error {
 	}
 
 	var user model.User
-	user.Username = username
+	user.Name = username
 	user.Password = string(hashed)
 
 	if err = us.userRepository.Insert(&user); err != nil {
@@ -85,7 +85,7 @@ func (us *userService) GenerateJWT(id int) (string, error) {
 
 	var cc jwt.CustomClaims
 	cc.UserId = user.Id
-	cc.UserName = user.Username
+	cc.UserName = user.Name
 	jwtStr, err := jwt.GenerateJWT(cc)
 
 	if err != nil {
@@ -108,7 +108,7 @@ func (us *userService) GetProfile(id int) (model.User, error) {
 }
 
 
-func (us *userService) UpdateUsername(id int, username string) error {
+func (us *userService) UpdateName(id int, username string) error {
 	u, err := us.userRepository.GetByName(username)
 
 	if err == nil && u.Id != id{
@@ -117,7 +117,7 @@ func (us *userService) UpdateUsername(id int, username string) error {
 
 	var user model.User
 	user.Id = id
-	user.Username = username
+	user.Name = username
 
 	if err = us.userRepository.UpdateName(&user); err != nil {
 		logger.Error(err.Error())
