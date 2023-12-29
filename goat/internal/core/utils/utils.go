@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"math/rand"
+	"time"
 	"strconv"
 )
 
@@ -30,11 +32,12 @@ func ItoaSlice(sl []int) []string {
 
 func RandomString(length int) string {
 	charset := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-	rand.Seed(time.Now().UnixNano())
+	seed := time.Now().UnixNano()
+	r := rand.New(rand.NewSource(seed))
 
 	b := make([]byte, length)
 	for i := range b {
-		b[i] = charset[rand.Intn(len(charset))]
+		b[i] = charset[r.Intn(len(charset))]
 	}
 	return string(b)
 }
