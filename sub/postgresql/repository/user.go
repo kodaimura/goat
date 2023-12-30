@@ -9,7 +9,7 @@ import (
 
 
 type UserRepository interface {
-	Insert(u *model.User) error
+	Insert(u *model.User) (int, error)
 	Get() ([]model.User, error)
 	GetById(id int) (model.User, error)
 	GetByName(name string) (model.User, error)
@@ -30,16 +30,20 @@ func NewUserRepository() UserRepository {
 }
 
 
-func (ur *userRepository) Insert(u *model.User) error {
-	_, err := ur.db.Exec(
+func (ur *userRepository) Insert(u *model.User) (int, error) {
+	var userId int
+	err := ur.db.QueryRow(
 		`INSERT INTO users (
 			user_name, 
 			password
-		 ) VALUES($1,$2)`,
+		 ) VALUES($1,$2)
+		 RETURNING user_id`,
 		u.Name, 
 		u.Password,
+	).Scan(
+		&userId,
 	)
-	return err
+	return userId, err
 }
 
 

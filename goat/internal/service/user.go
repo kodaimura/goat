@@ -51,12 +51,12 @@ func (us *userService) Signup(name, password string) error {
 	user.Name = name
 	user.Password = string(hashed)
 
-	if err = us.userRepository.Insert(&user); err != nil {
+	_, err = us.userRepository.Insert(&user);
+	if err != nil {
 		logger.Error(err.Error())
-		return err
 	}
 
-	return nil
+	return err
 }
 
 
