@@ -1,6 +1,7 @@
 package service
 
 import (
+	"database/sql"
 	"golang.org/x/crypto/bcrypt"
 
 	"goat/internal/core/jwt"
@@ -63,15 +64,20 @@ func (us *userService) Signup(name, password string) error {
 func (us *userService) Login(name, password string) (model.User, error) {
 	user, err := us.userRepository.GetByName(name)
 	if err != nil {
-		return model.User{}, err
+		if err == sql.ErrNoRows {
+			logger.Debug(err.Error())
+		} else {
+			logger.Error(err.Error())
+		}
+		return user, err
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
-		return model.User{}, err
+		logger.Error(err.Error())
 	}
 
-	return user, nil
+	return user, err
 }
 
 
@@ -101,7 +107,11 @@ func (us *userService) GetProfile(id int) (model.User, error) {
 	user, err := us.userRepository.GetById(id)
 
 	if err != nil {
-		logger.Error(err.Error())
+		if err == sql.ErrNoRows {
+			logger.Debug(err.Error())
+		} else {
+			logger.Error(err.Error())
+		}
 	}
 
 	return user, err
