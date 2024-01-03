@@ -121,10 +121,19 @@ func (uc *UserController) GetProfile(c *gin.Context) {
 //PUT /api/account/password
 func (uc *UserController) UpdatePassword(c *gin.Context) {
 	id := jwt.GetUserId(c)
+	name := jwt.GetUserName(c)
 
 	m := map[string]string{}
 	c.BindJSON(&m)
+	oldPass := m["old_user_password"]
 	pass := m["user_password"]
+
+	_, err := uc.userService.Login(name, oldPass)
+	if err != nil {
+		c.JSON(400, gin.H{"error": "旧パスワードが異なります。"})
+		c.Abort()
+		return
+	}
 
 	if uc.userService.UpdatePassword(id, pass) != nil {
 		c.JSON(500, gin.H{"error": "変更に失敗しました。"})
