@@ -36,7 +36,8 @@ func (ur *userRepository) Insert(u *model.User) (int, error) {
 		`INSERT INTO users (
 			user_name, 
 			user_password
-		 ) VALUES(?,?)`,
+		 ) VALUES(?,?)
+		 RETURNING user_id`,
 		u.Name, 
 		u.Password,
 	).Scan(
@@ -47,8 +48,6 @@ func (ur *userRepository) Insert(u *model.User) (int, error) {
 
 
 func (ur *userRepository) Get() ([]model.User, error) {
-	var ret []model.User
-
 	rows, err := ur.db.Query(
 		`SELECT 
 			user_id, 
@@ -57,11 +56,13 @@ func (ur *userRepository) Get() ([]model.User, error) {
 			updated_at 
 		 FROM users`,
 	)
+	defer rows.Close()
 
 	if err != nil {
 		return nil, err
 	}
 
+	ret := []model.User{}
 	for rows.Next() {
 		u := model.User{}
 		err = rows.Scan(
@@ -71,12 +72,12 @@ func (ur *userRepository) Get() ([]model.User, error) {
 			&u.UpdatedAt,
 		)
 		if err != nil {
-			break
+			return nil, err
 		}
 		ret = append(ret, u)
 	}
 
-	return ret, err
+	return ret, nil
 }
 
 
