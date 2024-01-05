@@ -26,6 +26,7 @@ func router() *gin.Engine {
 	r.Static("/js", "web/static/js")
 	r.Static("/img", "web/static/img")
 	r.StaticFile("/favicon.ico", "web/static/favicon.ico")
+	r.StaticFile("/manifest.json", "web/static/manifest.json")
 
 	controller.SetRouter(r)
 
