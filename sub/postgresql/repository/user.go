@@ -35,7 +35,7 @@ func (ur *userRepository) Insert(u *model.User) (int, error) {
 	err := ur.db.QueryRow(
 		`INSERT INTO users (
 			user_name, 
-			password
+			user_password
 		 ) VALUES($1,$2)
 		 RETURNING user_id`,
 		u.Name, 
