@@ -15,6 +15,11 @@ $ bash _setup_setup.sh <appname> [-db {sqlite3| pg | mysql}]
 ```
 * -db オプションを省略した場合は sqlite3 が選択される
 
+```
+$ go mod init <appname>
+$ go mod tidy
+```
+
 ## Setting
 ### appname/config/env 内のファイルを修正
 ```
