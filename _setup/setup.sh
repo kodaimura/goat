@@ -3,7 +3,7 @@
 APP_NAME=${1:-goatapp}
 shift
 
-CURRENT_DIR=$(pwd)
+SELF_DIR=$(cd $(dirname $0); pwd)
 DB="sqlite3"
 
 while (( $# > 0 ))
@@ -28,7 +28,8 @@ if [ $DB != "sqlite3" ] && [ $DB != "pg" ] && [ $DB != "mysql" ]; then
   exit 1
 fi
 
-cd $CURRENT_DIR/$APP_NAME
+cd $SELF_DIR
+cd ../
 
 mv cmd/goat-base cmd/$APP_NAME
 
@@ -36,18 +37,18 @@ mkdir log
 
 if [ $DB = "pg" ]; then
   rm -r scripts
-  cp -r _sub/postgresql/scripts .
-  cp -r _sub/postgresql/repository internal/
-  cp -r _sub/postgresql/db internal/core/
-  cp -r _sub/postgresql/env/local.env config/env/
+  cp -r _setup/postgresql/scripts .
+  cp -r _setup/postgresql/repository internal/
+  cp -r _setup/postgresql/db internal/core/
+  cp -r _setup/postgresql/env/local.env config/env/
 fi
 
 if [ $DB = "mysql" ]; then
   rm -r scripts
-  cp -r _sub/mysql/scripts .
-  cp -r _sub/mysql/repository internal/
-  cp -r _sub/mysql/db internal/core/
-  cp -r _sub/mysql/env/local.env config/env/
+  cp -r _setup/mysql/scripts .
+  cp -r _setup/mysql/repository internal/
+  cp -r _setup/mysql/db internal/core/
+  cp -r _setup/mysql/env/local.env config/env/
 fi
 
 # goat-baseを置換
