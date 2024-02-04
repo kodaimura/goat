@@ -28,8 +28,6 @@ if [ $DB != "sqlite3" ] && [ $DB != "pg" ] && [ $DB != "mysql" ]; then
   exit 1
 fi
 
-git clone https://github.com/kodaimura/goat-base $APP_NAME
-
 cd $CURRENT_DIR/$APP_NAME
 
 mv cmd/goat-base cmd/$APP_NAME
@@ -52,8 +50,6 @@ if [ $DB = "mysql" ]; then
   cp -r _sub/mysql/env/local.env config/env/
 fi
 
-yes | rm -r _sub
-
 # goat-baseを置換
 for fpath in `find . -name "*.go"`
 do sed -i "" s/goat-base/$APP_NAME/g $fpath
@@ -63,7 +59,6 @@ sed -i "" s/goat-base/$APP_NAME/g ./config/env/local.env
 for fpath in `find . -name "*.DS_Store"`
 do rm $fpath
 done
-rm ./README.md
 
 cat <<EOF > .gitignore
 *.log
@@ -77,10 +72,4 @@ EOF
 
 rm go.sum
 rm go.mod
-go mod init $APP_NAME
-go mod tidy
-
-echo ""
-echo "config/env/ 内のファイルを設定"
-echo "開発環境では下記コマンドで実行"
-echo "ENV=local go run cmd/$APP_NAME/main.go"
+yes | rm -r _setup
