@@ -11,7 +11,7 @@ $ git clone https://github.com/kodaimura/goat <appname>
 ## Usage
 ```
 $ cd <appname>
-$ bash _setup_setup.sh <appname> [-db {sqlite3| pg | mysql}]
+$ bash _setup/setup.sh <appname> [-db {sqlite3| pg | mysql}]
 ```
 * -db オプションを省略した場合は sqlite3 が選択される
 
