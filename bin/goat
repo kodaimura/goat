@@ -63,6 +63,7 @@ sed -i "" s/goat-base/$APP_NAME/g ./config/env/local.env
 for fpath in `find . -name "*.DS_Store"`
 do rm $fpath
 done
+rm ./README.md
 
 cat <<EOF > .gitignore
 *.log
