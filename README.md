@@ -1,7 +1,7 @@
 # GOAT
 ## Go Web Application Template
-Go(Gin)のWebアプリケーション雛形作成スクリプト。\
-ディレクトリ構成 + Signup/Login/Logout 機能を画面およびサーバプログラム自動生成。
+Go(Gin)のWebアプリケーション雛形作成スクリプト。[テンプレート](https://github.com/kodaimura/goat-base)\
+ディレクトリ構成 + Signup/Login/Logout 機能を画面およびサーバプログラム自動生成。  
 
 ## Install
 ```
