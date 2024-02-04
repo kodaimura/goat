@@ -3,6 +3,7 @@
 APP_NAME=${1:-goatapp}
 shift
 
+CURRENT_DIR=$(pwd)
 DB="sqlite3"
 
 while (( $# > 0 ))
@@ -27,49 +28,37 @@ if [ $DB != "sqlite3" ] && [ $DB != "pg" ] && [ $DB != "mysql" ]; then
   exit 1
 fi
 
-#シェルの実行ディレクトリの絶対パス
-CURRENT_DIR=$(pwd)
-#このスクリプトの絶対パス
-SELF_DIR=$(cd $(dirname $0); pwd)
-#goatコピー元プログラムの絶対パス
-GOAT_DIR=$(cd $SELF_DIR; cd ../goat; pwd)
-#subプログラムの絶対パス
-SUB_DIR=$(cd $SELF_DIR; cd ../sub; pwd)
+git clone https://github.com/kodaimura/goat-base $APP_NAME
 
-mkdir $CURRENT_DIR/$APP_NAME
 cd $CURRENT_DIR/$APP_NAME
 
-go mod init $APP_NAME
-
-cp -r $GOAT_DIR/cmd .
-mv cmd/goat cmd/$APP_NAME
-
-cp -r $GOAT_DIR/config .
-cp -r $GOAT_DIR/docs .
-cp -r $GOAT_DIR/internal .
-cp -r $GOAT_DIR/scripts .
-cp -r $GOAT_DIR/web .
+mv cmd/goat-base cmd/$APP_NAME
 
 mkdir log
 
 if [ $DB = "pg" ]; then
   rm -r scripts
-  cp -r $SUB_DIR/postgresql/scripts .
-  cp -r $SUB_DIR/postgresql/repository internal/
-  cp -r $SUB_DIR/postgresql/db internal/core/
+  cp -r _sub/postgresql/scripts .
+  cp -r _sub/postgresql/repository internal/
+  cp -r _sub/postgresql/db internal/core/
+  cp -r _sub/postgresql/env/local.env config/env/
 fi
 
 if [ $DB = "mysql" ]; then
   rm -r scripts
-  cp -r $SUB_DIR/mysql/scripts .
-  cp -r $SUB_DIR/mysql/repository internal/
-  cp -r $SUB_DIR/mysql/db internal/core/
+  cp -r _sub/mysql/scripts .
+  cp -r _sub/mysql/repository internal/
+  cp -r _sub/mysql/db internal/core/
+  cp -r _sub/mysql/env/local.env config/env/
 fi
 
-#.goファイル内のgoatを全て置換
+yes | rm -r _sub
+
+# goat-baseを置換
 for fpath in `find . -name "*.go"`
-do sed -i "" s/goat/$APP_NAME/g $fpath
+do sed -i "" s/goat-base/$APP_NAME/g $fpath
 done
+sed -i "" s/goat-base/$APP_NAME/g ./config/env/local.env
 
 for fpath in `find . -name "*.DS_Store"`
 do rm $fpath
@@ -85,11 +74,10 @@ local.env
 main
 EOF
 
-git init
-
+rm go.sum
+rm go.mod
+go mod init $APP_NAME
 go mod tidy
-
-go build cmd/$APP_NAME/main.go
 
 echo ""
 echo "config/env/ 内のファイルを設定"
