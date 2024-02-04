@@ -3,8 +3,8 @@ package repository
 import (
 	"database/sql"
 
-	"goat-base/internal/core/db"
-	"goat-base/internal/model"
+	"goat/internal/core/db"
+	"goat/internal/model"
 )
 
 

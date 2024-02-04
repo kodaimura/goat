@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	jwtpackage "github.com/golang-jwt/jwt/v4"
 
-	"goat-base/config"
+	"goat/config"
 )
 
 

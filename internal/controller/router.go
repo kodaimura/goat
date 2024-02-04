@@ -3,7 +3,7 @@ package controller
 import (
 	"github.com/gin-gonic/gin"
 
-	"goat-base/internal/core/jwt"
+	"goat/internal/core/jwt"
 )
 
 

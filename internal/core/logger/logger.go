@@ -9,7 +9,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"goat-base/config"
+	"goat/config"
 )
 
 

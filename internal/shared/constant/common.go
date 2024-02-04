@@ -1,7 +1,7 @@
 package constant
 
 
-const APPNAME string = "goat-base"
+const APPNAME string = "goat"
 
 //フラグ系(*_FLG)テーブルカラム設定値 
 const FLG_ON = 1

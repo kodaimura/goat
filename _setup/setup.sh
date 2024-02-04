@@ -31,7 +31,7 @@ fi
 cd $SELF_DIR
 cd ../
 
-mv cmd/goat-base cmd/$APP_NAME
+mv cmd/goat cmd/$APP_NAME
 
 mkdir log
 
@@ -51,11 +51,11 @@ if [ $DB = "mysql" ]; then
   cp -r _setup/mysql/env/local.env config/env/
 fi
 
-# goat-baseを置換
+# goatを置換
 for fpath in `find . -name "*.go"`
-do sed -i "" s/goat-base/$APP_NAME/g $fpath
+do sed -i "" s/goat/$APP_NAME/g $fpath
 done
-sed -i "" s/goat-base/$APP_NAME/g ./config/env/local.env
+sed -i "" s/goat/$APP_NAME/g ./config/env/local.env
 
 for fpath in `find . -name "*.DS_Store"`
 do rm $fpath

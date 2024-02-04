@@ -4,11 +4,11 @@ import (
 	"database/sql"
 	"golang.org/x/crypto/bcrypt"
 
-	"goat-base/internal/core/jwt"
-	"goat-base/internal/core/logger"
-	"goat-base/internal/core/errs"
-	"goat-base/internal/model"
-	"goat-base/internal/repository"
+	"goat/internal/core/jwt"
+	"goat/internal/core/logger"
+	"goat/internal/core/errs"
+	"goat/internal/model"
+	"goat/internal/repository"
 )
 
 

@@ -3,10 +3,10 @@ package controller
 import (
 	"github.com/gin-gonic/gin"
 
-	"goat-base/config"
-	"goat-base/internal/core/jwt"
-	"goat-base/internal/core/errs"
-	"goat-base/internal/service"
+	"goat/config"
+	"goat/internal/core/jwt"
+	"goat/internal/core/errs"
+	"goat/internal/service"
 )
 
 type UserController struct {

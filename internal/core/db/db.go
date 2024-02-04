@@ -6,7 +6,7 @@ import (
 	
 	_ "github.com/mattn/go-sqlite3"
 
-	"goat-base/config"
+	"goat/config"
 )
 
 

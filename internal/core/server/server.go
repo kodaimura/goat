@@ -3,9 +3,9 @@ package server
 import (
 	"github.com/gin-gonic/gin"
 
-	"goat-base/config"
-	"goat-base/internal/core/logger"
-	"goat-base/internal/controller"
+	"goat/config"
+	"goat/internal/core/logger"
+	"goat/internal/controller"
 )
 
 func Run() {
