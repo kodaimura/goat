@@ -1,0 +1,29 @@
+version: "3.8"
+
+services:
+  app:
+    container_name: goat_app
+    build:
+      context: .
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    volumes:
+      - .:/usr/src/app
+    working_dir: /usr/src/app
+    tty: true
+    environment:
+      - ENV=local
+
+  db:
+    container_name: goat_db
+    image: mysql:8.0.3
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: goat
+      TZ: Asia/Tokyo
+    volumes:
+      - ./my.ini:/etc/mysql/conf.d/my.cnf
+      - ./scripts:/docker-entrypoint-initdb.d
+      - ./data:/var/lib/postgresql/data 

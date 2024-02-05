@@ -41,6 +41,7 @@ if [ $DB = "pg" ]; then
   cp -r _setup/postgresql/repository internal/
   cp -r _setup/postgresql/db internal/core/
   cp -r _setup/postgresql/env/local.env config/env/
+  cp -r _setup/postgresql/docker-compose.yml .
 fi
 
 if [ $DB = "mysql" ]; then
@@ -49,13 +50,19 @@ if [ $DB = "mysql" ]; then
   cp -r _setup/mysql/repository internal/
   cp -r _setup/mysql/db internal/core/
   cp -r _setup/mysql/env/local.env config/env/
+  cp -r _setup/mysql/docker-compose.yml .
+  cp -r _setup/mysql/my.ini .
 fi
 
 # goatを置換
 for fpath in `find . -name "*.go"`
 do sed -i "" s/goat/$APP_NAME/g $fpath
 done
+sed -i "" s/goat/$APP_NAME/g Makefile
+sed -i "" s/goat/$APP_NAME/g Dockerfile
+sed -i "" s/goat/$APP_NAME/g docker-compose.yml
 sed -i "" s/goat/$APP_NAME/g ./config/env/local.env
+sed -i "" s/goat/$APP_NAME/g ./web/static/manifest.json
 
 for fpath in `find . -name "*.DS_Store"`
 do rm $fpath
@@ -69,6 +76,7 @@ cat <<EOF > .gitignore
 local.env
 .DS_Store
 main
+data
 EOF
 
 rm go.sum
