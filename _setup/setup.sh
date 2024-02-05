@@ -37,7 +37,7 @@ mkdir log
 
 if [ $DB = "sqlite3" ]; then
   touch $APP_NAME.db
-  RUN sqlite3 $APP_NAME.db < ./scripts/create-table.sql
+  sqlite3 $APP_NAME.db < ./scripts/create-table.sql
 fi
 
 if [ $DB = "pg" ]; then
@@ -47,6 +47,7 @@ if [ $DB = "pg" ]; then
   cp -r _setup/postgresql/db internal/core/
   cp -r _setup/postgresql/env/local.env config/env/
   cp -r _setup/postgresql/docker-compose.yml .
+  cp -r _setup/postgresql/Dockerfile .
 fi
 
 if [ $DB = "mysql" ]; then
@@ -56,6 +57,7 @@ if [ $DB = "mysql" ]; then
   cp -r _setup/mysql/db internal/core/
   cp -r _setup/mysql/env/local.env config/env/
   cp -r _setup/mysql/docker-compose.yml .
+  cp -r _setup/mysql/Dockerfile .
   cp -r _setup/mysql/my.ini .
 fi
 
@@ -63,6 +65,7 @@ fi
 for fpath in `find . -name "*.go"`
 do sed -i "" s/goat/$APP_NAME/g $fpath
 done
+sed -i "" s/goat/$APP_NAME/g go.mod
 sed -i "" s/goat/$APP_NAME/g Makefile
 sed -i "" s/goat/$APP_NAME/g Dockerfile
 sed -i "" s/goat/$APP_NAME/g docker-compose.yml
@@ -83,6 +86,5 @@ local.env
 main
 data
 EOF
-
 
 yes | rm -r _setup
