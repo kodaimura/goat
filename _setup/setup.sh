@@ -37,6 +37,7 @@ mkdir log
 
 if [ $DB = "sqlite3" ]; then
   touch $APP_NAME.db
+  RUN sqlite3 $APP_NAME.db < ./scripts/create-table.sql
 fi
 
 if [ $DB = "pg" ]; then
@@ -83,6 +84,5 @@ main
 data
 EOF
 
-rm go.sum
-rm go.mod
+
 yes | rm -r _setup
