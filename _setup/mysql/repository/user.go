@@ -32,14 +32,20 @@ func NewUserRepository() UserRepository {
 
 func (ur *userRepository) Insert(u *model.User) (int, error) {
 	var userId int
-	err := ur.db.QueryRow(
+	_, err := ur.db.Exec(
 		`INSERT INTO users (
 			user_name, 
 			user_password
-		 ) VALUES(?,?)
-		 RETURNING user_id`,
+		 ) VALUES(?,?)`,
 		u.Name, 
 		u.Password,
+	)
+	if err != nil {
+		return userId, err
+	}
+
+	err = ur.db.QueryRow(
+		`SELECT LAST_INSERT_ID() AS user_id`,
 	).Scan(
 		&userId,
 	)
