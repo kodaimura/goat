@@ -35,6 +35,10 @@ mv cmd/goat cmd/$APP_NAME
 
 mkdir log
 
+if [ $DB = "sqlite3" ]; then
+  touch $APP_NAME.db
+fi
+
 if [ $DB = "pg" ]; then
   rm -r scripts
   cp -r _setup/postgresql/scripts .

@@ -13,3 +13,4 @@ services:
     tty: true
     environment:
       - ENV=local
+    command: ["sh", "-c", "sqlite3 goat.db < ./scripts/create-table.sql"]
