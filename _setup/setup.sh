@@ -83,6 +83,7 @@ cat <<EOF > .gitignore
 *.sqlite3
 .env
 local.env
+docker.env
 .DS_Store
 main
 data
