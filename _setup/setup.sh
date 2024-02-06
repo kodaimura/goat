@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [ $# -eq 0 ]; then
+    echo "ERROR: bash _setup/setup.sh <appname> [-db {sqlite3| postgres | mysql}]"
+    exit 1
+fi
+
 APP_NAME=${1:-goatapp}
 shift
 
@@ -13,7 +18,7 @@ do
       if [[ $1 =~ ^--db= ]]; then
         DB=$2
       elif [ -z $2 ]; then
-        echo "'db' requires an argument. (sqlite3 or pg or mysql)" 1>&2
+        echo "ERROR: bash _setup/setup.sh <appname> [-db {sqlite3| postgres | mysql}]"
         exit 1
       else
         DB=$2
@@ -23,8 +28,8 @@ do
   shift
 done
 
-if [ $DB != "sqlite3" ] && [ $DB != "pg" ] && [ $DB != "mysql" ]; then
-	echo "'db' requires an argument. (sqlite3 or pg or mysql)" 1>&2
+if [ $DB != "sqlite3" ] && [ $DB != "postgres" ] && [ $DB != "mysql" ]; then
+	echo "ERROR: bash _setup/setup.sh <appname> [-db {sqlite3| postgres | mysql}]"
   exit 1
 fi
 
@@ -40,7 +45,7 @@ if [ $DB = "sqlite3" ]; then
   sqlite3 $APP_NAME.db < ./scripts/create-table.sql
 fi
 
-if [ $DB = "pg" ]; then
+if [ $DB = "postgres" ]; then
   rm -r scripts
   cp -r _setup/postgresql/scripts .
   cp -r _setup/postgresql/repository internal/
@@ -81,9 +86,7 @@ cat <<EOF > .gitignore
 *.log
 *.db
 *.sqlite3
-.env
-local.env
-docker.env
+*.env
 .DS_Store
 main
 data
