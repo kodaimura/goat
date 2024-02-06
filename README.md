@@ -1,7 +1,9 @@
 # GOAT
 ## Go Web Application Template
-Go(Gin)のWebアプリケーション雛形作成スクリプト。  
-ディレクトリ構成 + Signup/Login/Logout 機能を画面およびサーバプログラム自動生成。  
+Go(Gin)のWebアプリケーション雛形。詳しくはプログラム参照。  
+usersテーブルをデフォルトで用意しており、サインアップ/ログイン機能を実装。
+
+https://github.com/kodaimura/create-app の設定により、下記 Install ~ 共通セットアップまでが一つのコマンドで可能。
 
 ## Install
 ```
@@ -9,60 +11,49 @@ $ git clone https://github.com/kodaimura/goat <appname>
 ```
 
 ## Usage
+### 共通セットアップ
 ```
 $ cd <appname>
-$ bash _setup/setup.sh <appname> [-db {sqlite3| pg | mysql}]
+$ bash _setup/setup.sh <appname> [-db {sqlite3| postgres | mysql}]
 ```
 * -db オプションを省略した場合は sqlite3 が選択される
 
+### Dockerで起動する場合
+* Dockerイメージ作成 & コンテナ起動
 ```
-$ go mod init <appname>
-$ go mod tidy
+$ make up
 ```
+* Dockerコンテナアクセス
+```
+$ make in
+```
+* アプリ起動（Dockerコンテナ内）
+```
+$ go mod tidy （初回のみ）
+$ make run
+```
+http://localhost:3000
 
-## Setting
-### appname/config/env 内のファイルを修正
+### ローカルで起動する場合
+* <appname>/config/env/local.env 修正
 ```
 # local.env (開発環境用の設定ファイル)
-
-APP_HOST=localhost (必須)
-APP_PORT=3000      (必須)
-DB_NAME=           (必須)
-DB_HOST=localhost
+APP_HOST=localhost
+APP_PORT=3000
+DB_NAME=
+DB_HOST=
 DB_PORT=
 DB_USER=
 DB_PASSWORD=
-JWT_SECRET_KEY=    (必須)
+JWT_SECRET_KEY=
+
+# sqlite3 の場合 DB_NAME にはdbファイルの絶対パスまたは、プロジェクトのルートフォルダからの相対パスを記載する。
 ```
+* DB作成
 
-* sqlite3 の場合 DB_NAME にはdbファイルの絶対パスまたは、プロジェクトのルートフォルダからの相対パスを記載する。
-
-### DB作成
-* sqlite3
-
+* アプリ起動
 ```
-任意の場所にdb作成
-$ sqlite3 [DB_NAME].db
-
-DB_NAME> .read scripts/create-table.sql
+$ go mod tidy （初回のみ）
+$ make lrun
 ```
-
-* postgresql
-```
-$ psql -d postgres
-
-postgres=# CREATE DATABASE [DB_NAME]
-CREATE DATABASE
-
-postgres=# \c [DB_NAME]
-
-DB_NAME=# scripts/create-function.sql
-DB_NAME=# scripts/create-table.sql
-```
-
-### 実行
-* 開発環境では下記コマンドで実行 (local.envが読み込まれる)
-
-```
-ENV=local go run cmd/<appname>/main.go
-```
+http://localhost:3000
