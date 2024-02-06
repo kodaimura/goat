@@ -45,7 +45,7 @@ if [ $DB = "pg" ]; then
   cp -r _setup/postgresql/scripts .
   cp -r _setup/postgresql/repository internal/
   cp -r _setup/postgresql/db internal/core/
-  cp -r _setup/postgresql/env/local.env config/env/
+  cp -r _setup/postgresql/env config/
   cp -r _setup/postgresql/docker-compose.yml .
   cp -r _setup/postgresql/Dockerfile .
 fi
@@ -55,7 +55,7 @@ if [ $DB = "mysql" ]; then
   cp -r _setup/mysql/scripts .
   cp -r _setup/mysql/repository internal/
   cp -r _setup/mysql/db internal/core/
-  cp -r _setup/mysql/env/local.env config/env/
+  cp -r _setup/mysql/env config/
   cp -r _setup/mysql/docker-compose.yml .
   cp -r _setup/mysql/Dockerfile .
   cp -r _setup/mysql/my.ini .
@@ -70,6 +70,7 @@ sed -i "" s/goat/$APP_NAME/g Makefile
 sed -i "" s/goat/$APP_NAME/g Dockerfile
 sed -i "" s/goat/$APP_NAME/g docker-compose.yml
 sed -i "" s/goat/$APP_NAME/g ./config/env/local.env
+sed -i "" s/goat/$APP_NAME/g ./config/env/docker.env
 sed -i "" s/goat/$APP_NAME/g ./web/static/manifest.json
 
 for fpath in `find . -name "*.DS_Store"`

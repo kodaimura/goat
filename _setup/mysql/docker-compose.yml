@@ -14,7 +14,7 @@ services:
     working_dir: /usr/src/app
     tty: true
     environment:
-      - ENV=local
+      - ENV=docker
 
   db:
     container_name: goat_db
