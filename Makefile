@@ -29,7 +29,7 @@ in:
 db:
 	docker exec -i -t goat_db bash
 
-clear:
+build:
 	docker compose build --no-cache
 
 # Docker Container
