@@ -19,9 +19,8 @@ const LOG_LEVEL_WARNING = 3
 const LOG_LEVEL_ERROR = 4
 const LOG_LEVEL_FATAL = 5
 
-const LOGFOLDER = "log/"
-const FORMAT = "2006-01-02-15-04-05"
-const LOGFILE_EX = ".log"
+const LOGFOLDER = "log"
+const LOGFILE = "app.log"
 
 var file *os.File
 
@@ -37,13 +36,16 @@ var logLevel int
 func init() {
 	_, err := os.Stat(LOGFOLDER)
 	if err != nil {
-		os.Mkdir(LOGFOLDER, 0777)
+		os.Mkdir(LOGFOLDER, 0755)
 	}
 
-	t := time.Now()
-	fn := LOGFOLDER + t.Format(FORMAT) + LOGFILE_EX
-
-	file, err = os.Create(fn);
+	fp := LOGFOLDER + "/" + LOGFILE
+	_, err = os.Stat(fp)
+	if err != nil {
+		file, err = os.Create(fp)
+	} else {
+		file, err = os.OpenFile(fp, os.O_APPEND|os.O_WRONLY, 0644)
+	}
 
 	if err != nil {
 		log.Panic(err)
