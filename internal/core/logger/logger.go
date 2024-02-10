@@ -4,7 +4,6 @@ import (
 	"log"
 	"io"
 	"os"
-	"time"
 	"runtime"
 
 	"github.com/gin-gonic/gin"
