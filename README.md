@@ -3,7 +3,8 @@
 Go(Gin)のWebアプリケーション雛形。詳しくはプログラム参照。  
 usersテーブルをデフォルトで用意しており、サインアップ/ログイン機能を実装。
 
-https://github.com/kodaimura/create-app の設定により、下記 Install ~ 共通セットアップまでが一つのコマンドで可能。
+https://github.com/kodaimura/create-app の設定により、
+下記 Install ~ 共通セットアップまでが一つのコマンドで可能。
 
 ## Install
 ```
