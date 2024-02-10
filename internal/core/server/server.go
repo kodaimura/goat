@@ -4,13 +4,11 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"goat/config"
-	"goat/internal/core/logger"
 	"goat/internal/controller"
 )
 
 func Run() {
 	cf := config.GetConfig()
-	logger.SetOutputLogToFile()
 	r := router()
 	r.Run(":" + cf.AppPort)
 }

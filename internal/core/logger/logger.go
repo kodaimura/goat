@@ -82,6 +82,7 @@ func init() {
 		log.LstdFlags,
 	)
 
+	gin.DefaultWriter = io.MultiWriter(os.Stdout, file)
 }
 
 
@@ -101,11 +102,6 @@ func getLogLevel() int {
 	default:
 		return LOG_LEVEL_INFO
 	}
-}
-
-
-func SetOutputLogToFile() {
-	gin.DefaultWriter = io.MultiWriter(os.Stdout, file)
 }
 
 
