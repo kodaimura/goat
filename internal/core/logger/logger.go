@@ -109,9 +109,11 @@ func Debug(msg string) {
 	if logLevel > LOG_LEVEL_DEBUG {
 		return
 	}
-	pc, _, _, _ := runtime.Caller(1)
+	pc, file, line, _ := runtime.Caller(1)
 	f := runtime.FuncForPC(pc)
-	logD.Println(f.Name(), msg)
+	logD.Println("\n", "File:", file, "Line:", line, "\n",
+		"Func:", f.Name(), "Msg:", msg,
+	)
 }
 
 
@@ -129,9 +131,11 @@ func Warning(msg string) {
 	if logLevel > LOG_LEVEL_WARNING {
 		return
 	}
-	pc, _, _, _ := runtime.Caller(1)
+	pc, file, line, _ := runtime.Caller(1)
 	f := runtime.FuncForPC(pc)
-	logW.Println(f.Name(), msg)
+	logW.Println("\n", "File:", file, "Line:", line, "\n",
+		"Func:", f.Name(), "Msg:", msg,
+	)
 }
 
 
