@@ -81,6 +81,7 @@ sed -i "" s/goat/$APP_NAME/g ./web/static/manifest.json
 for fpath in `find . -name "*.DS_Store"`
 do rm $fpath
 done
+yes | rm -r .git
 
 cat <<EOF > .gitignore
 *.log
