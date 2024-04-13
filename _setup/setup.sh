@@ -38,8 +38,6 @@ cd ../
 
 mv cmd/goat cmd/$APP_NAME
 
-mkdir log
-
 if [ $DB = "sqlite3" ]; then
   touch $APP_NAME.db
   sqlite3 $APP_NAME.db < ./scripts/create-table.sql
