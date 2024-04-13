@@ -105,7 +105,7 @@ func (uc *UserController) Logout(c *gin.Context) {
 
 
 //GET /api/account/profile
-func (uc *UserController) GetProfile(c *gin.Context) {
+func (uc *UserController) ApiGetProfile(c *gin.Context) {
 	user, err := uc.userService.GetProfile(jwt.GetUserId(c))
 
 	if err != nil {
@@ -119,7 +119,7 @@ func (uc *UserController) GetProfile(c *gin.Context) {
 
 
 //PUT /api/account/password
-func (uc *UserController) UpdatePassword(c *gin.Context) {
+func (uc *UserController) ApiPutPassword(c *gin.Context) {
 	id := jwt.GetUserId(c)
 	name := jwt.GetUserName(c)
 
@@ -146,7 +146,7 @@ func (uc *UserController) UpdatePassword(c *gin.Context) {
 
 
 //PUT /api/account/name
-func (uc *UserController) UpdateName(c *gin.Context) {
+func (uc *UserController) ApiPutName(c *gin.Context) {
 	id := jwt.GetUserId(c)
 
 	m := map[string]string{}
@@ -168,7 +168,7 @@ func (uc *UserController) UpdateName(c *gin.Context) {
 
 
 //DELETE /api/account
-func (uc *UserController) DeleteAccount(c *gin.Context) {
+func (uc *UserController) ApiDeleteAccount(c *gin.Context) {
 	id := jwt.GetUserId(c)
 
 	if uc.userService.DeleteUser(id) != nil {
