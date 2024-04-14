@@ -78,7 +78,7 @@ func (uc *UserController) Login(c *gin.Context) {
 		return
 	}
 
-	jwtStr, err := uc.userService.GenerateJWT(user.Id)
+	pl, err := uc.userService.GenerateJwtPayload(user.Id)
 
 	if err != nil {
 		c.HTML(500, "login.html", gin.H{
@@ -89,9 +89,7 @@ func (uc *UserController) Login(c *gin.Context) {
 		c.Abort()
 		return
 	}
-
-	cf := config.GetConfig()
-	c.SetCookie(jwt.COOKIE_KEY_JWT, jwtStr, int(jwt.JWT_EXPIRES), "/", cf.AppHost, false, true)
+	jwt.SetPayload(c, pl)
 	c.Redirect(303, "/")
 }
 
@@ -106,7 +104,8 @@ func (uc *UserController) Logout(c *gin.Context) {
 
 //GET /api/account/profile
 func (uc *UserController) ApiGetProfile(c *gin.Context) {
-	user, err := uc.userService.GetProfile(jwt.GetUserId(c))
+	pl := jwt.GetPayload(c)
+	user, err := uc.userService.GetProfile(pl.UserId)
 
 	if err != nil {
 		c.JSON(500, gin.H{})
@@ -120,8 +119,9 @@ func (uc *UserController) ApiGetProfile(c *gin.Context) {
 
 //PUT /api/account/password
 func (uc *UserController) ApiPutPassword(c *gin.Context) {
-	id := jwt.GetUserId(c)
-	name := jwt.GetUserName(c)
+	pl := jwt.GetPayload(c)
+	id := pl.UserId
+	name := pl.UserName
 
 	m := map[string]string{}
 	c.BindJSON(&m)
@@ -147,7 +147,8 @@ func (uc *UserController) ApiPutPassword(c *gin.Context) {
 
 //PUT /api/account/name
 func (uc *UserController) ApiPutName(c *gin.Context) {
-	id := jwt.GetUserId(c)
+	pl := jwt.GetPayload(c)
+	id := pl.UserId
 
 	m := map[string]string{}
 	c.BindJSON(&m)
@@ -169,7 +170,8 @@ func (uc *UserController) ApiPutName(c *gin.Context) {
 
 //DELETE /api/account
 func (uc *UserController) ApiDeleteAccount(c *gin.Context) {
-	id := jwt.GetUserId(c)
+	pl := jwt.GetPayload(c)
+	id := pl.UserId
 
 	if uc.userService.DeleteUser(id) != nil {
 		c.JSON(500, gin.H{"error": "削除に失敗しました。"})

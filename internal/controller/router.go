@@ -3,7 +3,7 @@ package controller
 import (
 	"github.com/gin-gonic/gin"
 
-	"goat/internal/core/jwt"
+	"goat/internal/middleware"
 )
 
 
@@ -19,13 +19,13 @@ func SetRouter(r *gin.Engine) {
 	r.GET("/logout", uc.Logout)
 
 	//render HTML or redirect (Authorized request)
-	a := r.Group("/", jwt.JwtAuthMiddleware())
+	a := r.Group("/", middleware.JwtAuthMiddleware())
 	{
 		a.GET("/", rc.IndexPage)
 	}
 
 	//response JSON (Authorized request)
-	api := r.Group("/api", jwt.JwtAuthApiMiddleware())
+	api := r.Group("/api", middleware.JwtAuthApiMiddleware())
 	{
 		api.GET("/account/profile", uc.ApiGetProfile)
 		api.PUT("/account/name", uc.ApiPutName)

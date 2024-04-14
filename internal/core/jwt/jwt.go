@@ -3,7 +3,6 @@ package jwt
 import (
 	"encoding/json"
 	"errors"
-	"time"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -13,38 +12,52 @@ import (
 )
 
 
-type JwtPayload struct {
-	jwtpackage.StandardClaims
-	CustomClaims
-}
-
-
-func GenerateJWT(claims CustomClaims) (string, error) {
-	pl := generatePayload(claims)
-
-	return encodeJWT(pl)
-}
-
-
-func generatePayload(claims CustomClaims) JwtPayload {
-	var pl JwtPayload
-
-	pl.CustomClaims = claims
-	pl.IssuedAt =  time.Now().Unix()
-	pl.ExpiresAt = time.Now().Add(time.Second * JWT_EXPIRES).Unix()
-
-	return pl
-}
-
-
-func encodeJWT(payload JwtPayload) (string, error) {
+func SetPayload (c *gin.Context, pl JwtPayload) error {
+	jwtStr, err := EncodeJwt(pl)
+	if err != nil {
+		return err
+	}
 	cf := config.GetConfig()
-	token := jwtpackage.NewWithClaims(jwtpackage.SigningMethodHS256, payload)
+	c.SetCookie(COOKIE_KEY_JWT, jwtStr, int(JWT_EXPIRES), "/", cf.AppHost, false, true)
+	return nil
+}
+
+
+func GetPayload(c *gin.Context) JwtPayload {
+	pl := c.Keys[CONTEXT_KEY_PAYLOAD]
+	return pl.(JwtPayload)
+}
+
+
+func EncodeJwt (pl JwtPayload) (string, error) {
+	return encodeJwt(pl)
+}
+
+
+func Auth(c *gin.Context) error {
+	tokenStr, err := getJwtToken(c)
+	if err != nil {
+		return err
+	}
+
+	pl, err := decodeJwt(tokenStr)
+	if err != nil {
+		return err
+	}
+	
+	c.Set(CONTEXT_KEY_PAYLOAD, pl)
+	return nil
+}
+
+
+func encodeJwt(pl JwtPayload) (string, error) {
+	cf := config.GetConfig()
+	token := jwtpackage.NewWithClaims(jwtpackage.SigningMethodHS256, pl)
 	return token.SignedString([]byte(cf.JwtSecretKey))
 }
 
 
-func decodeJWT(encoded string) (*jwtpackage.Token, error) {
+func decodeJwt(encoded string) (JwtPayload, error) {
 	cf := config.GetConfig()
 	token, err := jwtpackage.Parse(encoded, func(token *jwtpackage.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwtpackage.SigningMethodHMAC); !ok {
@@ -52,56 +65,32 @@ func decodeJWT(encoded string) (*jwtpackage.Token, error) {
 		}
 		return []byte(cf.JwtSecretKey), nil
 	})
-
-	return token, err
-} 
-
-
-func JwtAuthMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		jwtStr, _ := extractTokenFromCookie(c)
-		pl, err := jwtAuth(jwtStr)
-
-		if err != nil {
-			c.Redirect(303, "/login")
-			c.Abort()
-			return
-		}
-		c.Set(CONTEXT_KEY_PAYLOAD, pl)
-		c.Next()
-	}
-}
-
-
-func JwtAuthApiMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		//jwtStr, _ := extractTokenFromRequestHeader(c)
-		jwtStr, _ := extractTokenFromCookie(c)
-		pl, err := jwtAuth(jwtStr)
-
-		if err != nil {
-			c.JSON(401, gin.H{"error": err.Error()})
-			c.Abort()
-			return
-		}
-		c.Set(CONTEXT_KEY_PAYLOAD, pl)
-		c.Next()
-	}
-}
-
-
-func jwtAuth(jwtStr string) (JwtPayload, error) {
-	token, err := decodeJWT(jwtStr)
-
 	if err != nil {
 		return JwtPayload{}, err
 	}
 
-	return getPayload(token)
+	return convertToPayload(token)
 }
 
 
-func getPayload(token *jwtpackage.Token) (JwtPayload, error) {
+func getJwtToken (c *gin.Context) (string, error) {
+	token, err := c.Cookie(COOKIE_KEY_JWT)
+	if err == nil {
+		return token, nil
+	}
+
+	bearer := c.Request.Header.Get("Authorization")
+	if bearer != "" {
+		if strings.Index(bearer, "Bearer ") != 0 {
+			return strings.TrimSpace(bearer[7:]), nil
+		}
+	}
+
+	return "", errors.New("Token not found")
+}
+
+
+func convertToPayload(token *jwtpackage.Token) (JwtPayload, error) {
 	var pl JwtPayload
 
 	jsonString, err := json.Marshal(token.Claims.(jwtpackage.MapClaims))
@@ -111,20 +100,4 @@ func getPayload(token *jwtpackage.Token) (JwtPayload, error) {
 	}
 
 	return pl, err
-}
-
-
-func extractTokenFromCookie (c *gin.Context) (string, error) {
-	return c.Cookie(COOKIE_KEY_JWT)
-} 
-
-
-func extractTokenFromRequestHeader (c *gin.Context) (string, error) {
-	tokenString := c.Request.Header.Get("Authorization")
-	if tokenString == "" {
-		return "", errors.New("Hint: Authorization")
-	}else if strings.Index(tokenString, "Bearer ") != 0 {
-		return "", errors.New("Hint: Bearer")
-	}
-	return strings.TrimSpace(tokenString[7:]), nil
 }
