@@ -1,6 +1,7 @@
 package jwt
 
 import (
+	"time"
 	"encoding/json"
 	"errors"
 	"strings"
@@ -31,6 +32,9 @@ func RemoveTokenFromCookie (c *gin.Context) {
 
 func GetPayload(c *gin.Context) JwtPayload {
 	pl := c.Keys[CONTEXT_KEY_PAYLOAD]
+	if pl == nil {
+		return JwtPayload{}
+	}
 	return pl.(JwtPayload)
 }
 
@@ -38,6 +42,12 @@ func GetPayload(c *gin.Context) JwtPayload {
 func EncodeJwt (pl JwtPayload) (string, error) {
 	return encodeJwt(pl)
 }
+
+func ExpireJwt (pl JwtPayload) JwtPayload {
+	pl.IssuedAt =  time.Now().Unix()
+	pl.ExpiresAt = time.Now().Unix()
+	return pl
+}  
 
 
 func Auth (c *gin.Context) error {
