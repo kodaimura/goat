@@ -81,7 +81,7 @@ func (uc *UserController) Login(c *gin.Context) {
 //GET /logout
 func (uc *UserController) Logout(c *gin.Context) {
 	jwt.RemoveTokenFromCookie(c)
-	c.JSON(200, gin.H{})
+	c.Redirect(303, "/login")
 }
 
 
