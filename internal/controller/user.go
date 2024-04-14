@@ -33,70 +33,55 @@ func (uc *UserController) LoginPage(c *gin.Context) {
 
 //POST /signup
 func (uc *UserController) Signup(c *gin.Context) {
-	name := c.PostForm("user_name")
-	pass := c.PostForm("user_password")
+	m := map[string]string{}
+	c.BindJSON(&m)
+	name := m["user_name"]
+	pass := m["user_password"]
 
 	err := uc.userService.Signup(name, pass)
-
 	if err != nil {
 		if _, ok := err.(errs.UniqueConstraintError); ok {
-			c.HTML(409, "signup.html", gin.H{
-				"user_name": name,
-				"user_password": pass,
-				"error": "ユーザ名が既に使われています。",
-			})
+			c.JSON(409, gin.H{"error": "ユーザ名が既に使われています。"})
 		} else {
-			c.HTML(500, "signup.html", gin.H{
-				"user_name": name,
-				"user_password": pass,
-				"error": "登録に失敗しました。",
-			})
+			c.JSON(500, gin.H{"error": "登録に失敗しました。"})
 		}
 		c.Abort()
 		return
 	}
-
-	c.Redirect(303, "/login")
+	c.JSON(200, gin.H{})
 }
 
 
 //POST /login
 func (uc *UserController) Login(c *gin.Context) {
-	name := c.PostForm("user_name")
-	pass := c.PostForm("user_password")
+	m := map[string]string{}
+	c.BindJSON(&m)
+	name := m["user_name"]
+	pass := m["user_password"]
 
 	user, err := uc.userService.Login(name, pass)
-
 	if err != nil {
-		c.HTML(401, "login.html", gin.H{
-			"user_name": name,
-			"user_password": pass,
-			"error": "ユーザ名またはパスワードが異なります。",
-		})
+		c.JSON(401, gin.H{"error": "ユーザ名またはパスワードが異なります。"})
 		c.Abort()
 		return
 	}
 
 	pl, err := uc.userService.GenerateJwtPayload(user.Id)
-
 	if err != nil {
-		c.HTML(500, "login.html", gin.H{
-			"user_name": name,
-			"user_password": pass,
-			"error": "ログインに失敗しました。",
-		})
+		c.JSON(500, gin.H{"error": "ログインに失敗しました。"})
 		c.Abort()
 		return
 	}
+
 	jwt.SetTokenToCookie(c, pl)
-	c.Redirect(303, "/")
+	c.JSON(200, gin.H{})
 }
 
 
 //GET /logout
 func (uc *UserController) Logout(c *gin.Context) {
 	jwt.RemoveTokenFromCookie(c)
-	c.Redirect(303, "/login")
+	c.JSON(200, gin.H{})
 }
 
 

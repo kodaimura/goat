@@ -9,22 +9,23 @@
 	<div class="row justify-content-center">
 		<h2 class="text-center">ログイン</h2>
 		<div class="col-md-6">
-			<div class="text-danger">{{.error}}</div>
-			<form method="POST">
+			<div class="text-danger" id="error"></div>
+			<form onsubmit="return false" id="login-form">
 				<div class="input-group mb-3">
 					<span class="input-group-text"><i class="bi bi-person-fill"></i></span>
-					<input type="text" name="user_name" value="{{.user_name}}" class="form-control" placeholder="ユーザ名">
+					<input type="text" name="user_name" class="form-control" placeholder="ユーザ名">
 				</div>
 				<div class="input-group mb-3">
 					<span class="input-group-text"><i class="bi bi-key-fill"></i></span>
-					<input type="password" name="user_password" value="{{.user_password}}" class="form-control" placeholder="パスワード">
+					<input type="password" name="user_password" class="form-control" placeholder="パスワード">
 				</div>
-				<button type="submit" id="signin" class="btn btn-primary w-100">ログイン</button>
+				<button class="btn btn-primary w-100" onclick="login()">ログイン</button>
 			</form>
 		</div>
 	</div>
 </main>
 
 {{template "footer" .}}
+<script type="text/javascript" src="/js/login.js"></script>
 </body>
 </html>

@@ -9,21 +9,21 @@
 	<div class="row justify-content-center">
 		<h2 class="text-center">アカウント作成</h2>
 		<div class="col-md-6">
-			<div class="text-danger" id="error">{{.error}}</div>
-			<form method="POST" onsubmit="return comparePasswords();" id="signup-form">
+			<div class="text-danger" id="error"></div>
+			<form onsubmit="return false;" id="signup-form">
 				<div class="input-group mb-3">
 					<span class="input-group-text"><i class="bi bi-person-fill"></i></span>
-					<input type="text" name="user_name" value="{{.user_name}}" class="form-control" placeholder="ユーザ名" required>
+					<input type="text" name="user_name" class="form-control" placeholder="ユーザ名">
 				</div>
 				<div class="input-group mb-3">
 					<span class="input-group-text"><i class="bi bi-key-fill"></i></span>
-					<input type="password" name="user_password" value="{{.user_password}}" class="form-control" placeholder="パスワード" required>
+					<input type="password" name="user_password" class="form-control" placeholder="パスワード">
 				</div>
 				<div class="input-group mb-3">
 					<span class="input-group-text"><i class="bi bi-key-fill"></i></span>
-					<input type="password" name="user_password_confirm" value="{{.user_password}}" class="form-control" placeholder="パスワード（再）" required>
+					<input type="password" name="user_password_confirm" class="form-control" placeholder="パスワード（再）">
 				</div>
-				<button type="submit" class="btn btn-success w-100">サインアップ</button>
+				<button class="btn btn-success w-100" onclick="signup()">サインアップ</button>
 			</form>
 		</div>
 	</div>
@@ -31,18 +31,6 @@
 
 {{template "footer" .}}
 
-<script>
-const comparePasswords = () => {
-	const form = document.getElementById("signup-form");
-    const password = form.elements['user_password'].value;
-    const password_confirm = form.elements['user_password_confirm'].value;
-	if (password !== password_confirm) {
-		document.getElementById("error").innerHTML = "パスワードが一致していません。"
-		return false
-	} else {
-		return true
-	}
-}
-</script>
+<script type="text/javascript" src="/js/signup.js"></script>
 </body>
 </html>
