@@ -6,7 +6,7 @@ const login = () => {
     const body = {
         user_name: user_name,
         user_password: user_password
-    }
+    };
 
     fetch('/login', {
         method: 'POST',
@@ -17,12 +17,11 @@ const login = () => {
     .then(() => {
         window.location.replace('/');
     })
+    .catch(handleError)
     .catch((error) => {
-        const status = error.message.match(/HTTP Status: (\d+)/)[1];
-        if (status == "401") {
-            document.getElementById("error").innerHTML = "IDまたはパスワードが異なります。";
-        } else {
-            document.getElementById("error").innerHTML = "ログインに失敗しました";
-        }
+        const status = getErrorStatus(error);
+        document.getElementById("error").innerHTML = (status === 401)
+        ? "ユーザ名またはパスワードが異なります。" 
+        : "ログインに失敗しました。";
     });
 }

@@ -1,3 +1,9 @@
+const getErrorStatus = (error) => {
+    const match = error.message.match(/HTTP Status: (\d+)/);
+    const status = match? match[1] : "0";
+    return parseInt(status);
+}
+
 const handleResponse = (response) => {
     if (!response.ok) {
         throw new Error(`HTTP Status: ${response.status}`);
@@ -7,13 +13,9 @@ const handleResponse = (response) => {
 }
 
 const handleError = (error) => {
-    const match = error.message.match(/HTTP Status: (\d+)/);
-    const status = match? match[1] : "";
-    if (status == "500") {
-        alert("予期せぬエラーが発生しました。");
-        window.location.replace('/logout');
-    } else {
+    const status = getErrorStatus(error);
+    if (status === 0) {
         console.error(error);
-        return error;
     }
+    throw error;
 }
