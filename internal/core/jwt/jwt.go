@@ -13,7 +13,7 @@ import (
 )
 
 
-func SetTokenToCookie (c *gin.Context, pl JwtPayload) error {
+func SetTokenToCookie (c *gin.Context, pl Payload) error {
 	jwtStr, err := EncodeJwt(pl)
 	if err != nil {
 		return err
@@ -30,20 +30,20 @@ func RemoveTokenFromCookie (c *gin.Context) {
 }
 
 
-func GetPayload(c *gin.Context) JwtPayload {
+func GetPayload(c *gin.Context) Payload {
 	pl := c.Keys[CONTEXT_KEY_PAYLOAD]
 	if pl == nil {
-		return JwtPayload{}
+		return Payload{}
 	}
-	return pl.(JwtPayload)
+	return pl.(Payload)
 }
 
 
-func EncodeJwt (pl JwtPayload) (string, error) {
+func EncodeJwt (pl Payload) (string, error) {
 	return encodeJwt(pl)
 }
 
-func ExpireJwt (pl JwtPayload) JwtPayload {
+func ExpireJwt (pl Payload) Payload {
 	pl.IssuedAt =  time.Now().Unix()
 	pl.ExpiresAt = time.Now().Unix()
 	return pl
@@ -66,14 +66,14 @@ func Auth (c *gin.Context) error {
 }
 
 
-func encodeJwt (pl JwtPayload) (string, error) {
+func encodeJwt (pl Payload) (string, error) {
 	cf := config.GetConfig()
 	token := jwtpackage.NewWithClaims(jwtpackage.SigningMethodHS256, pl)
 	return token.SignedString([]byte(cf.JwtSecretKey))
 }
 
 
-func decodeJwt (encoded string) (JwtPayload, error) {
+func decodeJwt (encoded string) (Payload, error) {
 	cf := config.GetConfig()
 	token, err := jwtpackage.Parse(encoded, func(token *jwtpackage.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwtpackage.SigningMethodHMAC); !ok {
@@ -82,7 +82,7 @@ func decodeJwt (encoded string) (JwtPayload, error) {
 		return []byte(cf.JwtSecretKey), nil
 	})
 	if err != nil {
-		return JwtPayload{}, err
+		return Payload{}, err
 	}
 
 	return convertToPayload(token)
@@ -106,8 +106,8 @@ func getJwtToken (c *gin.Context) (string, error) {
 }
 
 
-func convertToPayload (token *jwtpackage.Token) (JwtPayload, error) {
-	var pl JwtPayload
+func convertToPayload (token *jwtpackage.Token) (Payload, error) {
+	var pl Payload
 
 	jsonString, err := json.Marshal(token.Claims.(jwtpackage.MapClaims))
 

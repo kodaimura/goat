@@ -7,7 +7,7 @@ import (
 )
 
 
-type JwtPayload struct {
+type Payload struct {
 	jwtpackage.StandardClaims
 	CustomClaims
 }
@@ -19,8 +19,8 @@ type CustomClaims struct {
 }
 
 
-func NewPayload(claims CustomClaims) JwtPayload {
-	var pl JwtPayload
+func NewPayload(claims CustomClaims) Payload {
+	var pl Payload
 
 	pl.CustomClaims = claims
 	pl.IssuedAt =  time.Now().Unix()

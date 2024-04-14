@@ -15,7 +15,7 @@ import (
 type UserService interface {
 	Signup(name, password string) error
 	Login(name, password string) (model.User, error)
-	GenerateJwtPayload(id int) (jwt.JwtPayload, error)
+	GenerateJwtPayload(id int) (jwt.Payload, error)
 	GetProfile(id int) (model.User, error)
 	UpdateName(id int, name string) error
 	UpdatePassword(id int, password string) error
@@ -81,12 +81,12 @@ func (us *userService) Login(name, password string) (model.User, error) {
 }
 
 
-func (us *userService) GenerateJwtPayload(id int) (jwt.JwtPayload, error) {
+func (us *userService) GenerateJwtPayload(id int) (jwt.Payload, error) {
 	user, err := us.userRepository.GetById(id)
 	
 	if err != nil {
 		logger.Error(err.Error())
-		return jwt.JwtPayload{}, err
+		return jwt.Payload{}, err
 	}
 
 	var cc jwt.CustomClaims
