@@ -3,7 +3,6 @@ package controller
 import (
 	"github.com/gin-gonic/gin"
 
-	"goat/config"
 	"goat/internal/core/jwt"
 	"goat/internal/core/errs"
 	"goat/internal/service"
@@ -89,15 +88,14 @@ func (uc *UserController) Login(c *gin.Context) {
 		c.Abort()
 		return
 	}
-	jwt.SetPayload(c, pl)
+	jwt.SetTokenToCookie(c, pl)
 	c.Redirect(303, "/")
 }
 
 
 //GET /logout
 func (uc *UserController) Logout(c *gin.Context) {
-	cf := config.GetConfig()
-	c.SetCookie(jwt.COOKIE_KEY_JWT, "", 0, "/", cf.AppHost, false, true)
+	jwt.RemoveTokenFromCookie(c)
 	c.Redirect(303, "/login")
 }
 
