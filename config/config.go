@@ -19,6 +19,11 @@ type Config struct {
 	DBUser string
 	DBPass string
 
+	MailHost string
+	MailPort string
+	MailUser string
+	MailPass string
+
 	JwtSecretKey string
 	LogLevel string
 }
@@ -41,6 +46,11 @@ func init() {
 	cf.DBPort = os.Getenv("DB_PORT")
 	cf.DBUser = os.Getenv("DB_USER")
 	cf.DBPass = os.Getenv("DB_PASSWORD")
+
+	cf.MailHost = os.Getenv("MAIL_HOST")
+	cf.MailPort = os.Getenv("MAIL_PORT")
+	cf.MailUser = os.Getenv("MAIL_USER")
+	cf.MailPass = os.Getenv("MAIL_PASSWORD")
 
 	cf.JwtSecretKey = os.Getenv("JWT_SECRET_KEY")
 	cf.LogLevel = os.Getenv("LOG_LEVEL")
