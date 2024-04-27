@@ -4,7 +4,6 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"goat/config"
-	"goat/internal/controller"
 )
 
 func Run() {
@@ -26,7 +25,8 @@ func router() *gin.Engine {
 	r.StaticFile("/favicon.ico", "web/static/favicon.ico")
 	r.StaticFile("/manifest.json", "web/static/manifest.json")
 
-	controller.SetRouter(r)
+	SetWebRouter(r.Group("/"))
+	SetApiRouter(r.Group("/api"))
 
 	return r
 }

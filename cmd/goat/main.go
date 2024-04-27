@@ -1,7 +1,7 @@
 package main
  
 import (
-	"goat/internal/core/server"
+	"goat/internal/server"
 )
  
 func main() {
