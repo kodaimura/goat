@@ -1,3 +1,10 @@
+import { getErrorStatus, handleResponse, handleError } from '/js/script.js';
+
+window.addEventListener("DOMContentLoaded", function() {
+    document.getElementById("signup").addEventListener("click", signup);
+});
+
+
 const signup = () => {
     const form = document.getElementById("signup-form");
     if (!validate(form)) return;

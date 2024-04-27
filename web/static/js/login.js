@@ -1,3 +1,10 @@
+import { getErrorStatus, handleResponse, handleError } from '/js/script.js';
+
+window.addEventListener("DOMContentLoaded", function() {
+    document.getElementById("login").addEventListener("click", login);
+});
+
+
 const login = () => {
     const form = document.getElementById("login-form");
     const user_name = form.elements['user_name'].value;
