@@ -16,8 +16,6 @@ func SetWebRouter(r *gin.RouterGroup) {
 
 	r.GET("/signup", uc.SignupPage)
 	r.GET("/login", uc.LoginPage)
-	r.POST("/signup", uc.Signup)
-	r.POST("/login", uc.Login)
 	r.GET("/logout", uc.Logout)
 
 	auth := r.Group("", middleware.JwtAuthMiddleware())
@@ -26,11 +24,15 @@ func SetWebRouter(r *gin.RouterGroup) {
 	}
 }
 
+
 /*
  Routing for "/api"
 */
 func SetApiRouter(r *gin.RouterGroup) {
 	uc := controller.NewUserController()
+
+	r.POST("/signup", uc.ApiSignup)
+	r.POST("/login", uc.ApiLogin)
 
 	auth := r.Group("", middleware.JwtAuthApiMiddleware())
 	{

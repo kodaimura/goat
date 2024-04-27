@@ -31,8 +31,15 @@ func (uc *UserController) LoginPage(c *gin.Context) {
 }
 
 
-//POST /signup
-func (uc *UserController) Signup(c *gin.Context) {
+//GET /logout
+func (uc *UserController) Logout(c *gin.Context) {
+	jwt.RemoveTokenFromCookie(c)
+	c.Redirect(303, "/login")
+}
+
+
+//POST /api/signup
+func (uc *UserController) ApiSignup(c *gin.Context) {
 	m := map[string]string{}
 	c.BindJSON(&m)
 	name := m["user_name"]
@@ -52,8 +59,8 @@ func (uc *UserController) Signup(c *gin.Context) {
 }
 
 
-//POST /login
-func (uc *UserController) Login(c *gin.Context) {
+//POST /api/login
+func (uc *UserController) ApiLogin(c *gin.Context) {
 	m := map[string]string{}
 	c.BindJSON(&m)
 	name := m["user_name"]
@@ -75,13 +82,6 @@ func (uc *UserController) Login(c *gin.Context) {
 
 	jwt.SetTokenToCookie(c, pl)
 	c.JSON(200, gin.H{})
-}
-
-
-//GET /logout
-func (uc *UserController) Logout(c *gin.Context) {
-	jwt.RemoveTokenFromCookie(c)
-	c.Redirect(303, "/login")
 }
 
 

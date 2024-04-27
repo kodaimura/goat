@@ -8,7 +8,7 @@ const login = () => {
         user_password: user_password
     };
 
-    fetch('/login', {
+    fetch('/api/login', {
         method: 'POST',
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify(body)
