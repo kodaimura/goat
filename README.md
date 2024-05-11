@@ -30,7 +30,6 @@ $ make in
 ```
 * アプリ起動（Dockerコンテナ内）
 ```
-$ go mod tidy （初回のみ）
 $ make run
 ```
 http://localhost:3000
