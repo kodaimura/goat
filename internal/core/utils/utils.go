@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"fmt"
+	"reflect"
 	"math/rand"
 	"time"
 	"strconv"
@@ -30,8 +32,11 @@ func ItoaSlice(sl []int) []string {
 } 
 
 
-func RandomString(length int) string {
+func RandomString(length int, options ...string) string {
 	charset := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	if len(options) > 0 {
+		charset = options[0]
+	}
 	seed := time.Now().UnixNano()
 	r := rand.New(rand.NewSource(seed))
 
@@ -40,4 +45,38 @@ func RandomString(length int) string {
 		b[i] = charset[r.Intn(len(charset))]
 	}
 	return string(b)
+}
+
+
+func GetFieldValue(obj interface{}, fieldName string) (interface{}, error) {
+	val := reflect.ValueOf(obj).Elem()
+	fieldVal := val.FieldByName(fieldName)
+
+	if !fieldVal.IsValid() {
+		return nil, fmt.Errorf("No such field: %s", fieldName)
+	}
+
+	return fieldVal.Interface(), nil
+}
+
+
+func SetFieldValue(obj interface{}, fieldName string, newValue interface{}) error {
+	val := reflect.ValueOf(obj).Elem()
+	fieldVal := val.FieldByName(fieldName)
+
+	if !fieldVal.IsValid() {
+		return fmt.Errorf("No such field: %s", fieldName)
+	}
+
+	if !fieldVal.CanSet() {
+		return fmt.Errorf("Cannot set field: %s", fieldName)
+	}
+
+	newVal := reflect.ValueOf(newValue)
+	if fieldVal.Type() != newVal.Type() {
+		return fmt.Errorf("Provided value type didn't match obj field type")
+	}
+
+	fieldVal.Set(newVal)
+	return nil
 }
