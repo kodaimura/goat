@@ -34,11 +34,11 @@ func NewUserService() UserService {
 }
 
 
-func (us *userService) Signup(name, password string) error {
+func (srv *userService) Signup(name, password string) error {
 	var u model.User
 	u.Name = name
 
-	_, err := us.userRepository.GetOne(&u)
+	_, err := srv.userRepository.GetOne(&u)
 	if err == nil {
 		return errs.NewUniqueConstraintError("user_name")
 	}
@@ -54,7 +54,7 @@ func (us *userService) Signup(name, password string) error {
 	user.Name = name
 	user.Password = string(hashed)
 
-	err = us.userRepository.Insert(&user, nil);
+	err = srv.userRepository.Insert(&user, nil);
 	if err != nil {
 		logger.Error(err.Error())
 	}
@@ -63,11 +63,11 @@ func (us *userService) Signup(name, password string) error {
 }
 
 
-func (us *userService) Login(name, password string) (model.User, error) {
+func (srv *userService) Login(name, password string) (model.User, error) {
 	var u model.User
 	u.Name = name
 
-	user, err := us.userRepository.GetOne(&u)
+	user, err := srv.userRepository.GetOne(&u)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			logger.Debug(err.Error())
@@ -86,11 +86,11 @@ func (us *userService) Login(name, password string) (model.User, error) {
 }
 
 
-func (us *userService) GenerateJwtPayload(id int) (jwt.Payload, error) {
+func (srv *userService) GenerateJwtPayload(id int) (jwt.Payload, error) {
 	var u model.User
 	u.Id = id
 
-	user, err := us.userRepository.GetOne(&u)
+	user, err := srv.userRepository.GetOne(&u)
 	if err != nil {
 		logger.Error(err.Error())
 		return jwt.Payload{}, err
@@ -103,11 +103,11 @@ func (us *userService) GenerateJwtPayload(id int) (jwt.Payload, error) {
 }
 
 
-func (us *userService) GetProfile(id int) (model.User, error) {
+func (srv *userService) GetProfile(id int) (model.User, error) {
 	var u model.User
 	u.Id = id
 
-	user, err := us.userRepository.GetOne(&u)
+	user, err := srv.userRepository.GetOne(&u)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			logger.Debug(err.Error())
@@ -120,11 +120,11 @@ func (us *userService) GetProfile(id int) (model.User, error) {
 }
 
 
-func (us *userService) UpdateName(id int, name string) error {
+func (srv *userService) UpdateName(id int, name string) error {
 	var u model.User
 	u.Name = name
 
-	u, err := us.userRepository.GetOne(&u)
+	u, err := srv.userRepository.GetOne(&u)
 	if err == nil && u.Id != id{
 		return errs.NewUniqueConstraintError("user_name")
 	}
@@ -133,7 +133,7 @@ func (us *userService) UpdateName(id int, name string) error {
 	user.Id = id
 	user.Name = name
 
-	if err = us.userRepository.UpdateName(&user, nil); err != nil {
+	if err = srv.userRepository.UpdateName(&user, nil); err != nil {
 		logger.Error(err.Error())
 		return err
 	}
@@ -142,7 +142,7 @@ func (us *userService) UpdateName(id int, name string) error {
 }
 
 
-func (us *userService) UpdatePassword(id int, password string) error {
+func (srv *userService) UpdatePassword(id int, password string) error {
 	hashed, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 
 	if err != nil {
@@ -154,7 +154,7 @@ func (us *userService) UpdatePassword(id int, password string) error {
 	user.Id = id
 	user.Password = string(hashed)
 	
-	if err = us.userRepository.UpdatePassword(&user, nil); err != nil {
+	if err = srv.userRepository.UpdatePassword(&user, nil); err != nil {
 		logger.Error(err.Error())
 		return err
 	}
@@ -163,11 +163,11 @@ func (us *userService) UpdatePassword(id int, password string) error {
 }
 
 
-func (us *userService) DeleteUser(id int) error {
+func (srv *userService) DeleteUser(id int) error {
 	var user model.User
 	user.Id = id
 
-	if err := us.userRepository.Delete(&user, nil); err != nil {
+	if err := srv.userRepository.Delete(&user, nil); err != nil {
 		logger.Error(err.Error())
 		return err
 	}

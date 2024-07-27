@@ -29,10 +29,10 @@ func NewUserRepository() UserRepository {
 	return &userRepository{db}
 }
 
-func (ur *userRepository) Get(u *model.User) ([]model.User, error) {
+func (rep *userRepository) Get(u *model.User) ([]model.User, error) {
 	where, binds := db.BuildWhereClause(u)
 	query := "SELECT * FROM users " + where
-	rows, err := ur.db.Query(query, binds...)
+	rows, err := rep.db.Query(query, binds...)
 	defer rows.Close()
 
 	if err != nil {
@@ -59,12 +59,12 @@ func (ur *userRepository) Get(u *model.User) ([]model.User, error) {
 }
 
 
-func (ur *userRepository) GetOne(u *model.User) (model.User, error) {
+func (rep *userRepository) GetOne(u *model.User) (model.User, error) {
 	var ret model.User
 	where, binds := db.BuildWhereClause(u)
 	query := "SELECT * FROM users " + where
 
-	err := ur.db.QueryRow(query, binds...).Scan(
+	err := rep.db.QueryRow(query, binds...).Scan(
 		&ret.Id, 
 		&ret.Name, 
 		&ret.Password,
@@ -76,7 +76,7 @@ func (ur *userRepository) GetOne(u *model.User) (model.User, error) {
 }
 
 
-func (ur *userRepository) Insert(u *model.User, tx *sql.Tx) error {
+func (rep *userRepository) Insert(u *model.User, tx *sql.Tx) error {
 	cmd := 
 	`INSERT INTO users (
 		user_name, 
@@ -88,14 +88,14 @@ func (ur *userRepository) Insert(u *model.User, tx *sql.Tx) error {
 	if tx != nil {
         _, err = tx.Exec(cmd, binds...)
     } else {
-        _, err = ur.db.Exec(cmd, binds...)
+        _, err = rep.db.Exec(cmd, binds...)
     }
 	
 	return err
 }
 
 
-func (ur *userRepository) Update(u *model.User, tx *sql.Tx) error {
+func (rep *userRepository) Update(u *model.User, tx *sql.Tx) error {
 	cmd := 
 	`UPDATE users 
 	 SET user_name = ?,
@@ -107,14 +107,14 @@ func (ur *userRepository) Update(u *model.User, tx *sql.Tx) error {
 	if tx != nil {
         _, err = tx.Exec(cmd, binds...)
     } else {
-        _, err = ur.db.Exec(cmd, binds...)
+        _, err = rep.db.Exec(cmd, binds...)
     }
 	
 	return err
 }
 
 
-func (ur *userRepository) Delete(u *model.User, tx *sql.Tx) error {
+func (rep *userRepository) Delete(u *model.User, tx *sql.Tx) error {
 	cmd := "DELETE FROM users WHERE user_id = ?"
 	binds := []interface{}{u.Id}
 
@@ -122,14 +122,14 @@ func (ur *userRepository) Delete(u *model.User, tx *sql.Tx) error {
 	if tx != nil {
         _, err = tx.Exec(cmd, binds...)
     } else {
-        _, err = ur.db.Exec(cmd, binds...)
+        _, err = rep.db.Exec(cmd, binds...)
     }
 	
 	return err
 }
 
 
-func (ur *userRepository) UpdateName(u *model.User, tx *sql.Tx) error {
+func (rep *userRepository) UpdateName(u *model.User, tx *sql.Tx) error {
 	cmd := 
 	`UPDATE users
 	 SET user_name = ? 
@@ -140,14 +140,14 @@ func (ur *userRepository) UpdateName(u *model.User, tx *sql.Tx) error {
 	if tx != nil {
         _, err = tx.Exec(cmd, binds...)
     } else {
-        _, err = ur.db.Exec(cmd, binds...)
+        _, err = rep.db.Exec(cmd, binds...)
     }
 	
 	return err
 }
 
 
-func (ur *userRepository) UpdatePassword(u *model.User, tx *sql.Tx) error {
+func (rep *userRepository) UpdatePassword(u *model.User, tx *sql.Tx) error {
 	cmd := 
 	`UPDATE users 
 	 SET user_password = ? 
@@ -158,7 +158,7 @@ func (ur *userRepository) UpdatePassword(u *model.User, tx *sql.Tx) error {
 	if tx != nil {
         _, err = tx.Exec(cmd, binds...)
     } else {
-        _, err = ur.db.Exec(cmd, binds...)
+        _, err = rep.db.Exec(cmd, binds...)
     }
 
 	return err

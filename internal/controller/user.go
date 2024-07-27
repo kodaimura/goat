@@ -21,31 +21,31 @@ func NewUserController() *UserController {
 
 
 //GET /signup
-func (uc *UserController) SignupPage(c *gin.Context) {
+func (ctr *UserController) SignupPage(c *gin.Context) {
 	c.HTML(200, "signup.html", gin.H{})
 }
 
 //GET /login
-func (uc *UserController) LoginPage(c *gin.Context) {
+func (ctr *UserController) LoginPage(c *gin.Context) {
 	c.HTML(200, "login.html", gin.H{})
 }
 
 
 //GET /logout
-func (uc *UserController) Logout(c *gin.Context) {
+func (ctr *UserController) Logout(c *gin.Context) {
 	jwt.RemoveTokenFromCookie(c)
 	c.Redirect(303, "/login")
 }
 
 
 //POST /api/signup
-func (uc *UserController) ApiSignup(c *gin.Context) {
+func (ctr *UserController) ApiSignup(c *gin.Context) {
 	m := map[string]string{}
 	c.BindJSON(&m)
 	name := m["user_name"]
 	pass := m["user_password"]
 
-	err := uc.userService.Signup(name, pass)
+	err := ctr.userService.Signup(name, pass)
 	if err != nil {
 		if _, ok := err.(errs.UniqueConstraintError); ok {
 			c.JSON(409, gin.H{"error": "ユーザ名が既に使われています。"})
@@ -60,20 +60,20 @@ func (uc *UserController) ApiSignup(c *gin.Context) {
 
 
 //POST /api/login
-func (uc *UserController) ApiLogin(c *gin.Context) {
+func (ctr *UserController) ApiLogin(c *gin.Context) {
 	m := map[string]string{}
 	c.BindJSON(&m)
 	name := m["user_name"]
 	pass := m["user_password"]
 
-	user, err := uc.userService.Login(name, pass)
+	user, err := ctr.userService.Login(name, pass)
 	if err != nil {
 		c.JSON(401, gin.H{"error": "ユーザ名またはパスワードが異なります。"})
 		c.Abort()
 		return
 	}
 
-	pl, err := uc.userService.GenerateJwtPayload(user.Id)
+	pl, err := ctr.userService.GenerateJwtPayload(user.Id)
 	if err != nil {
 		c.JSON(500, gin.H{"error": "ログインに失敗しました。"})
 		c.Abort()
@@ -86,9 +86,9 @@ func (uc *UserController) ApiLogin(c *gin.Context) {
 
 
 //GET /api/account/profile
-func (uc *UserController) ApiGetProfile(c *gin.Context) {
+func (ctr *UserController) ApiGetProfile(c *gin.Context) {
 	pl := jwt.GetPayload(c)
-	user, err := uc.userService.GetProfile(pl.UserId)
+	user, err := ctr.userService.GetProfile(pl.UserId)
 
 	if err != nil {
 		c.JSON(500, gin.H{})
@@ -101,7 +101,7 @@ func (uc *UserController) ApiGetProfile(c *gin.Context) {
 
 
 //PUT /api/account/password
-func (uc *UserController) ApiPutPassword(c *gin.Context) {
+func (ctr *UserController) ApiPutPassword(c *gin.Context) {
 	pl := jwt.GetPayload(c)
 	id := pl.UserId
 	name := pl.UserName
@@ -111,14 +111,14 @@ func (uc *UserController) ApiPutPassword(c *gin.Context) {
 	oldPass := m["old_user_password"]
 	pass := m["user_password"]
 
-	_, err := uc.userService.Login(name, oldPass)
+	_, err := ctr.userService.Login(name, oldPass)
 	if err != nil {
 		c.JSON(400, gin.H{"error": "旧パスワードが異なります。"})
 		c.Abort()
 		return
 	}
 
-	if uc.userService.UpdatePassword(id, pass) != nil {
+	if ctr.userService.UpdatePassword(id, pass) != nil {
 		c.JSON(500, gin.H{"error": "変更に失敗しました。"})
 		c.Abort()
 		return
@@ -129,7 +129,7 @@ func (uc *UserController) ApiPutPassword(c *gin.Context) {
 
 
 //PUT /api/account/name
-func (uc *UserController) ApiPutName(c *gin.Context) {
+func (ctr *UserController) ApiPutName(c *gin.Context) {
 	pl := jwt.GetPayload(c)
 	id := pl.UserId
 
@@ -137,7 +137,7 @@ func (uc *UserController) ApiPutName(c *gin.Context) {
 	c.BindJSON(&m)
 	name := m["user_name"]
 
-	err := uc.userService.UpdateName(id, name)
+	err := ctr.userService.UpdateName(id, name)
 	if err != nil {
 		if _, ok := err.(errs.UniqueConstraintError); ok {
 			c.JSON(409, gin.H{"error": "ユーザ名が既に使われています。"})
@@ -152,11 +152,11 @@ func (uc *UserController) ApiPutName(c *gin.Context) {
 
 
 //DELETE /api/account
-func (uc *UserController) ApiDeleteAccount(c *gin.Context) {
+func (ctr *UserController) ApiDeleteAccount(c *gin.Context) {
 	pl := jwt.GetPayload(c)
 	id := pl.UserId
 
-	if uc.userService.DeleteUser(id) != nil {
+	if ctr.userService.DeleteUser(id) != nil {
 		c.JSON(500, gin.H{"error": "削除に失敗しました。"})
 		c.Abort()
 		return
