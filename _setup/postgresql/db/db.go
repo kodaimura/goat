@@ -48,6 +48,7 @@ func BuildWhereClause(filter interface{}) (string, []interface{}) {
 	}
 	typ := val.Type()
 
+	seq := 1
 	for i := 0; i < val.NumField(); i++ {
 		field := typ.Field(i)
 		fieldValue := val.Field(i).Interface()
@@ -66,8 +67,9 @@ func BuildWhereClause(filter interface{}) (string, []interface{}) {
 		}
 
 		if !isZero {
-			conditions = append(conditions, dmt.Sprintf("%s = $%d", columnName, i++))
+			conditions = append(conditions, fmt.Sprintf("%s = $%d", columnName, seq))
 			args = append(args, fieldValue)
+			seq += 1
 		}
 	}
 
