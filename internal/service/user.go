@@ -35,8 +35,10 @@ func NewUserService() UserService {
 
 
 func (us *userService) Signup(name, password string) error {
-	_, err := us.userRepository.GetByName(name)
+	var u model.User
+	u.Name = name
 
+	_, err := us.userRepository.GetOne(&u)
 	if err == nil {
 		return errs.NewUniqueConstraintError("user_name")
 	}
@@ -62,7 +64,10 @@ func (us *userService) Signup(name, password string) error {
 
 
 func (us *userService) Login(name, password string) (model.User, error) {
-	user, err := us.userRepository.GetByName(name)
+	var u model.User
+	u.Name = name
+
+	user, err := us.userRepository.GetOne(&u)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			logger.Debug(err.Error())
@@ -82,8 +87,10 @@ func (us *userService) Login(name, password string) (model.User, error) {
 
 
 func (us *userService) GenerateJwtPayload(id int) (jwt.Payload, error) {
-	user, err := us.userRepository.GetById(id)
-	
+	var u model.User
+	u.Id = id
+
+	user, err := us.userRepository.GetOne(&u)
 	if err != nil {
 		logger.Error(err.Error())
 		return jwt.Payload{}, err
@@ -97,8 +104,10 @@ func (us *userService) GenerateJwtPayload(id int) (jwt.Payload, error) {
 
 
 func (us *userService) GetProfile(id int) (model.User, error) {
-	user, err := us.userRepository.GetById(id)
+	var u model.User
+	u.Id = id
 
+	user, err := us.userRepository.GetOne(&u)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			logger.Debug(err.Error())
@@ -112,8 +121,10 @@ func (us *userService) GetProfile(id int) (model.User, error) {
 
 
 func (us *userService) UpdateName(id int, name string) error {
-	u, err := us.userRepository.GetByName(name)
+	var u model.User
+	u.Name = name
 
+	u, err := us.userRepository.GetOne(&u)
 	if err == nil && u.Id != id{
 		return errs.NewUniqueConstraintError("user_name")
 	}
