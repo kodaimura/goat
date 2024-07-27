@@ -1,8 +1,10 @@
 package db
 
 import (
-	"fmt"
 	"log"
+	"fmt"
+	"reflect"
+	"strings"	
 	"database/sql"
 	
 	_ "github.com/lib/pq"
@@ -30,6 +32,7 @@ func init() {
 		log.Panic(err)
 	}
 }
+
 
 func GetDB() *sql.DB {
 	return db

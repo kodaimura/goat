@@ -1,8 +1,10 @@
 package db
 
 import (
-	"fmt"
 	"log"
+	"fmt"
+	"reflect"
+	"strings"	
 	"database/sql"
 	
 	_ "github.com/go-sql-driver/mysql"
@@ -31,10 +33,10 @@ func init() {
 	}
 }
 
+
 func GetDB() *sql.DB {
 	return db
 }
-
 
 func BuildWhereClause(filter interface{}) (string, []interface{}) {
 	var conditions []string
@@ -64,7 +66,7 @@ func BuildWhereClause(filter interface{}) (string, []interface{}) {
 		}
 
 		if !isZero {
-			conditions = append(conditions, columnName+" = ?")
+			conditions = append(conditions, fmt.Sprintf("%s = ?", columnName))
 			args = append(args, fieldValue)
 		}
 	}

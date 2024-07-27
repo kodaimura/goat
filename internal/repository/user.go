@@ -11,12 +11,12 @@ import (
 type UserRepository interface {
 	Get(u *model.User) ([]model.User, error)
 	GetOne(u *model.User) (model.User, error)
-	Insert(u *model.User) (int, error)
-	Update(u *model.User) error
-	Delete(u *model.User) error
+	Insert(u *model.User, tx *sql.Tx) error
+	Update(u *model.User, tx *sql.Tx) error
+	Delete(u *model.User, tx *sql.Tx) error
 
-	UpdateName(u *model.User) error
-	UpdatePassword(u *model.User) error
+	UpdateName(u *model.User, tx *sql.Tx) error
+	UpdatePassword(u *model.User, tx *sql.Tx) error
 }
 
 
@@ -29,11 +29,10 @@ func NewUserRepository() UserRepository {
 	return &userRepository{db}
 }
 
-
 func (ur *userRepository) Get(u *model.User) ([]model.User, error) {
-	where, args := db.BuildWhereClause(u)
+	where, binds := db.BuildWhereClause(u)
 	query := "SELECT * FROM users " + where
-	rows, err := ur.db.Query(query, args...)
+	rows, err := ur.db.Query(query, binds...)
 	defer rows.Close()
 
 	if err != nil {
@@ -62,10 +61,10 @@ func (ur *userRepository) Get(u *model.User) ([]model.User, error) {
 
 func (ur *userRepository) GetOne(u *model.User) (model.User, error) {
 	var ret model.User
-	where, args := db.BuildWhereClause(u)
+	where, binds := db.BuildWhereClause(u)
 	query := "SELECT * FROM users " + where
 
-	err := ur.db.QueryRow(query, args...).Scan(
+	err := ur.db.QueryRow(query, binds...).Scan(
 		&ret.Id, 
 		&ret.Name, 
 		&ret.Password,
@@ -77,66 +76,90 @@ func (ur *userRepository) GetOne(u *model.User) (model.User, error) {
 }
 
 
-func (ur *userRepository) Insert(u *model.User) (int, error) {
-	var userId int
-	err := ur.db.QueryRow(
-		`INSERT INTO users (
-			user_name, 
-			user_password
-		 ) VALUES(?,?)
-		 RETURNING user_id`,
-		u.Name, 
-		u.Password,
-	).Scan(
-		&userId,
-	)
-	return userId, err
-}
+func (ur *userRepository) Insert(u *model.User, tx *sql.Tx) error {
+	cmd := 
+	`INSERT INTO users (
+		user_name, 
+		user_password
+	 ) VALUES(?,?)`
+	binds := []interface{}{u.Name, u.Password}
 
-
-func (ur *userRepository) Update(u *model.User) error {
-	_, err := ur.db.Exec(
-		`UPDATE users 
-		 SET user_name = ?,
-		 	user_password = ?
-		 WHERE user_id = ?`,
-		u.Name,
-		u.Password, 
-		u.Id,
-	)
+	var err error
+	if tx != nil {
+        _, err = tx.Exec(cmd, binds...)
+    } else {
+        _, err = ur.db.Exec(cmd, binds...)
+    }
+	
 	return err
 }
 
 
-func (ur *userRepository) Delete(u *model.User) error {
-	_, err := ur.db.Exec(
-		`DELETE FROM users WHERE user_id = ?`, 
-		u.Id,
-	)
-
+func (ur *userRepository) Update(u *model.User, tx *sql.Tx) error {
+	cmd := 
+	`UPDATE users 
+	 SET user_name = ?,
+	 user_password = ?
+	 WHERE user_id = ?`
+	binds := []interface{}{u.Name, u.Password, u.Id}
+	
+	var err error
+	if tx != nil {
+        _, err = tx.Exec(cmd, binds...)
+    } else {
+        _, err = ur.db.Exec(cmd, binds...)
+    }
+	
 	return err
 }
 
 
-func (ur *userRepository) UpdateName(u *model.User) error {
-	_, err := ur.db.Exec(
-		`UPDATE users
-		 SET user_name = ? 
-		 WHERE user_id = ?`, 
-		u.Name, 
-		u.Id,
-	)
+func (ur *userRepository) Delete(u *model.User, tx *sql.Tx) error {
+	cmd := "DELETE FROM users WHERE user_id = ?"
+	binds := []interface{}{u.Id}
+
+	var err error
+	if tx != nil {
+        _, err = tx.Exec(cmd, binds...)
+    } else {
+        _, err = ur.db.Exec(cmd, binds...)
+    }
+	
 	return err
 }
 
 
-func (ur *userRepository) UpdatePassword(u *model.User) error {
-	_, err := ur.db.Exec(
-		`UPDATE users 
-		 SET user_password = ? 
-		 WHERE user_id = ?`, 
-		 u.Password, 
-		 u.Id,
-	)
+func (ur *userRepository) UpdateName(u *model.User, tx *sql.Tx) error {
+	cmd := 
+	`UPDATE users
+	 SET user_name = ? 
+	 WHERE user_id = ?`
+	binds := []interface{}{u.Name, u.Id}
+
+	var err error
+	if tx != nil {
+        _, err = tx.Exec(cmd, binds...)
+    } else {
+        _, err = ur.db.Exec(cmd, binds...)
+    }
+	
+	return err
+}
+
+
+func (ur *userRepository) UpdatePassword(u *model.User, tx *sql.Tx) error {
+	cmd := 
+	`UPDATE users 
+	 SET user_password = ? 
+	 WHERE user_id = ?`
+	binds := []interface{}{u.Password, u.Id}
+
+	var err error
+	if tx != nil {
+        _, err = tx.Exec(cmd, binds...)
+    } else {
+        _, err = ur.db.Exec(cmd, binds...)
+    }
+
 	return err
 }
