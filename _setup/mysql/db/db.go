@@ -10,6 +10,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 
 	"goat/config"
+	"goat/internal/core/utils"
 )
 
 
@@ -40,7 +41,7 @@ func GetDB() *sql.DB {
 
 func BuildWhereClause(filter interface{}) (string, []interface{}) {
 	var conditions []string
-	var args []interface{}
+	var binds []interface{}
 
 	val := reflect.ValueOf(filter)
 	if val.Kind() == reflect.Ptr {
@@ -49,26 +50,18 @@ func BuildWhereClause(filter interface{}) (string, []interface{}) {
 	typ := val.Type()
 
 	for i := 0; i < val.NumField(); i++ {
-		field := typ.Field(i)
+		columnName := typ.Field(i).Tag.Get("db")
 		fieldValue := val.Field(i).Interface()
-		columnName := field.Tag.Get("db")
 
-		if columnName == "" {
+		if columnName == "" { 
+			continue
+		}
+		if utils.IsZero(fieldValue) {
 			continue
 		}
 
-		isZero := false
-		switch fieldValue.(type) {
-		case string:
-			isZero = fieldValue == ""
-		case int:
-			isZero = fieldValue == 0
-		}
-
-		if !isZero {
-			conditions = append(conditions, fmt.Sprintf("%s = ?", columnName))
-			args = append(args, fieldValue)
-		}
+		conditions = append(conditions, fmt.Sprintf("%s = ?", columnName))
+		binds = append(binds, fieldValue)
 	}
 
 	whereClause := ""
@@ -76,5 +69,5 @@ func BuildWhereClause(filter interface{}) (string, []interface{}) {
 		whereClause = " WHERE " + strings.Join(conditions, " AND ")
 	}
 
-	return whereClause, args
+	return whereClause, binds
 }

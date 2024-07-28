@@ -80,3 +80,22 @@ func SetFieldValue(obj interface{}, fieldName string, newValue interface{}) erro
 	fieldVal.Set(newVal)
 	return nil
 }
+
+
+func IsZero(value interface{}) bool {
+	if value == nil {
+        return true
+    }
+    switch v := value.(type) {
+    case string:
+        return v == ""
+    case int:
+        return v == 0
+    case float32:
+        return v == 0.0
+    case float64:
+        return v == 0.0
+    default:
+        return false
+    }
+}
