@@ -36,7 +36,7 @@ func (rep *userRepository) Get(u *model.User) ([]model.User, error) {
 	defer rows.Close()
 
 	if err != nil {
-		return nil, err
+		return []model.User{}, err
 	}
 
 	ret := []model.User{}
@@ -50,7 +50,7 @@ func (rep *userRepository) Get(u *model.User) ([]model.User, error) {
 			&u.UpdatedAt,
 		)
 		if err != nil {
-			return nil, err
+			return []model.User{}, err
 		}
 		ret = append(ret, u)
 	}
