@@ -86,7 +86,7 @@ cat <<EOF > .gitignore
 *.log
 *.db
 *.sqlite3
-*.env
+.env
 .DS_Store
 main
 data
