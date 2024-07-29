@@ -99,7 +99,7 @@ func (rep *userRepository) Update(u *model.User, tx *sql.Tx) error {
 	cmd := 
 	`UPDATE users 
 	 SET user_name = ?,
-	 user_password = ?
+	     user_password = ?
 	 WHERE user_id = ?`
 	binds := []interface{}{u.Name, u.Password, u.Id}
 	
