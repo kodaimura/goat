@@ -166,10 +166,7 @@ func (srv *userService) UpdatePassword(id int, password string) error {
 
 
 func (srv *userService) DeleteUser(id int) error {
-	var user model.User
-	user.Id = id
-
-	if err := srv.userRepository.Delete(&user, nil); err != nil {
+	if err := srv.userRepository.Delete(&model.User{Id: id}, nil); err != nil {
 		logger.Error(err.Error())
 		return err
 	}

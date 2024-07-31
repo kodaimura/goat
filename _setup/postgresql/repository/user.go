@@ -112,8 +112,8 @@ func (rep *userRepository) Update(u *model.User, tx *sql.Tx) error {
 
 
 func (rep *userRepository) Delete(u *model.User, tx *sql.Tx) error {
-	cmd := "DELETE FROM users WHERE user_id = $1"
-	binds := []interface{}{u.Id}
+	where, binds := db.BuildWhereClause(u)
+	cmd := "DELETE FROM users " + where
 
 	var err error
 	if tx != nil {
