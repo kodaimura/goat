@@ -14,9 +14,6 @@ type UserRepository interface {
 	Insert(u *model.User, tx *sql.Tx) error
 	Update(u *model.User, tx *sql.Tx) error
 	Delete(u *model.User, tx *sql.Tx) error
-
-	UpdateName(u *model.User, tx *sql.Tx) error
-	UpdatePassword(u *model.User, tx *sql.Tx) error
 }
 
 
@@ -125,41 +122,5 @@ func (rep *userRepository) Delete(u *model.User, tx *sql.Tx) error {
         _, err = rep.db.Exec(cmd, binds...)
     }
 	
-	return err
-}
-
-
-func (rep *userRepository) UpdateName(u *model.User, tx *sql.Tx) error {
-	cmd := 
-	`UPDATE users
-	 SET user_name = $1 
-	 WHERE user_id = $2`
-	binds := []interface{}{u.Name, u.Id}
-
-	var err error
-	if tx != nil {
-        _, err = tx.Exec(cmd, binds...)
-    } else {
-        _, err = rep.db.Exec(cmd, binds...)
-    }
-	
-	return err
-}
-
-
-func (rep *userRepository) UpdatePassword(u *model.User, tx *sql.Tx) error {
-	cmd := 
-	`UPDATE users 
-	 SET user_password = $1 
-	 WHERE user_id = $2`
-	binds := []interface{}{u.Password, u.Id}
-
-	var err error
-	if tx != nil {
-        _, err = tx.Exec(cmd, binds...)
-    } else {
-        _, err = rep.db.Exec(cmd, binds...)
-    }
-
 	return err
 }

@@ -125,11 +125,14 @@ func (srv *userService) UpdateName(id int, name string) error {
 		return errs.NewUniqueConstraintError("user_name")
 	}
 
-	var user model.User
-	user.Id = id
-	user.Name = name
+	user, err := srv.userRepository.GetOne(&model.User{Id: id})
+	if err != nil {
+		logger.Error(err.Error())
+		return err
+	}
 
-	if err = srv.userRepository.UpdateName(&user, nil); err != nil {
+	user.Name = name
+	if err = srv.userRepository.Update(&user, nil); err != nil {
 		logger.Error(err.Error())
 		return err
 	}
@@ -146,11 +149,14 @@ func (srv *userService) UpdatePassword(id int, password string) error {
 		return err
 	}
 
-	var user model.User
-	user.Id = id
+	user, err := srv.userRepository.GetOne(&model.User{Id: id})
+	if err != nil {
+		logger.Error(err.Error())
+		return err
+	}
+
 	user.Password = string(hashed)
-	
-	if err = srv.userRepository.UpdatePassword(&user, nil); err != nil {
+	if err = srv.userRepository.Update(&user, nil); err != nil {
 		logger.Error(err.Error())
 		return err
 	}
