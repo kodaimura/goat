@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   app:
-    container_name: goat_app
+    container_name: app
     build:
       context: .
     ports:
@@ -17,7 +17,7 @@ services:
       - ENV=docker
 
   db:
-    container_name: goat_db
+    container_name: db
     image: postgres:16.1
     environment:
       POSTGRES_DB: goat
