@@ -3,19 +3,21 @@
 Go(Gin)のWebアプリケーション雛形。詳しくはプログラム参照。  
 usersテーブルをデフォルトで用意しており、サインアップ/ログイン機能を実装。
 
-https://github.com/kodaimura/create-app の設定により、  
-下記 Install ~ 共通セットアップまでが一つのコマンドで可能。
-
 ## Install
 ```
-$ git clone https://github.com/kodaimura/goat <appname>
+$ git clone https://github.com/kodaimura/goat
+```
+* goat/bin にPATHを通す
+* 実行権限付与
+
+```
+$ chmod -R +x path/to/goat/bin
 ```
 
 ## Usage
-### 共通セットアップ
+### プロジェクト作成
 ```
-$ cd <appname>
-$ bash _setup/setup.sh <appname> [-db {sqlite3| postgres | mysql}]
+$ goat-create-app <appname> [-db {sqlite3| postgres | mysql}]
 ```
 * -db オプションを省略した場合は sqlite3 が選択される
 
