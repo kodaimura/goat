@@ -1,6 +1,6 @@
 #!/bin/bash
 
-f [ $# -eq 0 ]; then
+if [ $# -eq 0 ]; then
     echo "ERROR: bash _setup/setup.sh <appname> [-db {sqlite3| postgres | mysql}]"
     exit 1
 fi
@@ -33,7 +33,7 @@ if [ $DB != "sqlite3" ] && [ $DB != "postgres" ] && [ $DB != "mysql" ]; then
 fi
 
 CURRENT_DIR=$(pwd)
-TEMPLATE_DIR=$(cd $(dirname $0); cd template; pwd)
+TEMPLATE_DIR=$(cd $(dirname $0); cd ../template; pwd)
 
 mkdir $CURRENT_DIR/$APP_NAME
 cp -r $TEMPLATE_DIR/* $CURRENT_DIR/$APP_NAME
@@ -75,7 +75,6 @@ sed -i "" s/goat/$APP_NAME/g go.mod
 sed -i "" s/goat/$APP_NAME/g Makefile
 sed -i "" s/goat/$APP_NAME/g Dockerfile
 sed -i "" s/goat/$APP_NAME/g docker-compose.yml
-sed -i "" s/goat/$APP_NAME/g ./config/env/local.env
 sed -i "" s/goat/$APP_NAME/g ./config/env/docker.env
 sed -i "" s/goat/$APP_NAME/g ./scripts/create-table.sql
 sed -i "" s/goat/$APP_NAME/g ./web/static/manifest.json
@@ -83,7 +82,6 @@ sed -i "" s/goat/$APP_NAME/g ./web/static/manifest.json
 for fpath in `find . -name "*.DS_Store"`
 do rm $fpath
 done
-yes | rm -r .git
 
 cat <<EOF > .gitignore
 *.log
@@ -95,4 +93,4 @@ main
 data
 EOF
 
-yes | rm -r _setup
+yes | rm -r _sub
