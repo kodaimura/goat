@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS users (
+	USER_ID INTEGER PRIMARY KEY AUTOINCREMENT,
+	user_name TEXT NOT NULL UNIQUE,
+	user_password TEXT NOT NULL,
+	created_at TEXT NOT NULL DEFAULT (DATETIME('now', 'localtime')),
+	updated_at TEXT NOT NULL DEFAULT (DATETIME('now', 'localtime'))
+);
