@@ -28,13 +28,14 @@ func main() {
 		fmt.Printf("Error reading file: %v\n", err)
 		return
 	}
-	fmt.Println(args[1])
 	
 	tables, _ := ddlparse.ParseForce(string(data))
 	
 	s := ""
 	for _, table := range tables {
-		s += "type " + snakeToPascal(strings.ToLower(table.Name)) + " struct {\n"
+		tn := strings.ToLower(table.Name)
+		s = "package model\n\n\n"
+		s += "type " + snakeToPascal(tn) + " struct {\n"
 		for _, column := range table.Columns {
 			cn := strings.ToLower(column.Name)
 			s += "\t" + snakeToPascal(cn) + " " + 
@@ -42,8 +43,20 @@ func main() {
 				"`db:\"" + cn + "\" json:\"" + cn + "\"`\n"
 		}
 		s += "}"
+
+		file, err := os.Create(tn + ".go")
+		if err != nil {
+			fmt.Println("ファイルの作成に失敗しました:", err)
+			return
+		}
+		defer file.Close()
+
+		_, err = file.WriteString(s)
+		if err != nil {
+			fmt.Println("ファイルへの書き込みに失敗しました:", err)
+			return
+		}
 	}
-	fmt.Println(s)
 }
 
 func snakeToPascal(snake string) string {
