@@ -32,7 +32,8 @@ func main() {
 	tables, _ := ddlparse.ParseForce(string(data))
 	
 	for _, table := range tables {
-		code := generateRepositoryCode(table)
+		tn := strings.ToLower(table.Name)
+		s := generateRepositoryCode(table)
 
 		file, err := os.Create(tn + ".go")
 		if err != nil {
@@ -99,8 +100,8 @@ const TEMPLATE =
 import (
 	"database/sql"
 
-	"%s/internal/core/db"
-	"%s/internal/model"
+	"xxxxx/internal/core/db"
+	"xxxxx/internal/model"
 )
 
 
@@ -150,10 +151,8 @@ const TEMPLATE_GET =
 
 	ret := []model.%s{}
 	for rows.Next() {
-		u := model.%s{}
-		err = rows.Scan(
-			%s
-		)
+		%s := model.%s{}
+		err = rows.Scan(%s)
 		if err != nil {
 			return []model.%s{}, err
 		}
@@ -169,9 +168,7 @@ const TEMPLATE_GETONE =
 	where, binds := db.BuildWhereClause(%s)
 	query := %s + where
 
-	err := rep.db.QueryRow(query, binds...).Scan(
-		%s
-	)
+	err := rep.db.QueryRow(query, binds...).Scan(%s)
 
 	return ret, err
 }`
@@ -223,7 +220,81 @@ const TEMPLATE_DELETE =
 
 func generateRepositoryCode(table ddlparse.Table) string {
 	tn := strings.ToLower(table.Name)
-	tnp := snakeToPascal(tn)
 	tnc := snakeToCamel(tn)
+	tnp := snakeToPascal(tn)
 	tni := getSnakeInitial(tn)
+
+	return fmt.Sprintf(
+		TEMPLATE,
+		tnp, tni, tnp, tnp, tni, tnp, tnp, tni, tnp, tni, tnp, tni, tnp,
+		tnc, tnp, tnp, tnc,
+		generateRepositoryGetCode(table),
+		generateRepositoryGetOneCode(table),
+		//generateRepositoryInserCode(table),
+		//generateRepositoryUpdateCode(table),
+		//generateRepositoryDeleteCode(table),
+	)
+}
+
+func generateRepositoryGetCode(table ddlparse.Table) string {
+	tn := strings.ToLower(table.Name)
+	tnc := snakeToCamel(tn)
+	tnp := snakeToPascal(tn)
+	tni := getSnakeInitial(tn)
+
+	query := "\n\t`SELECT\n"
+	for i, c := range table.Columns {
+		if i == 0 {
+			query += fmt.Sprintf("\t\t%s", c.Name)
+		} else {
+			query += fmt.Sprintf("\n\t\t,%s", c.Name)
+		}
+	}
+	query += fmt.Sprintf("\n\t FROM %s `", tn)
+
+	scan := "\n"
+	for _, c := range table.Columns {
+		scan += fmt.Sprintf("\t\t\t&%s.%s,\n", tni, snakeToPascal(c.Name))
+	}
+	scan += "\t\t"
+
+	return fmt.Sprintf(
+		TEMPLATE_GET,
+		tnc, tni, tnp, tnp, tni, 
+		query,
+		tnp, tnp, tni, tnp,
+		scan,
+		tnp, tni,
+	) 
+}
+
+
+func generateRepositoryGetOneCode(table ddlparse.Table) string {
+	tn := strings.ToLower(table.Name)
+	tnc := snakeToCamel(tn)
+	tnp := snakeToPascal(tn)
+	tni := getSnakeInitial(tn)
+
+	query := "\n\t`SELECT\n"
+	for i, c := range table.Columns {
+		if i == 0 {
+			query += fmt.Sprintf("\t\t%s", c.Name)
+		} else {
+			query += fmt.Sprintf("\n\t\t,%s", c.Name)
+		}
+	}
+	query += fmt.Sprintf("\n\t FROM %s `", tn)
+
+	scan := "\n"
+	for _, c := range table.Columns {
+		scan += fmt.Sprintf("\t\t&ret.%s,\n", snakeToPascal(c.Name))
+	}
+	scan += "\t"
+
+	return fmt.Sprintf(
+		TEMPLATE_GETONE,
+		tnc, tni, tnp, tnp, tnp, tni, 
+		query,
+		scan,
+	) 
 }
