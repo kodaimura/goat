@@ -230,9 +230,9 @@ func generateRepositoryCode(table ddlparse.Table) string {
 		tnc, tnp, tnp, tnc,
 		generateRepositoryGetCode(table),
 		generateRepositoryGetOneCode(table),
-		//generateRepositoryInserCode(table),
-		//generateRepositoryUpdateCode(table),
-		//generateRepositoryDeleteCode(table),
+		generateRepositoryInsertCode(table),
+		generateRepositoryUpdateCode(table),
+		generateRepositoryDeleteCode(table),
 	)
 }
 
@@ -297,4 +297,151 @@ func generateRepositoryGetOneCode(table ddlparse.Table) string {
 		query,
 		scan,
 	) 
+}
+
+
+func getBindVar(rdbms string, n int) string {
+	if rdbms == "postgresql" {
+		return fmt.Sprintf("$%d", n)
+	} else {
+		return "?"
+	}
+}
+
+
+func concatBindVariableWithCommas(rdbms string, bindCount int) string {
+	var ls []string
+	for i := 1; i <= bindCount; i++ {
+		ls = append(ls, getBindVar(rdbms, i))
+	}
+	return strings.Join(ls, ",")
+}
+
+
+func isInsertColumn(c ddlparse.Column) bool {
+	if c.Constraint.IsAutoincrement {
+		return false
+	}
+	if strings.Contains(c.Name, "_at") || strings.Contains(c.Name, "_AT") {
+		return false
+	}
+
+	return true
+}
+
+
+func generateRepositoryInsertCode(table ddlparse.Table) string {
+	tn := strings.ToLower(table.Name)
+	tnc := snakeToCamel(tn)
+	tnp := snakeToPascal(tn)
+	tni := getSnakeInitial(tn)
+
+	query := fmt.Sprintf("\n\t`INSERT INTO %s (\n", tn)
+	bindCount := 0
+	for _, c := range table.Columns {
+		if isInsertColumn(c) {
+			bindCount += 1
+			if bindCount == 1 {
+				query += fmt.Sprintf("\t\t%s", c.Name)
+			} else {
+				query += fmt.Sprintf("\n\t\t,%s", c.Name)
+			}
+		}	
+	}
+	query += fmt.Sprintf("\n\t ) VALUES(%s)`\n", concatBindVariableWithCommas("", bindCount))
+
+	binds := "\n"
+	for _, c := range table.Columns {
+		if isInsertColumn(c) {
+			binds += fmt.Sprintf("\t\t%s.%s,\n", tni, snakeToPascal(c.Name))
+		}
+	}
+	binds += "\t"
+
+	return fmt.Sprintf(
+		TEMPLATE_INSERT,
+		tnc, tni, tnp,
+		query,
+		binds,
+	) 
+}
+
+
+func isUpdateColumn(c ddlparse.Column) bool {
+	if c.Constraint.IsAutoincrement {
+		return false
+	}
+	if c.Constraint.IsPrimaryKey {
+		return false
+	}
+	if strings.Contains(c.Name, "_at") || strings.Contains(c.Name, "_AT") {
+		return false
+	}
+
+	return true
+}
+
+
+func generateRepositoryUpdateCode(table ddlparse.Table) string {
+	tn := strings.ToLower(table.Name)
+	tnc := snakeToCamel(tn)
+	tnp := snakeToPascal(tn)
+	tni := getSnakeInitial(tn)
+
+	query := fmt.Sprintf("\n\t`UPDATE %s\n\t SET ", tn) 
+	bindCount := 0
+	for _, c := range table.Columns {
+		if isUpdateColumn(c) {
+			bindCount += 1
+			if bindCount == 1 {
+				query += fmt.Sprintf("%s = %s\n", c.Name, getBindVar("", bindCount))
+			} else {
+				query += fmt.Sprintf("\t\t,%s = %s\n", c.Name, getBindVar("", bindCount))
+			}
+		}	
+	}
+	query += "\t WHERE "
+	isFirst := true
+	for _, c := range table.Columns {
+		if c.Constraint.IsPrimaryKey {
+			bindCount += 1
+			if isFirst {
+				query += fmt.Sprintf("%s = %s", c.Name, getBindVar("", bindCount))
+				isFirst = false
+			} else {
+				query += fmt.Sprintf("\n\t   AND %s = %s", c.Name, getBindVar("", bindCount))
+			}
+		}
+	}
+	query += "`"
+
+	binds := "\n"
+	for _, c := range table.Columns {
+		if isUpdateColumn(c) {
+			binds += fmt.Sprintf("\t\t%s.%s,\n", tni, snakeToPascal(c.Name))
+		}
+	}
+	for _, c := range table.Columns {
+		if c.Constraint.IsPrimaryKey {
+			binds += fmt.Sprintf("\t\t%s.%s,\n", tni, snakeToPascal(c.Name))
+		}
+	}
+	binds += "\t"
+
+	return fmt.Sprintf(
+		TEMPLATE_UPDATE,
+		tnc, tni, tnp,
+		query,
+		binds,
+	) 
+}
+
+
+func generateRepositoryDeleteCode(table ddlparse.Table) string {
+	tn := strings.ToLower(table.Name)
+	tnc := snakeToCamel(tn)
+	tnp := snakeToPascal(tn)
+	tni := getSnakeInitial(tn)
+
+	return fmt.Sprintf(TEMPLATE_DELETE, tnc, tni, tnp, tni, tn) 
 }
