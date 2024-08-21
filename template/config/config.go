@@ -13,6 +13,7 @@ type Config struct {
 	AppHost string
 	AppPort string
 
+	DBDriver string
 	DBName string
 	DBHost string
 	DBPort string
@@ -41,6 +42,7 @@ func init() {
 	cf.AppHost = os.Getenv("APP_HOST")
 	cf.AppPort = os.Getenv("APP_PORT")
 
+	cf.DBDriver = os.Getenv("DB_DRIVER")
 	cf.DBName = os.Getenv("DB_NAME")
 	cf.DBHost = os.Getenv("DB_HOST")
 	cf.DBPort = os.Getenv("DB_PORT")
