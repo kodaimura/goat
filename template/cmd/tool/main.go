@@ -13,41 +13,114 @@ func main() {
 	args := os.Args
 
 	if len(args) < 2 {
-		fmt.Println("Error: The path to the DDL must be provided as the first argument.")
+		fmt.Println("第一引数にツール名を指定する")
 		return
 	}
-	file, err := os.Open(args[1])
+	tool := args[1]
+	if (tool == "generate" || tool == "g") {
+		generate(args[2:])
+	} else if (tool == "generate:model" || tool == "g:m") {
+		generateModel(args[2:])
+	} else if (tool == "generate:repository" || tool == "g:r") {
+		generateRepository(args[2:])
+	} else {
+		fmt.Println("ツール名が存在しません")
+	}
+}
+
+func generate(args []string) {
+	generateModel(args)
+	generateRepository(args)
+}
+
+func readFile(path string) (string, error) {
+	file, err := os.Open(path)
 	if err != nil {
-		fmt.Printf("Error opening file: %v\n", err)
-		return
+		fmt.Printf("DDLファイルの参照に失敗しました:", err)
+		return "", err
 	}
 	defer file.Close()
 
-	data, err := io.ReadAll(file)
+	content, err := io.ReadAll(file)
 	if err != nil {
-		fmt.Printf("Error reading file: %v\n", err)
-		return
+		fmt.Printf("DDLファイルの参照に失敗しました:", err)
+		return "", err
 	}
-	
-	tables, _ := ddlparse.ParseForce(string(data))
-	
+	return string(content), nil	
+}
+
+func writeFile(path, content string) error {
+	file, err := os.Create(path)
+	if err != nil {
+		fmt.Println("ファイルの作成に失敗しました:", err)
+		return err
+	}
+	defer file.Close()
+
+	_, err = file.WriteString(content)
+	if err != nil {
+		fmt.Println("ファイルへの書き込みに失敗しました:", err)
+		return err
+	}
+	return nil
+}
+
+func generateModel(args []string) error {
+	ddl, err := readFile(args[0])
+	if err != nil {
+		return err
+	}
+
+	tables, err := ddlparse.ParseForce(ddl)
+	if err != nil {
+		return err
+	}
+
 	for _, table := range tables {
-		tn := strings.ToLower(table.Name)
-		s := generateRepositoryCode(table)
-
-		file, err := os.Create(tn + ".go")
+		code := generateModelCode(table)
+		path := fmt.Sprintf("internal/model/%s.go", strings.ToLower(table.Name))
+		err = writeFile(path, code)
 		if err != nil {
-			fmt.Println("ファイルの作成に失敗しました:", err)
-			return
-		}
-		defer file.Close()
-
-		_, err = file.WriteString(s)
-		if err != nil {
-			fmt.Println("ファイルへの書き込みに失敗しました:", err)
-			return
+			return err
 		}
 	}
+	return nil
+}
+
+func generateModelCode(table ddlparse.Table) string {
+	code := "package model\n\n\n"
+	tn := strings.ToLower(table.Name)
+	code += "type " + snakeToPascal(tn) + " struct {\n"
+	for _, column := range table.Columns {
+		cn := strings.ToLower(column.Name)
+		code += "\t" + snakeToPascal(cn) + " " + 
+			dataTypeToGoType(column.DataType.Name) + " " + 
+			"`db:\"" + cn + "\" json:\"" + cn + "\"`\n"
+	}
+	code += "}"
+	return code
+}
+
+func generateRepository(args []string) error {
+	ddl, err := readFile(args[0])
+	if err != nil {
+		return err
+	}
+
+	tables, err := ddlparse.ParseForce(ddl)
+	if err != nil {
+		return err
+	}
+
+	for _, table := range tables {
+		code := generateRepositoryCode(table)
+		path := fmt.Sprintf("internal/repository/%s.go", strings.ToLower(table.Name))
+		err = writeFile(path, code)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func snakeToPascal(snake string) string {
