@@ -7,6 +7,8 @@ import (
 	"strings"
 	
 	"github.com/kodaimura/ddlparse"
+
+	"goat/config"
 )
 
 func main() {
@@ -373,8 +375,8 @@ func generateRepositoryGetOneCode(table ddlparse.Table) string {
 }
 
 
-func getBindVar(rdbms string, n int) string {
-	if rdbms == "postgresql" {
+func getBindVar(dbDriver string, n int) string {
+	if dbDriver == "postgres" {
 		return fmt.Sprintf("$%d", n)
 	} else {
 		return "?"
@@ -382,10 +384,10 @@ func getBindVar(rdbms string, n int) string {
 }
 
 
-func concatBindVariableWithCommas(rdbms string, bindCount int) string {
+func concatBindVariableWithCommas(dbDriver string, bindCount int) string {
 	var ls []string
 	for i := 1; i <= bindCount; i++ {
-		ls = append(ls, getBindVar(rdbms, i))
+		ls = append(ls, getBindVar(dbDriver, i))
 	}
 	return strings.Join(ls, ",")
 }
@@ -404,6 +406,7 @@ func isInsertColumn(c ddlparse.Column) bool {
 
 
 func generateRepositoryInsertCode(table ddlparse.Table) string {
+	cf := config.GetConfig()
 	tn := strings.ToLower(table.Name)
 	tnc := snakeToCamel(tn)
 	tnp := snakeToPascal(tn)
@@ -421,7 +424,7 @@ func generateRepositoryInsertCode(table ddlparse.Table) string {
 			}
 		}	
 	}
-	query += fmt.Sprintf("\n\t ) VALUES(%s)`\n", concatBindVariableWithCommas("", bindCount))
+	query += fmt.Sprintf("\n\t ) VALUES(%s)`\n", concatBindVariableWithCommas(cf.DBDriver, bindCount))
 
 	binds := "\n"
 	for _, c := range table.Columns {
@@ -456,6 +459,7 @@ func isUpdateColumn(c ddlparse.Column) bool {
 
 
 func generateRepositoryUpdateCode(table ddlparse.Table) string {
+	cf := config.GetConfig()
 	tn := strings.ToLower(table.Name)
 	tnc := snakeToCamel(tn)
 	tnp := snakeToPascal(tn)
@@ -467,9 +471,9 @@ func generateRepositoryUpdateCode(table ddlparse.Table) string {
 		if isUpdateColumn(c) {
 			bindCount += 1
 			if bindCount == 1 {
-				query += fmt.Sprintf("%s = %s\n", c.Name, getBindVar("", bindCount))
+				query += fmt.Sprintf("%s = %s\n", c.Name, getBindVar(cf.DBDriver, bindCount))
 			} else {
-				query += fmt.Sprintf("\t\t,%s = %s\n", c.Name, getBindVar("", bindCount))
+				query += fmt.Sprintf("\t\t,%s = %s\n", c.Name, getBindVar(cf.DBDriver, bindCount))
 			}
 		}	
 	}
@@ -479,10 +483,10 @@ func generateRepositoryUpdateCode(table ddlparse.Table) string {
 		if c.Constraint.IsPrimaryKey {
 			bindCount += 1
 			if isFirst {
-				query += fmt.Sprintf("%s = %s", c.Name, getBindVar("", bindCount))
+				query += fmt.Sprintf("%s = %s", c.Name, getBindVar(cf.DBDriver, bindCount))
 				isFirst = false
 			} else {
-				query += fmt.Sprintf("\n\t   AND %s = %s", c.Name, getBindVar("", bindCount))
+				query += fmt.Sprintf("\n\t   AND %s = %s", c.Name, getBindVar(cf.DBDriver, bindCount))
 			}
 		}
 	}
