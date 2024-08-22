@@ -175,8 +175,8 @@ const TEMPLATE =
 import (
 	"database/sql"
 
-	"xxxxx/internal/core/db"
-	"xxxxx/internal/model"
+	"%s/internal/core/db"
+	"%s/internal/model"
 )
 
 
@@ -294,13 +294,14 @@ const TEMPLATE_DELETE =
 }`
 
 func generateRepositoryCode(table ddlparse.Table) string {
+	cf := config.GetConfig()
 	tn := strings.ToLower(table.Name)
 	tnc := snakeToCamel(tn)
 	tnp := snakeToPascal(tn)
 	tni := getSnakeInitial(tn)
 
 	return fmt.Sprintf(
-		TEMPLATE,
+		TEMPLATE, cf.AppName, cf.AppName,
 		tnp, tni, tnp, tnp, tni, tnp, tnp, tni, tnp, tni, tnp, tni, tnp,
 		tnc, tnp, tnp, tnc,
 		generateRepositoryGetCode(table),

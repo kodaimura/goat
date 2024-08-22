@@ -70,7 +70,7 @@ sed -i "" s/goat/$APP_NAME/g go.mod
 sed -i "" s/goat/$APP_NAME/g Makefile
 sed -i "" s/goat/$APP_NAME/g Dockerfile
 sed -i "" s/goat/$APP_NAME/g docker-compose.yml
-sed -i "" s/goat/$APP_NAME/g ./config/env/local.env
+sed -i "" s/goat/$APP_NAME/g ./config/env/.env
 sed -i "" s/goat/$APP_NAME/g ./config/env/docker.env
 sed -i "" s/goat/$APP_NAME/g ./scripts/create-table.sql
 sed -i "" s/goat/$APP_NAME/g ./web/static/manifest.json

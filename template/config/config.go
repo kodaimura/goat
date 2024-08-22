@@ -10,6 +10,7 @@ import (
 
 
 type Config struct {
+	AppName string
 	AppHost string
 	AppPort string
 
@@ -39,6 +40,7 @@ func init() {
 		log.Panic(err)
 	}
 
+	cf.AppName = os.Getenv("APP_NAME")
 	cf.AppHost = os.Getenv("APP_HOST")
 	cf.AppPort = os.Getenv("APP_PORT")
 
