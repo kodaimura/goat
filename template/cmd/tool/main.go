@@ -1,5 +1,5 @@
 package main
- 
+
 import (
 	"io"
 	"os"
@@ -11,7 +11,10 @@ import (
 	"goat/config"
 )
 
+var cf *config.Config
+
 func main() {
+	cf = config.GetConfig()
 	args := os.Args
 
 	if len(args) < 2 {
@@ -51,6 +54,22 @@ func readFile(path string) (string, error) {
 	return string(content), nil	
 }
 
+func parseDDL(ddl string) ([]ddlparse.Table, error) {
+	var tables []ddlparse.Table
+	var err error
+	if (cf.DBDriver == "postgres") {
+		tables, err = ddlparse.ParsePostgreSQL(ddl)
+	} else if (cf.DBDriver == "mysql") {
+		tables, err = ddlparse.ParseMySQL(ddl)
+	} else if (cf.DBDriver == "sqlite3") {
+		tables, err = ddlparse.ParseSQLite(ddl)
+	} else {
+		fmt.Printf("DB_DRIBERが対応していません")
+	}
+	
+	return tables, err
+}
+
 func writeFile(path, content string) error {
 	file, err := os.Create(path)
 	if err != nil {
@@ -73,7 +92,7 @@ func generateModel(args []string) error {
 		return err
 	}
 
-	tables, err := ddlparse.ParseForce(ddl)
+	tables, err := parseDDL(ddl)
 	if err != nil {
 		return err
 	}
@@ -109,7 +128,7 @@ func generateRepository(args []string) error {
 		return err
 	}
 
-	tables, err := ddlparse.ParseForce(ddl)
+	tables, err := parseDDL(ddl)
 	if err != nil {
 		return err
 	}
@@ -294,7 +313,6 @@ const TEMPLATE_DELETE =
 }`
 
 func generateRepositoryCode(table ddlparse.Table) string {
-	cf := config.GetConfig()
 	tn := strings.ToLower(table.Name)
 	tnc := snakeToCamel(tn)
 	tnp := snakeToPascal(tn)
@@ -407,7 +425,7 @@ func isInsertColumn(c ddlparse.Column) bool {
 
 
 func generateRepositoryInsertCode(table ddlparse.Table) string {
-	cf := config.GetConfig()
+	
 	tn := strings.ToLower(table.Name)
 	tnc := snakeToCamel(tn)
 	tnp := snakeToPascal(tn)
@@ -460,7 +478,6 @@ func isUpdateColumn(c ddlparse.Column) bool {
 
 
 func generateRepositoryUpdateCode(table ddlparse.Table) string {
-	cf := config.GetConfig()
 	tn := strings.ToLower(table.Name)
 	tnc := snakeToCamel(tn)
 	tnp := snakeToPascal(tn)
