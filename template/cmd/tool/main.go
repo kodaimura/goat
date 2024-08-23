@@ -108,15 +108,39 @@ func generateModel(args []string) error {
 	return nil
 }
 
+func isNullColumn(column ddlparse.Column, constraints ddlparse.TableConstraint) bool {
+	if (column.Constraint.IsNotNull) {
+		return false
+	}
+	if (column.Constraint.IsPrimaryKey) {
+		return false
+	}
+	if (column.Constraint.IsAutoincrement) {
+		return false
+	}
+
+	for _, pk := range constraints.PrimaryKey {
+		for _, name := range pk.ColumnNames {
+			if (column.Name == name) {
+				return false
+			}
+		}
+	}
+	return true
+}
+
 func generateModelCode(table ddlparse.Table) string {
 	code := "package model\n\n\n"
 	tn := strings.ToLower(table.Name)
 	code += "type " + snakeToPascal(tn) + " struct {\n"
 	for _, column := range table.Columns {
 		cn := strings.ToLower(column.Name)
-		code += "\t" + snakeToPascal(cn) + " " + 
-			dataTypeToGoType(column.DataType.Name) + " " + 
-			"`db:\"" + cn + "\" json:\"" + cn + "\"`\n"
+		code += "\t" + snakeToPascal(cn) + " ";
+		if isNullColumn(column, table.Constraints) {
+			code += "*"
+		}
+		code += dataTypeToGoType(column.DataType.Name) + " "
+		code += "`db:\"" + cn + "\" json:\"" + cn + "\"`\n"
 	}
 	code += "}"
 	return code
