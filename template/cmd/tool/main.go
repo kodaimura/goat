@@ -86,6 +86,21 @@ func writeFile(path, content string) error {
 	return nil
 }
 
+func filterTable(tables []ddlparse.Table, names []string) []ddlparse.Table {
+	if len(names) == 0 {
+		return tables
+	}
+	var ret []ddlparse.Table
+	for _, table := range tables {
+		for _, name := range names {
+			if name == table.Name {
+				ret = append(ret, table)
+			}
+		}
+	}
+	return ret
+}
+
 func generateModel(args []string) error {
 	ddl, err := readFile(args[0])
 	if err != nil {
@@ -96,6 +111,8 @@ func generateModel(args []string) error {
 	if err != nil {
 		return err
 	}
+
+	tables = filterTable(tables, args[1:])
 
 	for _, table := range tables {
 		code := generateModelCode(table)
@@ -156,6 +173,8 @@ func generateRepository(args []string) error {
 	if err != nil {
 		return err
 	}
+
+	tables = filterTable(tables, args[1:])
 
 	for _, table := range tables {
 		code := generateRepositoryCode(table)
