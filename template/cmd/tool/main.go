@@ -101,18 +101,26 @@ func filterTable(tables []ddlparse.Table, names []string) []ddlparse.Table {
 	return ret
 }
 
-func generateModel(args []string) error {
+func getParsedTables(args []string) ([]ddlparse.Table, error) {
 	ddl, err := readFile(args[0])
 	if err != nil {
-		return err
+		return []ddlparse.Table{}, err
 	}
 
 	tables, err := parseDDL(ddl)
 	if err != nil {
-		return err
+		return []ddlparse.Table{}, err
 	}
 
-	tables = filterTable(tables, args[1:])
+	return filterTable(tables, args[1:]), nil
+
+}
+
+func generateModel(args []string) error {
+	tables, err := getParsedTables(args)
+	if err != nil {
+		return err
+	}
 
 	for _, table := range tables {
 		code := generateModelCode(table)
@@ -164,17 +172,10 @@ func generateModelCode(table ddlparse.Table) string {
 }
 
 func generateRepository(args []string) error {
-	ddl, err := readFile(args[0])
+	tables, err := getParsedTables(args)
 	if err != nil {
 		return err
 	}
-
-	tables, err := parseDDL(ddl)
-	if err != nil {
-		return err
-	}
-
-	tables = filterTable(tables, args[1:])
 
 	for _, table := range tables {
 		code := generateRepositoryCode(table)
