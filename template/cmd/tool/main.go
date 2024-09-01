@@ -18,7 +18,11 @@ func main() {
 	args := os.Args
 
 	if len(args) < 2 {
-		fmt.Println("第一引数にツール名を指定する")
+		fmt.Println("第一引数にツール名を指定してください。")
+		return
+	}
+	if len(args) < 3 {
+		fmt.Println("第二引数にDDLのパスを指定してください。")
 		return
 	}
 	tool := args[1]
@@ -29,7 +33,7 @@ func main() {
 	} else if (tool == "generate:repository" || tool == "g:r") {
 		generateRepository(args[2:])
 	} else {
-		fmt.Println("ツール名が存在しません")
+		fmt.Println("ツール名が存在しません。")
 	}
 }
 
@@ -41,14 +45,14 @@ func generate(args []string) {
 func readFile(path string) (string, error) {
 	file, err := os.Open(path)
 	if err != nil {
-		fmt.Printf("DDLファイルの参照に失敗しました:", err)
+		fmt.Println(fmt.Sprintf("%s の取得に失敗しました。: %s", path, err.Error()))
 		return "", err
 	}
 	defer file.Close()
 
 	content, err := io.ReadAll(file)
 	if err != nil {
-		fmt.Printf("DDLファイルの参照に失敗しました:", err)
+		fmt.Println(fmt.Sprintf("%s の読み込みに失敗しました。:", path, err.Error()))
 		return "", err
 	}
 	return string(content), nil	
@@ -64,7 +68,7 @@ func parseDDL(ddl string) ([]ddlparse.Table, error) {
 	} else if (cf.DBDriver == "sqlite3") {
 		tables, err = ddlparse.ParseSQLite(ddl)
 	} else {
-		fmt.Printf("DB_DRIBERが対応していません")
+		fmt.Println(fmt.Sprintf("DB_DRIBER=%s が対応していません。", cf.DBDriver))
 	}
 	
 	return tables, err
@@ -73,16 +77,17 @@ func parseDDL(ddl string) ([]ddlparse.Table, error) {
 func writeFile(path, content string) error {
 	file, err := os.Create(path)
 	if err != nil {
-		fmt.Println("ファイルの作成に失敗しました:", err)
+		fmt.Println(fmt.Sprintf("%s の作成に失敗しました。: %s", path, err.Error()))
 		return err
 	}
 	defer file.Close()
 
 	_, err = file.WriteString(content)
 	if err != nil {
-		fmt.Println("ファイルへの書き込みに失敗しました:", err)
+		fmt.Println(fmt.Sprintf("%s への書き込みに失敗しました。: %s", path, err.Error()))
 		return err
 	}
+	fmt.Println(fmt.Sprintf("Success: %s", path))
 	return nil
 }
 
@@ -117,8 +122,10 @@ func getParsedTables(args []string) ([]ddlparse.Table, error) {
 }
 
 func generateModel(args []string) error {
+	fmt.Println("internal/model の生成を開始します。")
 	tables, err := getParsedTables(args)
 	if err != nil {
+		fmt.Println(fmt.Sprintf("DDLの解析に失敗しました。: %s", err.Error()))
 		return err
 	}
 
@@ -130,6 +137,7 @@ func generateModel(args []string) error {
 			return err
 		}
 	}
+	fmt.Println("internal/model の生成を終了します。")
 	return nil
 }
 
@@ -172,6 +180,7 @@ func generateModelCode(table ddlparse.Table) string {
 }
 
 func generateRepository(args []string) error {
+	fmt.Println("internal/repository の生成を開始します。")
 	tables, err := getParsedTables(args)
 	if err != nil {
 		return err
@@ -185,6 +194,7 @@ func generateRepository(args []string) error {
 			return err
 		}
 	}
+	fmt.Println("internal/repository の生成を終了します。")
 	return nil
 }
 
