@@ -121,6 +121,16 @@ func getParsedTables(args []string) ([]ddlparse.Table, error) {
 
 }
 
+func getFieldName(columnName, tableName string) string {
+	cn := strings.ToLower(columnName)
+	tn := strings.ToLower(tableName)
+	pf := tn + "_"
+	if (strings.HasPrefix(cn, pf)) {
+		cn = cn[len(pf):]
+	}
+	return snakeToPascal(cn)
+}
+
 func generateModel(args []string) error {
 	fmt.Println("internal/model の生成を開始します。")
 	tables, err := getParsedTables(args)
@@ -168,7 +178,7 @@ func generateModelCode(table ddlparse.Table) string {
 	code += "type " + snakeToPascal(tn) + " struct {\n"
 	for _, column := range table.Columns {
 		cn := strings.ToLower(column.Name)
-		code += "\t" + snakeToPascal(cn) + " ";
+		code += "\t" + getFieldName(cn ,tn) + " ";
 		if isNullColumn(column, table.Constraints) {
 			code += "*"
 		}
@@ -402,7 +412,7 @@ func generateRepositoryGetCode(table ddlparse.Table) string {
 
 	scan := "\n"
 	for _, c := range table.Columns {
-		scan += fmt.Sprintf("\t\t\t&%s.%s,\n", tni, snakeToPascal(c.Name))
+		scan += fmt.Sprintf("\t\t\t&%s.%s,\n", tni, getFieldName(c.Name ,tn))
 	}
 	scan += "\t\t"
 
@@ -435,7 +445,7 @@ func generateRepositoryGetOneCode(table ddlparse.Table) string {
 
 	scan := "\n"
 	for _, c := range table.Columns {
-		scan += fmt.Sprintf("\t\t&ret.%s,\n", snakeToPascal(c.Name))
+		scan += fmt.Sprintf("\t\t&ret.%s,\n", getFieldName(c.Name ,tn))
 	}
 	scan += "\t"
 
@@ -502,7 +512,7 @@ func generateRepositoryInsertCode(table ddlparse.Table) string {
 	binds := "\n"
 	for _, c := range table.Columns {
 		if isInsertColumn(c) {
-			binds += fmt.Sprintf("\t\t%s.%s,\n", tni, snakeToPascal(c.Name))
+			binds += fmt.Sprintf("\t\t%s.%s,\n", tni, getFieldName(c.Name ,tn))
 		}
 	}
 	binds += "\t"
@@ -567,12 +577,12 @@ func generateRepositoryUpdateCode(table ddlparse.Table) string {
 	binds := "\n"
 	for _, c := range table.Columns {
 		if isUpdateColumn(c) {
-			binds += fmt.Sprintf("\t\t%s.%s,\n", tni, snakeToPascal(c.Name))
+			binds += fmt.Sprintf("\t\t%s.%s,\n", tni, getFieldName(c.Name ,tn))
 		}
 	}
 	for _, c := range table.Columns {
 		if c.Constraint.IsPrimaryKey {
-			binds += fmt.Sprintf("\t\t%s.%s,\n", tni, snakeToPascal(c.Name))
+			binds += fmt.Sprintf("\t\t%s.%s,\n", tni, getFieldName(c.Name ,tn))
 		}
 	}
 	binds += "\t"
