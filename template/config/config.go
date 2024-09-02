@@ -10,9 +10,11 @@ import (
 
 
 type Config struct {
+	AppName string
 	AppHost string
 	AppPort string
 
+	DBDriver string
 	DBName string
 	DBHost string
 	DBPort string
@@ -21,7 +23,7 @@ type Config struct {
 
 	MailHost string
 	MailPort string
-	MailUser string
+	MailAccount string
 	MailPass string
 
 	JwtSecretKey string
@@ -38,9 +40,11 @@ func init() {
 		log.Panic(err)
 	}
 
+	cf.AppName = os.Getenv("APP_NAME")
 	cf.AppHost = os.Getenv("APP_HOST")
 	cf.AppPort = os.Getenv("APP_PORT")
 
+	cf.DBDriver = os.Getenv("DB_DRIVER")
 	cf.DBName = os.Getenv("DB_NAME")
 	cf.DBHost = os.Getenv("DB_HOST")
 	cf.DBPort = os.Getenv("DB_PORT")
@@ -49,7 +53,7 @@ func init() {
 
 	cf.MailHost = os.Getenv("MAIL_HOST")
 	cf.MailPort = os.Getenv("MAIL_PORT")
-	cf.MailUser = os.Getenv("MAIL_USER")
+	cf.MailAccount = os.Getenv("MAIL_USER")
 	cf.MailPass = os.Getenv("MAIL_PASSWORD")
 
 	cf.JwtSecretKey = os.Getenv("JWT_SECRET_KEY")
