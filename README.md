@@ -30,9 +30,12 @@ $ make up
 ```
 $ make in
 ```
+* goatセットアップ (Dockerコンテナ内)
+```
+$ make init（初回のみ）
+```
 * アプリ起動（Dockerコンテナ内）
 ```
-$ go mod tidy （初回のみ）
 $ make run
 ```
 http://localhost:3000
