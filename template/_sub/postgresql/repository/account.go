@@ -8,44 +8,44 @@ import (
 )
 
 
-type UserRepository interface {
-	Get(u *model.User) ([]model.User, error)
-	GetOne(u *model.User) (model.User, error)
-	Insert(u *model.User, tx *sql.Tx) error
-	Update(u *model.User, tx *sql.Tx) error
-	Delete(u *model.User, tx *sql.Tx) error
+type AccountRepository interface {
+	Get(u *model.Account) ([]model.Account, error)
+	GetOne(u *model.Account) (model.Account, error)
+	Insert(u *model.Account, tx *sql.Tx) error
+	Update(u *model.Account, tx *sql.Tx) error
+	Delete(u *model.Account, tx *sql.Tx) error
 }
 
 
-type userRepository struct {
+type accountRepository struct {
 	db *sql.DB
 }
 
-func NewUserRepository() UserRepository {
+func NewAccountRepository() AccountRepository {
 	db := db.GetDB()
-	return &userRepository{db}
+	return &accountRepository{db}
 }
 
-func (rep *userRepository) Get(u *model.User) ([]model.User, error) {
+func (rep *accountRepository) Get(u *model.Account) ([]model.Account, error) {
 	where, binds := db.BuildWhereClause(u)
 	query := 
 	`SELECT
-		user_id,
-		user_name,
-		user_password,
+		account_id,
+		account_name,
+		account_password,
 		created_at,
 		updated_at
-	 FROM users ` + where
+	 FROM account ` + where
 	rows, err := rep.db.Query(query, binds...)
 	defer rows.Close()
 
 	if err != nil {
-		return []model.User{}, err
+		return []model.Account{}, err
 	}
 
-	ret := []model.User{}
+	ret := []model.Account{}
 	for rows.Next() {
-		u := model.User{}
+		u := model.Account{}
 		err = rows.Scan(
 			&u.Id, 
 			&u.Name,
@@ -54,7 +54,7 @@ func (rep *userRepository) Get(u *model.User) ([]model.User, error) {
 			&u.UpdatedAt,
 		)
 		if err != nil {
-			return []model.User{}, err
+			return []model.Account{}, err
 		}
 		ret = append(ret, u)
 	}
@@ -63,17 +63,17 @@ func (rep *userRepository) Get(u *model.User) ([]model.User, error) {
 }
 
 
-func (rep *userRepository) GetOne(u *model.User) (model.User, error) {
-	var ret model.User
+func (rep *accountRepository) GetOne(u *model.Account) (model.Account, error) {
+	var ret model.Account
 	where, binds := db.BuildWhereClause(u)
 	query := 
 	`SELECT
-		user_id,
-		user_name,
-		user_password,
+		account_id,
+		account_name,
+		account_password,
 		created_at,
 		updated_at
-	 FROM users ` + where
+	 FROM account ` + where
 
 	err := rep.db.QueryRow(query, binds...).Scan(
 		&ret.Id, 
@@ -87,12 +87,12 @@ func (rep *userRepository) GetOne(u *model.User) (model.User, error) {
 }
 
 
-func (rep *userRepository) Insert(u *model.User, tx *sql.Tx) error {
+func (rep *accountRepository) Insert(u *model.Account, tx *sql.Tx) error {
 	cmd := 
-	`INSERT INTO users (
-		user_name, 
-		user_password
-	 ) VALUES(?,?)`
+	`INSERT INTO account (
+		account_name, 
+		account_password
+	 ) VALUES($1,$2)`
 	binds := []interface{}{u.Name, u.Password}
 
 	var err error
@@ -106,12 +106,12 @@ func (rep *userRepository) Insert(u *model.User, tx *sql.Tx) error {
 }
 
 
-func (rep *userRepository) Update(u *model.User, tx *sql.Tx) error {
+func (rep *accountRepository) Update(u *model.Account, tx *sql.Tx) error {
 	cmd := 
-	`UPDATE users 
-	 SET user_name = ?,
-	     user_password = ?
-	 WHERE user_id = ?`
+	`UPDATE account 
+	 SET account_name = $1,
+	 	 account_password = $2
+	 WHERE account_id = $3`
 	binds := []interface{}{u.Name, u.Password, u.Id}
 	
 	var err error
@@ -125,9 +125,9 @@ func (rep *userRepository) Update(u *model.User, tx *sql.Tx) error {
 }
 
 
-func (rep *userRepository) Delete(u *model.User, tx *sql.Tx) error {
+func (rep *accountRepository) Delete(u *model.Account, tx *sql.Tx) error {
 	where, binds := db.BuildWhereClause(u)
-	cmd := "DELETE FROM users " + where
+	cmd := "DELETE FROM account " + where
 
 	var err error
 	if tx != nil {

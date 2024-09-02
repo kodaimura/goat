@@ -13,8 +13,8 @@ type Payload struct {
 }
 
 type CustomClaims struct {
-	UserId int
-	UserName string
+	AccountId int
+	AccountName string
 	/* 独自のフィールドを追加可能 */
 }
 

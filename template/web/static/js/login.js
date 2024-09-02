@@ -7,12 +7,12 @@ window.addEventListener("DOMContentLoaded", function() {
 
 const login = () => {
     const form = document.getElementById("login-form");
-    const user_name = form.elements['user_name'].value;
-    const user_password = form.elements['user_password'].value;
+    const account_name = form.elements['account_name'].value;
+    const account_password = form.elements['account_password'].value;
 
     const body = {
-        user_name: user_name,
-        user_password: user_password
+        account_name: account_name,
+        account_password: account_password
     };
 
     fetch('/api/login', {

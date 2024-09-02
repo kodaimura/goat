@@ -9,12 +9,12 @@ const signup = () => {
     const form = document.getElementById("signup-form");
     if (!validate(form)) return;
 
-    const user_name = form.elements['user_name'].value;
-    const user_password = form.elements['user_password'].value;
+    const account_name = form.elements['account_name'].value;
+    const account_password = form.elements['account_password'].value;
 
     const body = {
-        user_name: user_name,
-        user_password: user_password
+        account_name: account_name,
+        account_password: account_password
     };
 
     fetch('/api/signup', {
@@ -36,16 +36,16 @@ const signup = () => {
 }
 
 const validate = (form) => {
-    const user_name = form.elements['user_name'].value;
-    const user_password = form.elements['user_password'].value;
-    const user_password_confirm = form.elements['user_password_confirm'].value;
+    const account_name = form.elements['account_name'].value;
+    const account_password = form.elements['account_password'].value;
+    const account_password_confirm = form.elements['account_password_confirm'].value;
 
     let error = "";
-    if (user_name === "") {
+    if (account_name === "") {
         error = "ユーザ名を入力して下さい。";
-    } else if (user_password === "") {
+    } else if (account_password === "") {
         error = "パスワードを入力して下さい。";
-    } else if (user_password !== user_password_confirm) {
+    } else if (account_password !== account_password_confirm) {
 		error = "パスワードが一致していません。";
 	}
 

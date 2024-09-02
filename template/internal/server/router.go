@@ -12,11 +12,11 @@ import (
 */
 func SetWebRouter(r *gin.RouterGroup) {
 	rc := controller.NewRootController()
-	uc := controller.NewUserController()
+	ac := controller.NewAccountController()
 
-	r.GET("/signup", uc.SignupPage)
-	r.GET("/login", uc.LoginPage)
-	r.GET("/logout", uc.Logout)
+	r.GET("/signup", ac.SignupPage)
+	r.GET("/login", ac.LoginPage)
+	r.GET("/logout", ac.Logout)
 
 	auth := r.Group("", middleware.JwtAuthMiddleware())
 	{
@@ -29,16 +29,16 @@ func SetWebRouter(r *gin.RouterGroup) {
  Routing for "/api"
 */
 func SetApiRouter(r *gin.RouterGroup) {
-	uc := controller.NewUserController()
+	ac := controller.NewAccountController()
 
-	r.POST("/signup", uc.ApiSignup)
-	r.POST("/login", uc.ApiLogin)
+	r.POST("/signup", ac.ApiSignup)
+	r.POST("/login", ac.ApiLogin)
 
 	auth := r.Group("", middleware.JwtAuthApiMiddleware())
 	{
-		auth.GET("/account/profile", uc.ApiGetProfile)
-		auth.PUT("/account/name", uc.ApiPutName)
-		auth.PUT("/account/password", uc.ApiPutPassword)
-		auth.DELETE("/account", uc.ApiDeleteAccount)
+		auth.GET("/account/profile", ac.ApiGetProfile)
+		auth.PUT("/account/name", ac.ApiPutName)
+		auth.PUT("/account/password", ac.ApiPutPassword)
+		auth.DELETE("/account", ac.ApiDeleteAccount)
 	}
 }
