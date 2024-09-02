@@ -1,17 +1,13 @@
-deploy:
-	go build cmd/goat/main.go
-	nohup ./main &
-
-up:
+dcup:
 	docker compose up -d
 
-down:
+dcdown:
 	docker compose down
 
-start:
+dcstart:
 	docker compose start
 
-stop:
+dcstop:
 	docker compose stop
 
 in:
@@ -20,8 +16,12 @@ in:
 indb:
 	docker compose exec db bash
 
-build:
+dcbuild:
 	docker compose build --no-cache
+
+init:
+	go mod tidy
+	go build -o gent cmd/gent/main.go
 
 run:
 	go run cmd/goat/main.go
