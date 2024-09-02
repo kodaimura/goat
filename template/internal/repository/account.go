@@ -9,11 +9,11 @@ import (
 
 
 type AccountRepository interface {
-	Get(u *model.Account) ([]model.Account, error)
-	GetOne(u *model.Account) (model.Account, error)
-	Insert(u *model.Account, tx *sql.Tx) error
-	Update(u *model.Account, tx *sql.Tx) error
-	Delete(u *model.Account, tx *sql.Tx) error
+	Get(a *model.Account) ([]model.Account, error)
+	GetOne(a *model.Account) (model.Account, error)
+	Insert(a *model.Account, tx *sql.Tx) error
+	Update(a *model.Account, tx *sql.Tx) error
+	Delete(a *model.Account, tx *sql.Tx) error
 }
 
 
@@ -26,15 +26,16 @@ func NewAccountRepository() AccountRepository {
 	return &accountRepository{db}
 }
 
-func (rep *accountRepository) Get(u *model.Account) ([]model.Account, error) {
-	where, binds := db.BuildWhereClause(u)
+
+func (rep *accountRepository) Get(a *model.Account) ([]model.Account, error) {
+	where, binds := db.BuildWhereClause(a)
 	query := 
 	`SELECT
-		account_id,
-		account_name,
-		account_password,
-		created_at,
-		updated_at
+		account_id
+		,account_name
+		,account_password
+		,created_at
+		,updated_at
 	 FROM account ` + where
 	rows, err := rep.db.Query(query, binds...)
 	defer rows.Close()
@@ -45,41 +46,41 @@ func (rep *accountRepository) Get(u *model.Account) ([]model.Account, error) {
 
 	ret := []model.Account{}
 	for rows.Next() {
-		u := model.Account{}
+		a := model.Account{}
 		err = rows.Scan(
-			&u.Id, 
-			&u.Name,
-			&u.Password,
-			&u.CreatedAt, 
-			&u.UpdatedAt,
+			&a.Id,
+			&a.Name,
+			&a.Password,
+			&a.CreatedAt,
+			&a.UpdatedAt,
 		)
 		if err != nil {
 			return []model.Account{}, err
 		}
-		ret = append(ret, u)
+		ret = append(ret, a)
 	}
 
 	return ret, nil
 }
 
 
-func (rep *accountRepository) GetOne(u *model.Account) (model.Account, error) {
+func (rep *accountRepository) GetOne(a *model.Account) (model.Account, error) {
 	var ret model.Account
-	where, binds := db.BuildWhereClause(u)
+	where, binds := db.BuildWhereClause(a)
 	query := 
 	`SELECT
-		account_id,
-		account_name,
-		account_password,
-		created_at,
-		updated_at
+		account_id
+		,account_name
+		,account_password
+		,created_at
+		,updated_at
 	 FROM account ` + where
 
 	err := rep.db.QueryRow(query, binds...).Scan(
-		&ret.Id, 
-		&ret.Name, 
+		&ret.Id,
+		&ret.Name,
 		&ret.Password,
-		&ret.CreatedAt, 
+		&ret.CreatedAt,
 		&ret.UpdatedAt,
 	)
 
@@ -87,13 +88,17 @@ func (rep *accountRepository) GetOne(u *model.Account) (model.Account, error) {
 }
 
 
-func (rep *accountRepository) Insert(u *model.Account, tx *sql.Tx) error {
+func (rep *accountRepository) Insert(a *model.Account, tx *sql.Tx) error {
 	cmd := 
 	`INSERT INTO account (
-		account_name, 
-		account_password
+		account_name
+		,account_password
 	 ) VALUES(?,?)`
-	binds := []interface{}{u.Name, u.Password}
+
+	binds := []interface{}{
+		a.Name,
+		a.Password,
+	}
 
 	var err error
 	if tx != nil {
@@ -106,13 +111,17 @@ func (rep *accountRepository) Insert(u *model.Account, tx *sql.Tx) error {
 }
 
 
-func (rep *accountRepository) Update(u *model.Account, tx *sql.Tx) error {
+func (rep *accountRepository) Update(a *model.Account, tx *sql.Tx) error {
 	cmd := 
-	`UPDATE account 
-	 SET account_name = ?,
-	     account_password = ?
+	`UPDATE account
+	 SET account_name = ?
+		,account_password = ?
 	 WHERE account_id = ?`
-	binds := []interface{}{u.Name, u.Password, u.Id}
+	binds := []interface{}{
+		a.Name,
+		a.Password,
+		a.Id,
+	}
 	
 	var err error
 	if tx != nil {
@@ -125,8 +134,8 @@ func (rep *accountRepository) Update(u *model.Account, tx *sql.Tx) error {
 }
 
 
-func (rep *accountRepository) Delete(u *model.Account, tx *sql.Tx) error {
-	where, binds := db.BuildWhereClause(u)
+func (rep *accountRepository) Delete(a *model.Account, tx *sql.Tx) error {
+	where, binds := db.BuildWhereClause(a)
 	cmd := "DELETE FROM account " + where
 
 	var err error
