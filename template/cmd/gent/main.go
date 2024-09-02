@@ -18,23 +18,10 @@ func main() {
 	args := os.Args
 
 	if len(args) < 2 {
-		fmt.Println("Error: Please specify the tool name as the 1st argument.")
+		fmt.Println("Error: Please specify the path to the DDL as the 1st argument")
 		return
 	}
-	if len(args) < 3 {
-		fmt.Println("Error: Please specify the path to the DDL as the 2nd argument")
-		return
-	}
-	tool := args[1]
-	if (tool == "generate" || tool == "g") {
-		generate(args[2:])
-	} else if (tool == "generate:model" || tool == "g:m") {
-		generateModel(args[2:])
-	} else if (tool == "generate:repository" || tool == "g:r") {
-		generateRepository(args[2:])
-	} else {
-		fmt.Println("Error: The specified tool name does not exist.")
-	}
+	generate(args[1:])
 }
 
 func generate(args []string) {
