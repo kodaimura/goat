@@ -1,13 +1,13 @@
-dcup:
+up:
 	docker compose up -d
 
-dcdown:
+down:
 	docker compose down
 
-dcstart:
+start:
 	docker compose start
 
-dcstop:
+stop:
 	docker compose stop
 
 in:
@@ -15,9 +15,6 @@ in:
 
 indb:
 	docker compose exec db bash
-
-dcbuild:
-	docker compose build --no-cache
 
 init:
 	go mod tidy
