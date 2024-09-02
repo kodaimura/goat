@@ -239,7 +239,7 @@ func getSnakeInitial(snake string) string {
 func dataTypeToGoType(dataType string) string {
 	dataType = strings.ToUpper(dataType)
 
-	if (strings.Contains(dataType, "INT") || strings.Contains(dataType, "BIT")) {
+	if (strings.Contains(dataType, "INT") || strings.Contains(dataType, "BIT") || strings.Contains(dataType, "SERIAL")) {
 		return "int"
 	} else if strings.Contains(dataType, "NUMERIC") ||
 		strings.Contains(dataType, "DECIMAL") ||
@@ -480,6 +480,9 @@ func isInsertColumn(c ddlparse.Column) bool {
 	if c.Constraint.IsAutoincrement {
 		return false
 	}
+	if strings.Contains(strings.ToUpper(c.DataType.Name), "SERIAL") {
+		return false
+	}
 	if strings.Contains(c.Name, "_at") || strings.Contains(c.Name, "_AT") {
 		return false
 	}
@@ -528,6 +531,9 @@ func generateRepositoryInsertCode(table ddlparse.Table) string {
 
 func isUpdateColumn(c ddlparse.Column) bool {
 	if c.Constraint.IsAutoincrement {
+		return false
+	}
+	if strings.Contains(strings.ToUpper(c.DataType.Name), "SERIAL") {
 		return false
 	}
 	if c.Constraint.IsPrimaryKey {
