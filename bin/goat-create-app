@@ -50,7 +50,6 @@ if [ $DB = "postgres" ]; then
   rm -r scripts
   cp -r _sub/postgresql/scripts .
   cp -r _sub/postgresql/repository internal/
-  cp -r _sub/postgresql/db internal/core/
   cp -r _sub/postgresql/env config/
   cp -r _sub/postgresql/docker-compose.yml .
   cp -r _sub/postgresql/Dockerfile .
@@ -60,7 +59,6 @@ if [ $DB = "mysql" ]; then
   rm -r scripts
   cp -r _sub/mysql/scripts .
   cp -r _sub/mysql/repository internal/
-  cp -r _sub/mysql/db internal/core/
   cp -r _sub/mysql/env config/
   cp -r _sub/mysql/docker-compose.yml .
   cp -r _sub/mysql/Dockerfile .
