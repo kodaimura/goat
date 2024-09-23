@@ -45,7 +45,7 @@ func (ctr *AccountController) ApiSignup(c *gin.Context) {
 	name := m["account_name"]
 	pass := m["account_password"]
 
-	err := ctr.accountService.Signup(name, pass)
+	_, err := ctr.accountService.Signup(name, pass)
 	if err != nil {
 		if _, ok := err.(errs.UniqueConstraintError); ok {
 			c.JSON(409, gin.H{"error": "ユーザ名が既に使われています。"})
