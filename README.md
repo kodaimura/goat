@@ -4,12 +4,15 @@ Go(Gin)のWebアプリケーション雛形。詳しくはプログラム参照�
 accountテーブルをデフォルトで用意しており、サインアップ/ログイン機能を実装。
 
 ## Install
+### clone
 ```
 $ git clone https://github.com/kodaimura/goat
 ```
-* goat/bin にPATHを通す
-* 実行権限付与
-
+### goat/bin にPATHを通す
+```
+export PATH=$PATH:path/to/goat/bin
+```
+### 実行権限付与
 ```
 $ chmod -R +x path/to/goat/bin
 ```
