@@ -234,11 +234,11 @@ func dataTypeToGoType(dataType string) string {
 	}
 }
 
-func getGoZeroValue(goType string) interface{} {
+func getGoZeroValue(goType string) string {
 	if (goType == "int") {
-		return 0
+		return "0"
 	} else if goType == "float64" {
-		return 0
+		return "0"
 	} else {
 		return "\"\""
 	}
@@ -434,8 +434,8 @@ func generateRepositoryCode(table ddlparse.Table) string {
 }
 
 func generateInsertInterfaceReturnTypeCode(table ddlparse.Table) string {
-	aiColumn := getAutoIncrementColumn(table)
-	if aiColumn.Constraint.IsAutoincrement {
+	aiColumn, found := getAutoIncrementColumn(table)
+	if found {
 		return fmt.Sprintf("(%s, error)", dataTypeToGoType(aiColumn.DataType.Name))
 	}
 	return "error"
@@ -538,19 +538,22 @@ func isInsertColumn(c ddlparse.Column) bool {
 }
 
 
-func getAutoIncrementColumn(table ddlparse.Table) ddlparse.Column {
+func getAutoIncrementColumn(table ddlparse.Table) (ddlparse.Column, bool) {
 	for _, c := range table.Columns {
 		if c.Constraint.IsAutoincrement {
-			return c
+			return c, true
+		}
+		if strings.Contains(strings.ToUpper(c.DataType.Name), "SERIAL") {
+			return c, true
 		}
 	}
-	return ddlparse.Column{}
+	return ddlparse.Column{}, false
 }
 
 
 func generateRepositoryInsertCode(table ddlparse.Table) string {
-	aiColumn := getAutoIncrementColumn(table)
-	if aiColumn.Constraint.IsAutoincrement {
+	_, found := getAutoIncrementColumn(table)
+	if found {
 		if cf.DBDriver == "mysql" {
 			return generateRepositoryInsertAIMySQLCode(table)
 		} else {
@@ -605,7 +608,7 @@ func generateRepositoryInsertAICode(table ddlparse.Table) string {
 	tnc := snakeToCamel(tn)
 	tnp := snakeToPascal(tn)
 	tni := getSnakeInitial(tn)
-	aiColumn := getAutoIncrementColumn(table)
+	aiColumn, _ := getAutoIncrementColumn(table)
 	aicn := strings.ToLower(aiColumn.Name)
 	aicnc := snakeToCamel(aicn)
 
@@ -649,7 +652,7 @@ func generateRepositoryInsertAIMySQLCode(table ddlparse.Table) string {
 	tnc := snakeToCamel(tn)
 	tnp := snakeToPascal(tn)
 	tni := getSnakeInitial(tn)
-	aiColumn := getAutoIncrementColumn(table)
+	aiColumn, _ := getAutoIncrementColumn(table)
 	aicn := strings.ToLower(aiColumn.Name)
 	aicnc := snakeToCamel(aicn)
 
@@ -676,7 +679,7 @@ func generateRepositoryInsertAIMySQLCode(table ddlparse.Table) string {
 	binds += "\t"
 
 	return fmt.Sprintf(
-		TEMPLATE_INSERT_AI,
+		TEMPLATE_INSERT_AI_MYSQL,
 		tnc, tni, tnp, dataTypeToGoType(aiColumn.DataType.Name),
 		query,
 		binds,
