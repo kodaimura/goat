@@ -14,7 +14,7 @@ import (
 
 
 type AccountService interface {
-	Signup(name, password string) error
+	Signup(name, password string) (int, error)
 	Login(name, password string) (dto.Account, error)
 	GetProfile(id int) (dto.Account, error)
 	GenerateJwtPayload(id int) (jwt.Payload, error)
@@ -45,29 +45,29 @@ func (srv *accountService) toAccountDTO(account model.Account) dto.Account {
 }
 
 
-func (srv *accountService) Signup(name, password string) error {
+func (srv *accountService) Signup(name, password string) (int, error) {
 	_, err := srv.accountRepository.GetOne(&model.Account{Name: name})
 	if err == nil {
-		return errs.NewUniqueConstraintError("account_name")
+		return 0, errs.NewUniqueConstraintError("account_name")
 	}
 
 	hashed, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 
 	if err != nil {
 		logger.Error(err.Error())
-		return err
+		return 0, err
 	}
 
 	var account model.Account
 	account.Name = name
 	account.Password = string(hashed)
 
-	err = srv.accountRepository.Insert(&account, nil);
+	accountId, err := srv.accountRepository.Insert(&account, nil);
 	if err != nil {
 		logger.Error(err.Error())
 	}
 
-	return err
+	return accountId, err
 }
 
 

@@ -88,26 +88,28 @@ func (rep *accountRepository) GetOne(a *model.Account) (model.Account, error) {
 }
 
 
-func (rep *accountRepository) Insert(a *model.Account, tx *sql.Tx) error {
+func (rep *accountRepository) Insert(a *model.Account, tx *sql.Tx) (int, error) {
 	cmd := 
 	`INSERT INTO account (
 		account_name
 		,account_password
-	 ) VALUES($1,$2)`
+	 ) VALUES($1,$2)
+	 RETURNING account_id`
 
 	binds := []interface{}{
 		a.Name,
 		a.Password,
 	}
 
+	var accountId int
 	var err error
 	if tx != nil {
-        _, err = tx.Exec(cmd, binds...)
-    } else {
-        _, err = rep.db.Exec(cmd, binds...)
-    }
-	
-	return err
+		err = tx.QueryRow(cmd, binds...).Scan(&accountId)
+	} else {
+		err = rep.db.QueryRow(cmd, binds...).Scan(&accountId)
+	}
+
+	return accountId, err
 }
 
 
