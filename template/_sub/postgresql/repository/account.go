@@ -11,7 +11,7 @@ import (
 type AccountRepository interface {
 	Get(a *model.Account) ([]model.Account, error)
 	GetOne(a *model.Account) (model.Account, error)
-	Insert(a *model.Account, tx *sql.Tx) error
+	Insert(a *model.Account, tx *sql.Tx) (int, error)
 	Update(a *model.Account, tx *sql.Tx) error
 	Delete(a *model.Account, tx *sql.Tx) error
 }
@@ -124,14 +124,14 @@ func (rep *accountRepository) Update(a *model.Account, tx *sql.Tx) error {
 		a.Password,
 		a.Id,
 	}
-	
+
 	var err error
 	if tx != nil {
         _, err = tx.Exec(cmd, binds...)
     } else {
         _, err = rep.db.Exec(cmd, binds...)
     }
-	
+
 	return err
 }
 
@@ -146,6 +146,6 @@ func (rep *accountRepository) Delete(a *model.Account, tx *sql.Tx) error {
     } else {
         _, err = rep.db.Exec(cmd, binds...)
     }
-	
+
 	return err
 }

@@ -133,14 +133,14 @@ func (rep *accountRepository) Update(a *model.Account, tx *sql.Tx) error {
 		a.Password,
 		a.Id,
 	}
-	
+
 	var err error
 	if tx != nil {
         _, err = tx.Exec(cmd, binds...)
     } else {
         _, err = rep.db.Exec(cmd, binds...)
     }
-	
+
 	return err
 }
 
@@ -155,6 +155,6 @@ func (rep *accountRepository) Delete(a *model.Account, tx *sql.Tx) error {
     } else {
         _, err = rep.db.Exec(cmd, binds...)
     }
-	
+
 	return err
 }
