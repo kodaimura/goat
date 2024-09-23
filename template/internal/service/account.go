@@ -7,20 +7,22 @@ import (
 	"goat/internal/core/jwt"
 	"goat/internal/core/logger"
 	"goat/internal/core/errs"
-	"goat/internal/model"
 	"goat/internal/dto"
+	"goat/internal/request"
+	"goat/internal/model"
 	"goat/internal/repository"
 )
 
 
 type AccountService interface {
-	Signup(name, password string) (int, error)
-	Login(name, password string) (dto.Account, error)
-	GetProfile(id int) (dto.Account, error)
-	GenerateJwtPayload(id int) (jwt.Payload, error)
+	GetOne(id int) (dto.Account, error)
+	Delete(id int) error
 	UpdateName(id int, name string) error
 	UpdatePassword(id int, password string) error
-	DeleteAccount(id int) error
+
+	Login(req request.Login) (dto.Account, error)
+	Signup(req request.Signup) (int, error)
+	GenerateJwtPayload(id int) (jwt.Payload, error)
 }
 
 
@@ -35,63 +37,7 @@ func NewAccountService() AccountService {
 }
 
 
-func (srv *accountService) toAccountDTO(account model.Account) dto.Account {
-	return dto.Account{
-		Id:        account.Id,
-		Name:      account.Name,
-		CreatedAt: account.CreatedAt,
-		UpdatedAt: account.UpdatedAt,
-	}
-}
-
-
-func (srv *accountService) Signup(name, password string) (int, error) {
-	_, err := srv.accountRepository.GetOne(&model.Account{Name: name})
-	if err == nil {
-		return 0, errs.NewUniqueConstraintError("account_name")
-	}
-
-	hashed, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-
-	if err != nil {
-		logger.Error(err.Error())
-		return 0, err
-	}
-
-	var account model.Account
-	account.Name = name
-	account.Password = string(hashed)
-
-	accountId, err := srv.accountRepository.Insert(&account, nil);
-	if err != nil {
-		logger.Error(err.Error())
-	}
-
-	return accountId, err
-}
-
-
-func (srv *accountService) Login(name, password string) (dto.Account, error) {
-	account, err := srv.accountRepository.GetOne(&model.Account{Name: name})
-	if err != nil {
-		if err == sql.ErrNoRows {
-			logger.Debug(err.Error())
-		} else {
-			logger.Error(err.Error())
-		}
-		return dto.Account{}, err
-	}
-
-	err = bcrypt.CompareHashAndPassword([]byte(account.Password), []byte(password))
-	if err != nil {
-		logger.Error(err.Error())
-	}
-
-	return srv.toAccountDTO(account), err
-}
-
-
-func (srv *accountService) GetProfile(id int) (dto.Account, error) {
+func (srv *accountService) GetOne(id int) (dto.Account, error) {
 	account, err := srv.accountRepository.GetOne(&model.Account{Id: id})
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -101,21 +47,7 @@ func (srv *accountService) GetProfile(id int) (dto.Account, error) {
 		}
 	}
 
-	return srv.toAccountDTO(account), err
-}
-
-
-func (srv *accountService) GenerateJwtPayload(id int) (jwt.Payload, error) {
-	account, err := srv.accountRepository.GetOne(&model.Account{Id: id})
-	if err != nil {
-		logger.Error(err.Error())
-		return jwt.Payload{}, err
-	}
-
-	var cc jwt.CustomClaims
-	cc.AccountId = account.Id
-	cc.AccountName = account.Name
-	return jwt.NewPayload(cc), nil
+	return dto.NewAccount(account), err
 }
 
 
@@ -165,11 +97,71 @@ func (srv *accountService) UpdatePassword(id int, password string) error {
 }
 
 
-func (srv *accountService) DeleteAccount(id int) error {
+func (srv *accountService) Delete(id int) error {
 	if err := srv.accountRepository.Delete(&model.Account{Id: id}, nil); err != nil {
 		logger.Error(err.Error())
 		return err
 	}
 
 	return nil
+}
+
+
+func (srv *accountService) Login(req request.Login) (dto.Account, error) {
+	account, err := srv.accountRepository.GetOne(&model.Account{Name: req.Name})
+	if err != nil {
+		if err == sql.ErrNoRows {
+			logger.Debug(err.Error())
+		} else {
+			logger.Error(err.Error())
+		}
+		return dto.Account{}, err
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(account.Password), []byte(req.Password))
+	if err != nil {
+		logger.Error(err.Error())
+	}
+
+	return dto.NewAccount(account), err
+}
+
+
+func (srv *accountService) Signup(req request.Signup) (int, error) {
+	_, err := srv.accountRepository.GetOne(&model.Account{Name: req.Name})
+	if err == nil {
+		return 0, errs.NewUniqueConstraintError("account_name")
+	}
+
+	hashed, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+
+	if err != nil {
+		logger.Error(err.Error())
+		return 0, err
+	}
+
+	var account model.Account
+	account.Name = req.Name
+	account.Password = string(hashed)
+
+	accountId, err := srv.accountRepository.Insert(&account, nil);
+	if err != nil {
+		logger.Error(err.Error())
+	}
+
+	return accountId, err
+}
+
+
+func (srv *accountService) GenerateJwtPayload(id int) (jwt.Payload, error) {
+	account, err := srv.accountRepository.GetOne(&model.Account{Id: id})
+	if err != nil {
+		logger.Error(err.Error())
+		return jwt.Payload{}, err
+	}
+
+	var cc jwt.CustomClaims
+	cc.AccountId = account.Id
+	cc.AccountName = account.Name
+	return jwt.NewPayload(cc), nil
 }

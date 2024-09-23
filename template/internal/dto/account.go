@@ -1,5 +1,18 @@
 package dto
 
+import (
+	"goat/internal/model"
+)
+
+
+func NewAccount(account model.Account) Account {
+	return Account{
+		Id:        account.Id,
+		Name:      account.Name,
+		CreatedAt: account.CreatedAt,
+		UpdatedAt: account.UpdatedAt,
+	}
+}
 
 type Account struct {
 	Id int `json:"account_id"`
