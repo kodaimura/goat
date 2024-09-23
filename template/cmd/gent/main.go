@@ -234,6 +234,16 @@ func dataTypeToGoType(dataType string) string {
 	}
 }
 
+func getGoZeroValue(goType string) interface{} {
+	if (goType == "int") {
+		return 0
+	} else if goType == "float64" {
+		return 0
+	} else {
+		return "\"\""
+	}
+}
+
 const TEMPLATE = 
 `package repository
 
@@ -248,7 +258,7 @@ import (
 type %sRepository interface {
 	Get(%s *model.%s) ([]model.%s, error)
 	GetOne(%s *model.%s) (model.%s, error)
-	Insert(%s *model.%s, tx *sql.Tx) error
+	Insert(%s *model.%s, tx *sql.Tx) %s
 	Update(%s *model.%s, tx *sql.Tx) error
 	Delete(%s *model.%s, tx *sql.Tx) error
 }
@@ -320,26 +330,68 @@ const TEMPLATE_INSERT =
 
 	var err error
 	if tx != nil {
-        _, err = tx.Exec(cmd, binds...)
-    } else {
-        _, err = rep.db.Exec(cmd, binds...)
-    }
-	
+		_, err = tx.Exec(cmd, binds...)
+	} else {
+		_, err = rep.db.Exec(cmd, binds...)
+	}
+
 	return err
+}`
+
+const TEMPLATE_INSERT_AI =
+`func (rep *%sRepository) Insert(%s *model.%s, tx *sql.Tx) (%s, error) {
+	cmd := %s
+	binds := []interface{}{%s}
+
+	var %s %s
+	var err error
+	if tx != nil {
+		err = tx.QueryRow(cmd, binds...).Scan(&%s)
+	} else {
+		err = rep.db.QueryRow(cmd, binds...).Scan(&%s)
+	}
+
+	return %s, err
+}`
+
+const TEMPLATE_INSERT_AI_MYSQL =
+`func (rep *%sRepository) Insert(%s *model.%s, tx *sql.Tx) (%s, error) {
+	cmd := %s
+	binds := []interface{}{%s}
+
+	var err error
+	if tx != nil {
+		_, err = tx.Exec(cmd, binds...)
+	} else {
+		_, err = rep.db.Exec(cmd, binds...)
+	}
+
+	if err != nil {
+		return %s, err
+	}
+
+	var %s %s
+	if tx != nil {
+		err = tx.QueryRow("SELECT LAST_INSERT_ID()").Scan(&%s)
+	} else {
+		err = rep.db.QueryRow("SELECT LAST_INSERT_ID()").Scan(&%s)
+	}
+
+	return %s, err
 }`
 
 const TEMPLATE_UPDATE =
 `func (rep *%sRepository) Update(%s *model.%s, tx *sql.Tx) error {
 	cmd := %s
 	binds := []interface{}{%s}
-	
+
 	var err error
 	if tx != nil {
         _, err = tx.Exec(cmd, binds...)
     } else {
         _, err = rep.db.Exec(cmd, binds...)
     }
-	
+
 	return err
 }`
 
@@ -354,7 +406,7 @@ const TEMPLATE_DELETE =
     } else {
         _, err = rep.db.Exec(cmd, binds...)
     }
-	
+
 	return err
 }`
 
@@ -366,7 +418,12 @@ func generateRepositoryCode(table ddlparse.Table) string {
 
 	return fmt.Sprintf(
 		TEMPLATE, cf.AppName, cf.AppName,
-		tnp, tni, tnp, tnp, tni, tnp, tnp, tni, tnp, tni, tnp, tni, tnp,
+		tnp, 
+		tni, tnp, tnp, 
+		tni, tnp, tnp, 
+		tni, tnp,  generateInsertInterfaceReturnTypeCode(table),
+		tni, tnp, 
+		tni, tnp, 
 		tnc, tnp, tnp, tnc,
 		generateRepositoryGetCode(table),
 		generateRepositoryGetOneCode(table),
@@ -374,6 +431,14 @@ func generateRepositoryCode(table ddlparse.Table) string {
 		generateRepositoryUpdateCode(table),
 		generateRepositoryDeleteCode(table),
 	)
+}
+
+func generateInsertInterfaceReturnTypeCode(table ddlparse.Table) string {
+	aiColumn := getAutoIncrementColumn(table)
+	if aiColumn.Constraint.IsAutoincrement {
+		return fmt.Sprintf("(%s, error)", dataTypeToGoType(aiColumn.DataType.Name))
+	}
+	return "error"
 }
 
 func generateRepositoryGetCode(table ddlparse.Table) string {
@@ -473,7 +538,30 @@ func isInsertColumn(c ddlparse.Column) bool {
 }
 
 
+func getAutoIncrementColumn(table ddlparse.Table) ddlparse.Column {
+	for _, c := range table.Columns {
+		if c.Constraint.IsAutoincrement {
+			return c
+		}
+	}
+	return ddlparse.Column{}
+}
+
+
 func generateRepositoryInsertCode(table ddlparse.Table) string {
+	aiColumn := getAutoIncrementColumn(table)
+	if aiColumn.Constraint.IsAutoincrement {
+		if cf.DBDriver == "mysql" {
+			return generateRepositoryInsertAIMySQLCode(table)
+		} else {
+			return generateRepositoryInsertAICode(table)
+		}	
+	}
+	return generateRepositoryInsertNomalCode(table)
+}
+
+
+func generateRepositoryInsertNomalCode(table ddlparse.Table) string {
 	
 	tn := strings.ToLower(table.Name)
 	tnc := snakeToCamel(tn)
@@ -507,6 +595,94 @@ func generateRepositoryInsertCode(table ddlparse.Table) string {
 		tnc, tni, tnp,
 		query,
 		binds,
+	) 
+}
+
+
+func generateRepositoryInsertAICode(table ddlparse.Table) string {
+	
+	tn := strings.ToLower(table.Name)
+	tnc := snakeToCamel(tn)
+	tnp := snakeToPascal(tn)
+	tni := getSnakeInitial(tn)
+	aiColumn := getAutoIncrementColumn(table)
+	aicn := strings.ToLower(aiColumn.Name)
+	aicnc := snakeToCamel(aicn)
+
+	query := fmt.Sprintf("\n\t`INSERT INTO %s (\n", tn)
+	bindCount := 0
+	for _, c := range table.Columns {
+		if isInsertColumn(c) {
+			bindCount += 1
+			if bindCount == 1 {
+				query += fmt.Sprintf("\t\t%s", c.Name)
+			} else {
+				query += fmt.Sprintf("\n\t\t,%s", c.Name)
+			}
+		}	
+	}
+	query += fmt.Sprintf("\n\t ) VALUES(%s)", concatBindVariableWithCommas(cf.DBDriver, bindCount))
+	query += fmt.Sprintf("\n\t RETURNING %s`\n", aicn)
+
+	binds := "\n"
+	for _, c := range table.Columns {
+		if isInsertColumn(c) {
+			binds += fmt.Sprintf("\t\t%s.%s,\n", tni, getFieldName(c.Name ,tn))
+		}
+	}
+	binds += "\t"
+
+	return fmt.Sprintf(
+		TEMPLATE_INSERT_AI,
+		tnc, tni, tnp, dataTypeToGoType(aiColumn.DataType.Name),
+		query,
+		binds,
+		aicnc, dataTypeToGoType(aiColumn.DataType.Name),
+		aicnc, aicnc, aicnc,
+	) 
+}
+
+
+func generateRepositoryInsertAIMySQLCode(table ddlparse.Table) string {
+	
+	tn := strings.ToLower(table.Name)
+	tnc := snakeToCamel(tn)
+	tnp := snakeToPascal(tn)
+	tni := getSnakeInitial(tn)
+	aiColumn := getAutoIncrementColumn(table)
+	aicn := strings.ToLower(aiColumn.Name)
+	aicnc := snakeToCamel(aicn)
+
+	query := fmt.Sprintf("\n\t`INSERT INTO %s (\n", tn)
+	bindCount := 0
+	for _, c := range table.Columns {
+		if isInsertColumn(c) {
+			bindCount += 1
+			if bindCount == 1 {
+				query += fmt.Sprintf("\t\t%s", c.Name)
+			} else {
+				query += fmt.Sprintf("\n\t\t,%s", c.Name)
+			}
+		}	
+	}
+	query += fmt.Sprintf("\n\t ) VALUES(%s)`\n", concatBindVariableWithCommas(cf.DBDriver, bindCount))
+
+	binds := "\n"
+	for _, c := range table.Columns {
+		if isInsertColumn(c) {
+			binds += fmt.Sprintf("\t\t%s.%s,\n", tni, getFieldName(c.Name ,tn))
+		}
+	}
+	binds += "\t"
+
+	return fmt.Sprintf(
+		TEMPLATE_INSERT_AI,
+		tnc, tni, tnp, dataTypeToGoType(aiColumn.DataType.Name),
+		query,
+		binds,
+		getGoZeroValue(dataTypeToGoType(aiColumn.DataType.Name)),
+		aicnc, dataTypeToGoType(aiColumn.DataType.Name),
+		aicnc, aicnc, aicnc,
 	) 
 }
 
