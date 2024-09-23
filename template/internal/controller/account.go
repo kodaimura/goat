@@ -6,6 +6,7 @@ import (
 	"goat/internal/core/jwt"
 	"goat/internal/core/errs"
 	"goat/internal/service"
+	"goat/internal/request"
 )
 
 type AccountController struct {
@@ -40,12 +41,14 @@ func (ctr *AccountController) Logout(c *gin.Context) {
 
 //POST /api/signup
 func (ctr *AccountController) ApiSignup(c *gin.Context) {
-	m := map[string]string{}
-	c.BindJSON(&m)
-	name := m["account_name"]
-	pass := m["account_password"]
+	var req request.Signup
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		c.Abort()
+		return
+	}
 
-	_, err := ctr.accountService.Signup(name, pass)
+	_, err := ctr.accountService.Signup(req)
 	if err != nil {
 		if _, ok := err.(errs.UniqueConstraintError); ok {
 			c.JSON(409, gin.H{"error": "ユーザ名が既に使われています。"})
@@ -61,12 +64,14 @@ func (ctr *AccountController) ApiSignup(c *gin.Context) {
 
 //POST /api/login
 func (ctr *AccountController) ApiLogin(c *gin.Context) {
-	m := map[string]string{}
-	c.BindJSON(&m)
-	name := m["account_name"]
-	pass := m["account_password"]
+	var req request.Login
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		c.Abort()
+		return
+	}
 
-	account, err := ctr.accountService.Login(name, pass)
+	account, err := ctr.accountService.Login(req)
 	if err != nil {
 		c.JSON(401, gin.H{"error": "ユーザ名またはパスワードが異なります。"})
 		c.Abort()
@@ -85,10 +90,10 @@ func (ctr *AccountController) ApiLogin(c *gin.Context) {
 }
 
 
-//GET /api/account/profile
-func (ctr *AccountController) ApiGetProfile(c *gin.Context) {
+//GET /api/account
+func (ctr *AccountController) ApiGetOne(c *gin.Context) {
 	pl := jwt.GetPayload(c)
-	account, err := ctr.accountService.GetProfile(pl.AccountId)
+	account, err := ctr.accountService.GetOne(pl.AccountId)
 
 	if err != nil {
 		c.JSON(500, gin.H{})
@@ -103,22 +108,22 @@ func (ctr *AccountController) ApiGetProfile(c *gin.Context) {
 //PUT /api/account/password
 func (ctr *AccountController) ApiPutPassword(c *gin.Context) {
 	pl := jwt.GetPayload(c)
-	id := pl.AccountId
-	name := pl.AccountName
 
-	m := map[string]string{}
-	c.BindJSON(&m)
-	oldPass := m["old_account_password"]
-	pass := m["account_password"]
+	var req request.PutAccountPassword
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		c.Abort()
+		return
+	}
 
-	_, err := ctr.accountService.Login(name, oldPass)
+	_, err := ctr.accountService.Login(request.Login{Name: pl.AccountName, Password: req.OldPassword})
 	if err != nil {
 		c.JSON(400, gin.H{"error": "旧パスワードが異なります。"})
 		c.Abort()
 		return
 	}
 
-	if ctr.accountService.UpdatePassword(id, pass) != nil {
+	if ctr.accountService.UpdatePassword(pl.AccountId, req.Password) != nil {
 		c.JSON(500, gin.H{"error": "変更に失敗しました。"})
 		c.Abort()
 		return
@@ -131,13 +136,15 @@ func (ctr *AccountController) ApiPutPassword(c *gin.Context) {
 //PUT /api/account/name
 func (ctr *AccountController) ApiPutName(c *gin.Context) {
 	pl := jwt.GetPayload(c)
-	id := pl.AccountId
 
-	m := map[string]string{}
-	c.BindJSON(&m)
-	name := m["account_name"]
+	var req request.PutAccountName
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		c.Abort()
+		return
+	}
 
-	err := ctr.accountService.UpdateName(id, name)
+	err := ctr.accountService.UpdateName(pl.AccountId, req.Name)
 	if err != nil {
 		if _, ok := err.(errs.UniqueConstraintError); ok {
 			c.JSON(409, gin.H{"error": "ユーザ名が既に使われています。"})
@@ -152,11 +159,10 @@ func (ctr *AccountController) ApiPutName(c *gin.Context) {
 
 
 //DELETE /api/account
-func (ctr *AccountController) ApiDeleteAccount(c *gin.Context) {
+func (ctr *AccountController) ApiDelete(c *gin.Context) {
 	pl := jwt.GetPayload(c)
-	id := pl.AccountId
 
-	if ctr.accountService.DeleteAccount(id) != nil {
+	if ctr.accountService.Delete(pl.AccountId) != nil {
 		c.JSON(500, gin.H{"error": "削除に失敗しました。"})
 		c.Abort()
 		return
