@@ -85,7 +85,7 @@ func (ctr *AccountController) ApiLogin(c *gin.Context) {
 }
 
 
-//GET /api/account/profile
+//GET /api/account
 func (ctr *AccountController) ApiGetProfile(c *gin.Context) {
 	pl := jwt.GetPayload(c)
 	account, err := ctr.accountService.GetProfile(pl.AccountId)
