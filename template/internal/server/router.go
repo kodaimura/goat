@@ -11,7 +11,7 @@ import (
  Routing for "/" 
 */
 func SetWebRouter(r *gin.RouterGroup) {
-	rc := controller.NewRootController()
+	ic := controller.NewIndexController()
 	ac := controller.NewAccountController()
 
 	r.GET("/signup", ac.SignupPage)
@@ -20,7 +20,7 @@ func SetWebRouter(r *gin.RouterGroup) {
 
 	auth := r.Group("", middleware.JwtAuthMiddleware())
 	{
-		auth.GET("/", rc.IndexPage)
+		auth.GET("/", ic.IndexPage)
 	}
 }
 
