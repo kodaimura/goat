@@ -100,6 +100,13 @@ func (rep *accountRepository) Insert(a *model.Account, tx *sql.Tx) (int, error) 
 		a.Password,
 	}
 
+	var err error
+	if tx != nil {
+		_, err = tx.Exec(cmd, binds...)
+	} else {
+		_, err = rep.db.Exec(cmd, binds...)
+	}
+
 	if err != nil {
 		return 0, err
 	}
