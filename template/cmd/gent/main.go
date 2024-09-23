@@ -234,16 +234,6 @@ func dataTypeToGoType(dataType string) string {
 	}
 }
 
-func getGoZeroValue(goType string) string {
-	if (goType == "int") {
-		return "0"
-	} else if goType == "float64" {
-		return "0"
-	} else {
-		return "\"\""
-	}
-}
-
 const TEMPLATE = 
 `package repository
 
@@ -339,11 +329,11 @@ const TEMPLATE_INSERT =
 }`
 
 const TEMPLATE_INSERT_AI =
-`func (rep *%sRepository) Insert(%s *model.%s, tx *sql.Tx) (%s, error) {
+`func (rep *%sRepository) Insert(%s *model.%s, tx *sql.Tx) (int, error) {
 	cmd := %s
 	binds := []interface{}{%s}
 
-	var %s %s
+	var %s int
 	var err error
 	if tx != nil {
 		err = tx.QueryRow(cmd, binds...).Scan(&%s)
@@ -355,7 +345,7 @@ const TEMPLATE_INSERT_AI =
 }`
 
 const TEMPLATE_INSERT_AI_MYSQL =
-`func (rep *%sRepository) Insert(%s *model.%s, tx *sql.Tx) (%s, error) {
+`func (rep *%sRepository) Insert(%s *model.%s, tx *sql.Tx) (int, error) {
 	cmd := %s
 	binds := []interface{}{%s}
 
@@ -367,10 +357,10 @@ const TEMPLATE_INSERT_AI_MYSQL =
 	}
 
 	if err != nil {
-		return %s, err
+		return 0, err
 	}
 
-	var %s %s
+	var %s int
 	if tx != nil {
 		err = tx.QueryRow("SELECT LAST_INSERT_ID()").Scan(&%s)
 	} else {
@@ -637,11 +627,10 @@ func generateRepositoryInsertAICode(table ddlparse.Table) string {
 
 	return fmt.Sprintf(
 		TEMPLATE_INSERT_AI,
-		tnc, tni, tnp, dataTypeToGoType(aiColumn.DataType.Name),
+		tnc, tni, tnp,
 		query,
 		binds,
-		aicnc, dataTypeToGoType(aiColumn.DataType.Name),
-		aicnc, aicnc, aicnc,
+		aicnc, aicnc, aicnc, aicnc,
 	) 
 }
 
@@ -680,12 +669,10 @@ func generateRepositoryInsertAIMySQLCode(table ddlparse.Table) string {
 
 	return fmt.Sprintf(
 		TEMPLATE_INSERT_AI_MYSQL,
-		tnc, tni, tnp, dataTypeToGoType(aiColumn.DataType.Name),
+		tnc, tni, tnp,
 		query,
 		binds,
-		getGoZeroValue(dataTypeToGoType(aiColumn.DataType.Name)),
-		aicnc, dataTypeToGoType(aiColumn.DataType.Name),
-		aicnc, aicnc, aicnc,
+		aicnc, aicnc, aicnc, aicnc,
 	) 
 }
 
