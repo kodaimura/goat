@@ -5,8 +5,11 @@ import (
 
 	"goat/internal/core/jwt"
 	"goat/internal/core/errs"
+	"goat/internal/core/utils"
 	"goat/internal/service"
+	"goat/internal/dto"
 	"goat/internal/request"
+	"goat/internal/response"
 )
 
 type AccountController struct {
@@ -48,7 +51,10 @@ func (ctr *AccountController) ApiSignup(c *gin.Context) {
 		return
 	}
 
-	_, err := ctr.accountService.Signup(req)
+	var input dto.Signup
+	utils.MapFields(&input, req)
+
+	accountId, err := ctr.accountService.Signup(input)
 	if err != nil {
 		if _, ok := err.(errs.UniqueConstraintError); ok {
 			c.JSON(409, gin.H{"error": "ユーザ名が既に使われています。"})
@@ -58,7 +64,9 @@ func (ctr *AccountController) ApiSignup(c *gin.Context) {
 		c.Abort()
 		return
 	}
-	c.JSON(200, gin.H{})
+
+	res := response.Signup{Id: accountId}
+	c.JSON(200, res)
 }
 
 
@@ -71,7 +79,10 @@ func (ctr *AccountController) ApiLogin(c *gin.Context) {
 		return
 	}
 
-	account, err := ctr.accountService.Login(req)
+	var input dto.Login
+	utils.MapFields(&input, req)
+
+	account, err := ctr.accountService.Login(input)
 	if err != nil {
 		c.JSON(401, gin.H{"error": "ユーザ名またはパスワードが異なります。"})
 		c.Abort()
@@ -101,7 +112,10 @@ func (ctr *AccountController) ApiGetOne(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, account)
+	var res response.GetAccount
+	utils.MapFields(&res, account)
+
+	c.JSON(200, res)
 }
 
 
@@ -116,7 +130,8 @@ func (ctr *AccountController) ApiPutPassword(c *gin.Context) {
 		return
 	}
 
-	_, err := ctr.accountService.Login(request.Login{Name: pl.AccountName, Password: req.OldPassword})
+	input := dto.Login{Name: pl.AccountName, Password: req.OldPassword}
+	_, err := ctr.accountService.Login(input)
 	if err != nil {
 		c.JSON(400, gin.H{"error": "旧パスワードが異なります。"})
 		c.Abort()

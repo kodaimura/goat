@@ -7,8 +7,8 @@ import (
 	"goat/internal/core/jwt"
 	"goat/internal/core/logger"
 	"goat/internal/core/errs"
+	"goat/internal/core/utils"
 	"goat/internal/dto"
-	"goat/internal/request"
 	"goat/internal/model"
 	"goat/internal/repository"
 )
@@ -20,8 +20,8 @@ type AccountService interface {
 	UpdateName(id int, name string) error
 	UpdatePassword(id int, password string) error
 
-	Login(req request.Login) (dto.Account, error)
-	Signup(req request.Signup) (int, error)
+	Login(input dto.Login) (dto.Account, error)
+	Signup(input dto.Signup) (int, error)
 	GenerateJwtPayload(id int) (jwt.Payload, error)
 }
 
@@ -47,7 +47,9 @@ func (srv *accountService) GetOne(id int) (dto.Account, error) {
 		}
 	}
 
-	return dto.NewAccount(account), err
+	var ret dto.Account
+	utils.MapFields(&ret, account)
+	return ret, err
 }
 
 
@@ -107,8 +109,8 @@ func (srv *accountService) Delete(id int) error {
 }
 
 
-func (srv *accountService) Login(req request.Login) (dto.Account, error) {
-	account, err := srv.accountRepository.GetOne(&model.Account{Name: req.Name})
+func (srv *accountService) Login(input dto.Login) (dto.Account, error) {
+	account, err := srv.accountRepository.GetOne(&model.Account{Name: input.Name})
 	if err != nil {
 		if err == sql.ErrNoRows {
 			logger.Debug(err.Error())
@@ -118,22 +120,24 @@ func (srv *accountService) Login(req request.Login) (dto.Account, error) {
 		return dto.Account{}, err
 	}
 
-	err = bcrypt.CompareHashAndPassword([]byte(account.Password), []byte(req.Password))
+	err = bcrypt.CompareHashAndPassword([]byte(account.Password), []byte(input.Password))
 	if err != nil {
 		logger.Error(err.Error())
 	}
 
-	return dto.NewAccount(account), err
+	var ret dto.Account
+	utils.MapFields(&ret, account)
+	return ret, err
 }
 
 
-func (srv *accountService) Signup(req request.Signup) (int, error) {
-	_, err := srv.accountRepository.GetOne(&model.Account{Name: req.Name})
+func (srv *accountService) Signup(input dto.Signup) (int, error) {
+	_, err := srv.accountRepository.GetOne(&model.Account{Name: input.Name})
 	if err == nil {
 		return 0, errs.NewUniqueConstraintError("account_name")
 	}
 
-	hashed, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	hashed, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
 
 	if err != nil {
 		logger.Error(err.Error())
@@ -141,7 +145,7 @@ func (srv *accountService) Signup(req request.Signup) (int, error) {
 	}
 
 	var account model.Account
-	account.Name = req.Name
+	account.Name = input.Name
 	account.Password = string(hashed)
 
 	accountId, err := srv.accountRepository.Insert(&account, nil);
