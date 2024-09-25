@@ -695,6 +695,38 @@ func isUpdateColumn(c ddlparse.Column) bool {
 }
 
 
+func contains(slice []string, element string) bool {
+    for _, v := range slice {
+        if v == element {
+            return true
+        }
+    }
+    return false
+}
+
+
+func getPKColumns(table ddlparse.Table) []ddlparse.Column {
+	pkcols := []string{}
+	for _, pk := range table.Constraints.PrimaryKey {
+		for _, name := range pk.ColumnNames {
+			pkcols = append(pkcols, name)
+		}
+	}
+
+	names := []string{}
+	ret := []ddlparse.Column{}
+	for _, c := range table.Columns {
+		if c.Constraint.IsPrimaryKey || contains(pkcols, c.Name) || strings.Contains(strings.ToUpper(c.DataType.Name), "SERIAL"){
+			if !contains(names, c.Name) {
+				names = append(names, c.Name)
+				ret = append(ret, c)
+			}
+		}
+	}
+	return ret
+}
+
+
 func generateRepositoryUpdateCode(table ddlparse.Table) string {
 	tn := strings.ToLower(table.Name)
 	tnc := snakeToCamel(tn)
@@ -715,15 +747,13 @@ func generateRepositoryUpdateCode(table ddlparse.Table) string {
 	}
 	query += "\t WHERE "
 	isFirst := true
-	for _, c := range table.Columns {
-		if c.Constraint.IsPrimaryKey {
-			bindCount += 1
-			if isFirst {
-				query += fmt.Sprintf("%s = %s", c.Name, getBindVar(cf.DBDriver, bindCount))
-				isFirst = false
-			} else {
-				query += fmt.Sprintf("\n\t   AND %s = %s", c.Name, getBindVar(cf.DBDriver, bindCount))
-			}
+	for _, c := range getPKColumns(table) {
+		bindCount += 1
+		if isFirst {
+			query += fmt.Sprintf("%s = %s", c.Name, getBindVar(cf.DBDriver, bindCount))
+			isFirst = false
+		} else {
+			query += fmt.Sprintf("\n\t   AND %s = %s", c.Name, getBindVar(cf.DBDriver, bindCount))
 		}
 	}
 	query += "`"
