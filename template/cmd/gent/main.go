@@ -764,10 +764,8 @@ func generateRepositoryUpdateCode(table ddlparse.Table) string {
 			binds += fmt.Sprintf("\t\t%s.%s,\n", tni, getFieldName(c.Name ,tn))
 		}
 	}
-	for _, c := range table.Columns {
-		if c.Constraint.IsPrimaryKey {
-			binds += fmt.Sprintf("\t\t%s.%s,\n", tni, getFieldName(c.Name ,tn))
-		}
+	for _, c := range getPKColumns(table) {
+		binds += fmt.Sprintf("\t\t%s.%s,\n", tni, getFieldName(c.Name ,tn))
 	}
 	binds += "\t"
 
