@@ -88,6 +88,7 @@ cat <<EOF > .gitignore
 .env
 .DS_Store
 main
+gent
 data
 EOF
 
