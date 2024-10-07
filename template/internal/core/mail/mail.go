@@ -19,7 +19,7 @@ func Send (from string, to []string, subject, body string) error {
 
 func getSmtpAuth () smtp.Auth {
 	cf := config.GetConfig()
-	return smtp.PlainAuth("", cf.MailAccount, cf.MailPass, cf.MailHost)
+	return smtp.PlainAuth("", cf.MailUser, cf.MailPass, cf.MailHost)
 }
 
 func getSmtpAddress () string {

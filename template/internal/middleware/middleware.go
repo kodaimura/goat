@@ -1,9 +1,29 @@
 package middleware
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
+
+	"goat/config"
 	"goat/internal/core/jwt"
 )
+
+
+func BasicAuthMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		cf := config.GetConfig()
+
+		user, pass, ok := c.Request.BasicAuth()
+		if !ok || user != cf.BasicAuthUser || pass != cf.BasicAuthPass {
+			c.Header("WWW-Authenticate", "Basic realm=Authorization Required")
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
+		c.Next()
+	}
+}
+
 
 func JwtAuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
