@@ -36,9 +36,9 @@ func SetApiRouter(r *gin.RouterGroup) {
 
 	auth := r.Group("", middleware.JwtAuthApiMiddleware())
 	{
-		auth.GET("/account", ac.ApiGetOne)
-		auth.PUT("/account/name", ac.ApiPutName)
-		auth.PUT("/account/password", ac.ApiPutPassword)
-		auth.DELETE("/account", ac.ApiDelete)
+		auth.GET("/accounts/me", ac.ApiGetOne)
+		auth.PUT("/accounts/me/name", ac.ApiPutName)
+		auth.PUT("/accounts/me/password", ac.ApiPutPassword)
+		auth.DELETE("/accounts/me", ac.ApiDelete)
 	}
 }
