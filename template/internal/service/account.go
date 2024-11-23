@@ -37,11 +37,10 @@ func (srv *accountService) GetOne(input dto.AccountPK) (dto.Account, error) {
 	account, err := srv.accountRepository.GetOne(&model.Account{Id: input.Id})
 	if err != nil {
 		if err == sql.ErrNoRows {
-			logger.Debug(err.Error())
-		} else {
-			logger.Error(err.Error())
+			return dto.Account{}, errs.NewNotFoundError()
 		}
-		return dto.Account{}, err
+		logger.Error(err.Error())
+		return dto.Account{}, errs.NewUnexpectedError(err.Error())
 	}
 
 	var ret dto.Account
@@ -50,53 +49,70 @@ func (srv *accountService) GetOne(input dto.AccountPK) (dto.Account, error) {
 }
 
 func (srv *accountService) UpdateName(input dto.UpdateAccountName) error {
-	if err := srv.checkUniqueName(input.Id, input.Name); err != nil {
-		return err
-	}
-
-	account, err := srv.getAccountByID(input.Id)
+	account, err := srv.accountRepository.GetOne(&model.Account{Id: input.Id})
 	if err != nil {
-		return err
+		if err == sql.ErrNoRows {
+			return errs.NewNotFoundError()
+		}
+		logger.Error(err.Error())
+		return errs.NewUnexpectedError(err.Error())
 	}
 
 	account.Name = input.Name
-	return srv.accountRepository.Update(account, nil)
+	if err := srv.accountRepository.Update(&account, nil); err != nil {
+		if column, ok := GetConflictColumn(err); ok {
+			return errs.NewConflictError(column)
+		}
+		logger.Error(err.Error())
+		return errs.NewUnexpectedError(err.Error())
+	}
+	return nil
 }
 
 func (srv *accountService) UpdatePassword(input dto.UpdateAccountPassword) error {
+	account, err := srv.accountRepository.GetOne(&model.Account{Id: input.Id})
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return errs.NewNotFoundError()
+		}
+		logger.Error(err.Error())
+		return errs.NewUnexpectedError(err.Error())
+	}
+
 	hashed, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
 	if err != nil {
 		logger.Error(err.Error())
-		return err
-	}
-
-	account, err := srv.getAccountByID(input.Id)
-	if err != nil {
-		return err
+		return errs.NewUnexpectedError(err.Error())
 	}
 
 	account.Password = string(hashed)
-	return srv.accountRepository.Update(account, nil)
+	if err := srv.accountRepository.Update(&account, nil); err != nil {
+		logger.Error(err.Error())
+		return errs.NewUnexpectedError(err.Error())
+	}
+	return nil
 }
 
 func (srv *accountService) Delete(input dto.AccountPK) error {
-	return srv.accountRepository.Delete(&model.Account{Id: input.Id}, nil)
+	if err := srv.accountRepository.Delete(&model.Account{Id: input.Id}, nil); err != nil {
+		logger.Error(err.Error())
+		return errs.NewUnexpectedError(err.Error())
+	}
+	return nil
 }
 
 func (srv *accountService) Login(input dto.Login) (dto.Account, error) {
 	account, err := srv.accountRepository.GetOne(&model.Account{Name: input.Name})
 	if err != nil {
 		if err == sql.ErrNoRows {
-			logger.Debug(err.Error())
-		} else {
-			logger.Error(err.Error())
+			return dto.Account{}, errs.NewUnauthorizedError()
 		}
-		return dto.Account{}, err
+		logger.Error(err.Error())
+		return dto.Account{}, errs.NewUnexpectedError(err.Error())
 	}
 
 	if err = bcrypt.CompareHashAndPassword([]byte(account.Password), []byte(input.Password)); err != nil {
-		logger.Error(err.Error())
-		return dto.Account{}, err
+		return dto.Account{}, errs.NewUnexpectedError(err.Error())
 	}
 
 	var ret dto.Account
@@ -106,13 +122,13 @@ func (srv *accountService) Login(input dto.Login) (dto.Account, error) {
 
 func (srv *accountService) Signup(input dto.Signup) (dto.AccountPK, error) {
 	if _, err := srv.accountRepository.GetOne(&model.Account{Name: input.Name}); err == nil {
-		return dto.AccountPK{}, errs.NewUniqueConstraintError("account_name")
+		return dto.AccountPK{}, errs.NewConflictError("account_name")
 	}
 
 	hashed, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
 	if err != nil {
 		logger.Error(err.Error())
-		return dto.AccountPK{}, err
+		return dto.AccountPK{}, errs.NewUnexpectedError(err.Error())
 	}
 
 	account := &model.Account{
@@ -122,16 +138,20 @@ func (srv *accountService) Signup(input dto.Signup) (dto.AccountPK, error) {
 
 	id, err := srv.accountRepository.Insert(account, nil)
 	if err != nil {
-		return dto.AccountPK{}, err
+		if column, ok := GetConflictColumn(err); ok {
+			return dto.AccountPK{}, errs.NewConflictError(column)
+		}
+		return dto.AccountPK{}, errs.NewUnexpectedError(err.Error())
 	}
 
 	return dto.AccountPK{Id: id}, nil
 }
 
 func (srv *accountService) GenerateJwtPayload(input dto.AccountPK) (jwt.Payload, error) {
-	account, err := srv.getAccountByID(input.Id)
+	account, err := srv.accountRepository.GetOne(&model.Account{Id: input.Id})
 	if err != nil {
-		return jwt.Payload{}, err
+		logger.Error(err.Error())
+		return jwt.Payload{}, errs.NewUnexpectedError(err.Error())
 	}
 
 	cc := jwt.CustomClaims{
@@ -139,21 +159,4 @@ func (srv *accountService) GenerateJwtPayload(input dto.AccountPK) (jwt.Payload,
 		AccountName: account.Name,
 	}
 	return jwt.NewPayload(cc), nil
-}
-
-func (srv *accountService) checkUniqueName(id int, name string) error {
-	existingAccount, err := srv.accountRepository.GetOne(&model.Account{Name: name})
-	if err == nil && existingAccount.Id != id {
-		return errs.NewUniqueConstraintError("account_name")
-	}
-	return nil
-}
-
-func (srv *accountService) getAccountByID(id int) (*model.Account, error) {
-	account, err := srv.accountRepository.GetOne(&model.Account{Id: id})
-	if err != nil {
-		logger.Error(err.Error())
-		return nil, err
-	}
-	return &account, nil
 }

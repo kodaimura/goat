@@ -7,6 +7,7 @@ import (
 
 	"goat/config"
 	"goat/internal/core/jwt"
+	"goat/internal/core/errs"
 )
 
 
@@ -61,12 +62,17 @@ func ApiResponse() gin.HandlerFunc {
 					"error": e.Error(), 
 					"details": gin.H{ "field": e.Field },
 				})
+			case errs.UnauthorizedError:
+				c.JSON(http.StatusUnauthorized, gin.H{
+					"error": e.Error(),
+					"details": gin.H{},
+				})
 			case errs.NotFoundError:
 				c.JSON(http.StatusNotFound, gin.H{
 					"error": e.Error(),
 					"details": gin.H{},
 				})
-			case errs.UniqueConstraintError:
+			case errs.ConflictError:
 				c.JSON(http.StatusConflict, gin.H{
 					"error": e.Error(),
 					"details": gin.H{ "column": e.Column },
