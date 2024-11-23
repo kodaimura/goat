@@ -8,3 +8,4 @@ RUN apt-get update \
 
 COPY ./linux/cron.d/app /etc/cron.d/app
 RUN chmod 0644 /etc/cron.d/app
+RUN crontab /etc/cron.d/app
