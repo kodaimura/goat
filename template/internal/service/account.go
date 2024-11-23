@@ -16,8 +16,7 @@ import (
 type AccountService interface {
 	GetOne(input dto.AccountPK) (dto.Account, error)
 	Delete(input dto.AccountPK) error
-	UpdateName(input dto.UpdateAccountName) error
-	UpdatePassword(input dto.UpdateAccountPassword) error
+	Update(input dto.UpdateAccount) error
 	Login(input dto.Login) (dto.Account, error)
 	Signup(input dto.Signup) (dto.AccountPK, error)
 	GenerateJwtPayload(input dto.AccountPK) (jwt.Payload, error)
@@ -48,7 +47,7 @@ func (srv *accountService) GetOne(input dto.AccountPK) (dto.Account, error) {
 	return ret, nil
 }
 
-func (srv *accountService) UpdateName(input dto.UpdateAccountName) error {
+func (srv *accountService) Update(input dto.UpdateAccount) error {
 	account, err := srv.accountRepository.GetOne(&model.Account{Id: input.Id})
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -58,35 +57,21 @@ func (srv *accountService) UpdateName(input dto.UpdateAccountName) error {
 		return errs.NewUnexpectedError(err.Error())
 	}
 
-	account.Name = input.Name
+	if input.Name != "" {
+		account.Name = input.Name
+	}
+	if input.Password != "" {
+		hashed, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
+		if err != nil {
+			logger.Error(err.Error())
+			return errs.NewUnexpectedError(err.Error())
+		}
+		account.Password = string(hashed)
+	}
 	if err := srv.accountRepository.Update(&account, nil); err != nil {
 		if column, ok := GetConflictColumn(err); ok {
 			return errs.NewConflictError(column)
 		}
-		logger.Error(err.Error())
-		return errs.NewUnexpectedError(err.Error())
-	}
-	return nil
-}
-
-func (srv *accountService) UpdatePassword(input dto.UpdateAccountPassword) error {
-	account, err := srv.accountRepository.GetOne(&model.Account{Id: input.Id})
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return errs.NewNotFoundError()
-		}
-		logger.Error(err.Error())
-		return errs.NewUnexpectedError(err.Error())
-	}
-
-	hashed, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
-	if err != nil {
-		logger.Error(err.Error())
-		return errs.NewUnexpectedError(err.Error())
-	}
-
-	account.Password = string(hashed)
-	if err := srv.accountRepository.Update(&account, nil); err != nil {
 		logger.Error(err.Error())
 		return errs.NewUnexpectedError(err.Error())
 	}

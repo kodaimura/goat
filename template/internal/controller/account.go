@@ -111,11 +111,11 @@ func (ctr *AccountController) ApiPutPassword(c *gin.Context) {
 		return
 	}
 
-	var input dto.UpdateAccountPassword
+	var input dto.UpdateAccount
 	utils.MapFields(&input, req)
 	input.Id = pl.AccountId
 
-	if err := ctr.accountService.UpdatePassword(input); err != nil {
+	if err := ctr.accountService.Update(input); err != nil {
 		c.Error(err)
 		return
 	}
@@ -133,11 +133,11 @@ func (ctr *AccountController) ApiPutName(c *gin.Context) {
 		return
 	}
 
-	var input dto.UpdateAccountName
+	var input dto.UpdateAccount
 	utils.MapFields(&input, req)
 	input.Id = pl.AccountId
 
-	if err := ctr.accountService.UpdateName(input); err != nil {
+	if err := ctr.accountService.Update(input); err != nil {
 		c.Error(err)
 		return
 	}
