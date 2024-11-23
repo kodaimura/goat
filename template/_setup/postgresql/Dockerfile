@@ -3,7 +3,7 @@ FROM golang:1.22
 WORKDIR /usr/src/app
 
 RUN apt-get update \
-    && apt-get install -y cron \
+    && apt-get install -y cron logrotate \
     && rm -rf /var/lib/apt/lists/*
 
 COPY ./linux/cron.d/app /etc/cron.d/app
