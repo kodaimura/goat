@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ $# -eq 0 ]; then
-    echo "ERROR: bash _setup/setup.sh <appname> [-db {sqlite3| postgres | mysql}]"
+    echo "ERROR: bash _setup/init.sh <appname> [-db {sqlite3| postgres | mysql}]"
     exit 1
 fi
 
@@ -18,7 +18,7 @@ do
       if [[ $1 =~ ^--db= ]]; then
         DB=$2
       elif [ -z $2 ]; then
-        echo "ERROR: bash _setup/setup.sh <appname> [-db {sqlite3| postgres | mysql}]"
+        echo "ERROR: bash _setup/init.sh <appname> [-db {sqlite3| postgres | mysql}]"
         exit 1
       else
         DB=$2
@@ -29,7 +29,7 @@ do
 done
 
 if [ $DB != "sqlite3" ] && [ $DB != "postgres" ] && [ $DB != "mysql" ]; then
-	echo "ERROR: bash _setup/setup.sh <appname> [-db {sqlite3| postgres | mysql}]"
+	echo "ERROR: bash _setup/init.sh <appname> [-db {sqlite3| postgres | mysql}]"
   exit 1
 fi
 
