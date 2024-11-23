@@ -112,7 +112,7 @@ func (srv *accountService) Login(input dto.Login) (dto.Account, error) {
 	}
 
 	if err = bcrypt.CompareHashAndPassword([]byte(account.Password), []byte(input.Password)); err != nil {
-		return dto.Account{}, errs.NewUnexpectedError(err.Error())
+		return dto.Account{}, errs.NewUnauthorizedError()
 	}
 
 	var ret dto.Account

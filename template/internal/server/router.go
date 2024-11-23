@@ -29,6 +29,8 @@ func SetWebRouter(r *gin.RouterGroup) {
  Routing for "/api"
 */
 func SetApiRouter(r *gin.RouterGroup) {
+	r.Use(middleware.ApiResponse())
+
 	ac := controller.NewAccountController()
 
 	r.POST("/signup", ac.ApiSignup)
