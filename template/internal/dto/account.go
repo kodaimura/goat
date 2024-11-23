@@ -22,12 +22,8 @@ type Login struct {
 	Password string `json:"account_password"`
 }
 
-type UpdateAccountName struct {
+type UpdateAccount struct {
 	Id int `json:"account_id"`
 	Name string `json:"account_name"`
-}
-
-type UpdateAccountPassword struct {
-	Id int `json:"account_id"`
 	Password string `json:"account_password"`
 }

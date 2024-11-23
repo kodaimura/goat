@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   app:
     build:
@@ -10,13 +8,16 @@ services:
       - db
     volumes:
       - .:/usr/src/app
+      - ./linux/logrotate.d/app:/etc/logrotate.d/app
+      - ./linux/cron.d/app:/etc/cron.d/app
     working_dir: /usr/src/app
     tty: true
     environment:
-      - ENV=docker
+      ENV: local
+    command: sh -c "service cron start && go mod tidy && go run cmd/goat/main.go"
 
   db:
-    image: mysql:8.0.3
+    image: mysql:8.0.34
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: goat
@@ -24,4 +25,4 @@ services:
     volumes:
       - ./my.ini:/etc/mysql/conf.d/my.cnf
       - ./scripts:/docker-entrypoint-initdb.d
-      - ./data:/var/lib/mysql/data 
+      - ./data:/var/lib/mysql
