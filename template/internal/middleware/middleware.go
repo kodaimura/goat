@@ -67,6 +67,11 @@ func ApiResponse() gin.HandlerFunc {
 					"error": e.Error(),
 					"details": gin.H{},
 				})
+			case errs.ForbiddenError:
+				c.JSON(http.StatusForbidden, gin.H{
+					"error": e.Error(),
+					"details": gin.H{},
+				})
 			case errs.NotFoundError:
 				c.JSON(http.StatusNotFound, gin.H{
 					"error": e.Error(),

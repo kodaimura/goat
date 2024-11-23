@@ -33,16 +33,14 @@ func (e UnauthorizedError) Error() string {
 }
 
 /////////////////////////////////////////////////////////////////////////
-type ConflictError struct {
-	Column string
+type ForbiddenError struct {}
+
+func NewForbiddenError() error {
+	return ForbiddenError{}
 }
 
-func NewConflictError(column string) error {
-	return ConflictError{Column: column}
-}
-
-func (e ConflictError) Error() string {
-	return fmt.Sprintf("error: Column '%s' should be unique.", e.Column)
+func (e ForbiddenError) Error() string {
+	return "error: Permission denied to access this resource."
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -54,6 +52,19 @@ func NewNotFoundError() error {
 
 func (e NotFoundError) Error() string {
 	return "error: Not found"
+}
+
+/////////////////////////////////////////////////////////////////////////
+type ConflictError struct {
+	Column string
+}
+
+func NewConflictError(column string) error {
+	return ConflictError{Column: column}
+}
+
+func (e ConflictError) Error() string {
+	return fmt.Sprintf("error: Column '%s' should be unique.", e.Column)
 }
 
 /////////////////////////////////////////////////////////////////////////
