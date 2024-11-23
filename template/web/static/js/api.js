@@ -1,12 +1,14 @@
 const BASE_URL = '/api';
 
 
-class HttpError extends Error{
+class HttpError extends Error {
     status;
+    details;
 
-    constructor(status, message) {
+    constructor(status, message, details) {
         super(message);
         this.status = status;
+        this.details = details;
     }
 }
 
@@ -36,7 +38,7 @@ class Api {
     
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new HttpError(response.status, errorData.error);
+                throw new HttpError(response.status, errorData.error, errorData.details);
             }
     
             let data;
@@ -44,7 +46,7 @@ class Api {
                 data = await response.json();
             } catch (error) {
                 if (response.status !== 204 && response.status !== 200) {
-                    throw new HttpError(response.status, 'Error parsing JSON');
+                    throw new HttpError(response.status, 'Error parsing JSON', {});
                 }
             }
             return data;
@@ -70,8 +72,8 @@ class Api {
         return this.apiFetch(endpoint, 'PUT', body);
     };
     
-    delete = async (endpoint) => {
-        return this.apiFetch(endpoint, 'DELETE', null);
+    delete = async (endpoint, body) => {
+        return this.apiFetch(endpoint, 'DELETE', body);
     };
 
     handleHttpError = (error) => {
