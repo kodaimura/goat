@@ -18,7 +18,7 @@ func SetWebRouter(r *gin.RouterGroup) {
 	r.GET("/login", ac.LoginPage)
 	r.GET("/logout", ac.Logout)
 
-	auth := r.Group("", middleware.JwtAuthMiddleware())
+	auth := r.Group("", middleware.JwtAuth())
 	{
 		auth.GET("/", ic.IndexPage)
 	}
@@ -34,7 +34,7 @@ func SetApiRouter(r *gin.RouterGroup) {
 	r.POST("/signup", ac.ApiSignup)
 	r.POST("/login", ac.ApiLogin)
 
-	auth := r.Group("", middleware.JwtAuthApiMiddleware())
+	auth := r.Group("", middleware.ApiJwtAuth())
 	{
 		auth.GET("/accounts/me", ac.ApiGetOne)
 		auth.PUT("/accounts/me/name", ac.ApiPutName)
