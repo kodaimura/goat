@@ -126,6 +126,7 @@ func (srv *accountService) Signup(input dto.Signup) (dto.AccountPK, error) {
 		if column, ok := GetConflictColumn(err); ok {
 			return dto.AccountPK{}, errs.NewConflictError(column)
 		}
+		logger.Error(err.Error())
 		return dto.AccountPK{}, errs.NewUnexpectedError(err.Error())
 	}
 
