@@ -47,9 +47,9 @@ func getFieldJsonTag(dataStruct interface{}, fieldName string) string {
 
 func extractFieldName(errorMsg string) string {
 	re := regexp.MustCompile(`Key:\s*'([^']+)'`)
-	matches := re.FindStringSubmatch(errorMsg)
-	if len(matches) > 1 {
-		return strings.Split(matches[1], ".")[1]
+	match := re.FindStringSubmatch(errorMsg)
+	if len(match) > 1 {
+		return strings.Split(match[1], ".")[1]
 	}
 	return ""
 }
