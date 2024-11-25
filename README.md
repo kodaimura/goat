@@ -36,9 +36,9 @@ http://localhost:3000
 * model/repository コード自動生成ツール
 * 第一引数にDDLファイルパスを指定して実行する
 ```
-$ go cmd/gent/main.go <path/to/create-table.sql>
+$ go run cmd/gent/main.go <path/to/create-table.sql>
 ```
 * 第二引数以降にテーブル名を入力し、コードを生成するテーブルを指定可能
 ```
-$ go cmd/gent/main.go <path/to/create-table.sql> table1 table2 table3 ...
+$ go run cmd/gent/main.go <path/to/create-table.sql> table1 table2 table3 ...
 ```
