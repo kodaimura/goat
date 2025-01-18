@@ -1,0 +1,15 @@
+services:
+  app:
+    build:
+      context: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/usr/src/app
+      - ./linux/logrotate.d/app:/etc/logrotate.d/app
+      - ./linux/cron.d/app:/etc/cron.d/app
+    working_dir: /usr/src/app
+    tty: true
+    environment:
+      ENV: local
+    command: sh -c "service cron start && go mod tidy && go run cmd/goat/main.go"

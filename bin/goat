@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ $# -eq 0 ]; then
-    echo "ERROR: goat <appname> [-db {sqlite3| postgres | mysql}]"
+    echo "ERROR: goat <appname> [-db {sqlite3| postgresql | mysql}]"
     exit 1
 fi
 
@@ -17,7 +17,7 @@ do
       if [[ $1 =~ ^--db= ]]; then
         DB=$2
       elif [ -z $2 ]; then
-        echo "ERROR: goat <appname> [-db {sqlite3| postgres | mysql}]"
+        echo "ERROR: goat <appname> [-db {sqlite3| postgresql | mysql}]"
         exit 1
       else
         DB=$2
@@ -27,42 +27,25 @@ do
   shift
 done
 
-if [ $DB != "sqlite3" ] && [ $DB != "postgres" ] && [ $DB != "mysql" ]; then
-	echo "ERROR: goat <appname> [-db {sqlite3| postgres | mysql}]"
+if [ $DB != "sqlite3" ] && [ $DB != "postgresql" ] && [ $DB != "mysql" ]; then
+	echo "ERROR: goat <appname> [-db {sqlite3| postgresql | mysql}]"
   exit 1
 fi
 
-CURRENT_DIR=$(pwd)
+APP_DIR=$(pwd)/$APP_NAME
 TEMPLATE_DIR=$(cd $(dirname $0); cd ../template; pwd)
+TEMPLATE_SUB_DIR=$(cd $(dirname $0); cd ../template_sub; pwd)
 
-mkdir $CURRENT_DIR/$APP_NAME
-cp -r $TEMPLATE_DIR/* $CURRENT_DIR/$APP_NAME
+mkdir $APP_DIR
+cd $APP_DIR
+cp -r $TEMPLATE_DIR/* .
+cp -r $TEMPLATE_SUB_DIR/$DB/* .
 
-cd $CURRENT_DIR/$APP_NAME
 mv cmd/goat cmd/$APP_NAME
 
 if [ $DB = "sqlite3" ]; then
   touch $APP_NAME.db
   sqlite3 $APP_NAME.db < ./scripts/create-table.sql
-fi
-
-if [ $DB = "postgres" ]; then
-  rm -r scripts
-  cp -r _setup/postgresql/scripts .
-  cp -r _setup/postgresql/repository internal/
-  cp -r _setup/postgresql/env config/
-  cp -r _setup/postgresql/docker-compose.yml .
-  cp -r _setup/postgresql/Dockerfile .
-fi
-
-if [ $DB = "mysql" ]; then
-  rm -r scripts
-  cp -r _setup/mysql/scripts .
-  cp -r _setup/mysql/repository internal/
-  cp -r _setup/mysql/env config/
-  cp -r _setup/mysql/docker-compose.yml .
-  cp -r _setup/mysql/Dockerfile .
-  cp -r _setup/mysql/my.ini .
 fi
 
 # goatを置換
@@ -93,5 +76,3 @@ main
 gent
 data
 EOF
-
-yes | rm -r _setup
