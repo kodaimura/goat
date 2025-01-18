@@ -1,7 +1,6 @@
 # GOAT
 ## Go Web Application Template
 Go(Gin)のWebアプリケーション雛形。詳しくはプログラム参照。  
-accountテーブルをデフォルトで用意しており、サインアップ/ログイン機能を実装。
 
 ## Install
 ### clone
