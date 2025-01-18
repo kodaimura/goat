@@ -20,7 +20,7 @@ $ chmod -R +x path/to/goat/bin
 ## Usage
 ### プロジェクト作成
 ```
-$ goat-create-app <appname> [-db {sqlite3| postgres | mysql}]
+$ goat <appname> [-db {sqlite3| postgres | mysql}]
 ```
 * -db オプションを省略した場合は sqlite3 が選択される
 
