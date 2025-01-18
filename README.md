@@ -19,14 +19,14 @@ $ chmod -R +x path/to/goat/bin
 ## Usage
 ### プロジェクト作成
 ```
-$ goat <appname> [-db {sqlite3| postgres | mysql}]
+$ goat <appname> [-db {sqlite3| postgresql | mysql}]
 ```
 * -db オプションを省略した場合は sqlite3 が選択される
 
 ### Dockerで起動
 * Dockerコンテナ & アプリ起動
 ```
-$ make dev
+$ make up
 ```
 http://localhost:3000
 
