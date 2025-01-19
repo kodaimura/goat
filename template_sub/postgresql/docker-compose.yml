@@ -14,7 +14,7 @@ services:
     tty: true
     environment:
       ENV: local
-    command: sh -c "service cron start && go mod tidy && go run cmd/goat/main.go"
+    command: sh -c "service cron start && go run cmd/goat/main.go"
 
   db:
     image: postgres:16.1
