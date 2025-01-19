@@ -24,6 +24,11 @@ $ goat <appname> [-db {sqlite3| postgresql | mysql}]
 * -db オプションを省略した場合は sqlite3 が選択される
 
 ### Dockerで起動
+* goモジュールのインストール
+```
+$ make install
+```
+
 * Dockerコンテナ & アプリ起動
 ```
 $ make up
