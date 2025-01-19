@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"goat/internal/core/jwt"
+	"goat/internal/core/errs"
 	"goat/internal/core/utils"
 	"goat/internal/service"
 	"goat/internal/dto"
@@ -40,7 +41,7 @@ func (ctr *AccountController) Logout(c *gin.Context) {
 func (ctr *AccountController) ApiSignup(c *gin.Context) {
 	var req request.Signup
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.Error(NewBindError(err, &req))
+		c.Error(errs.NewBadRequestError(err.Error()))
 		return
 	}
 
@@ -60,7 +61,7 @@ func (ctr *AccountController) ApiSignup(c *gin.Context) {
 func (ctr *AccountController) ApiLogin(c *gin.Context) {
 	var req request.Login
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.Error(NewBindError(err, &req))
+		c.Error(errs.NewBadRequestError(err.Error()))
 		return
 	}
 
@@ -101,7 +102,7 @@ func (ctr *AccountController) ApiPutPassword(c *gin.Context) {
 
 	var req request.PutAccountPassword
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.Error(NewBindError(err, &req))
+		c.Error(errs.NewBadRequestError(err.Error()))
 		return
 	}
 
@@ -129,7 +130,7 @@ func (ctr *AccountController) ApiPutName(c *gin.Context) {
 
 	var req request.PutAccountName
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.Error(NewBindError(err, &req))
+		c.Error(errs.NewBadRequestError(err.Error()))
 		return
 	}
 

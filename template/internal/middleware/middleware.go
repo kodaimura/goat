@@ -60,32 +60,26 @@ func ApiResponse() gin.HandlerFunc {
 			case errs.BadRequestError:
 				c.JSON(http.StatusBadRequest, gin.H{
 					"error": e.Error(), 
-					"details": gin.H{ "field": e.Field },
 				})
 			case errs.UnauthorizedError:
 				c.JSON(http.StatusUnauthorized, gin.H{
 					"error": e.Error(),
-					"details": gin.H{},
 				})
 			case errs.ForbiddenError:
 				c.JSON(http.StatusForbidden, gin.H{
 					"error": e.Error(),
-					"details": gin.H{},
 				})
 			case errs.NotFoundError:
 				c.JSON(http.StatusNotFound, gin.H{
 					"error": e.Error(),
-					"details": gin.H{},
 				})
 			case errs.ConflictError:
 				c.JSON(http.StatusConflict, gin.H{
 					"error": e.Error(),
-					"details": gin.H{ "column": e.Column },
 				})
 			default:
 				c.JSON(http.StatusInternalServerError, gin.H{
 					"error": e.Error(),
-					"details": gin.H{},
 				})
 			}
 		}

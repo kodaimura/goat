@@ -7,18 +7,15 @@ import (
 
 /////////////////////////////////////////////////////////////////////////
 type BadRequestError struct {
-	Field string
+	Message string
 }
 
-func NewBadRequestError(field string) error {
-	return BadRequestError{Field: field}
+func NewBadRequestError(message string) error {
+	return BadRequestError{Message: message}
 }
 
 func (e BadRequestError) Error() string {
-	if e.Field == "" {
-		return "error: The content of the request is invalid."
-	}
-	return fmt.Sprintf("error: Field '%s' binding failed.", e.Field)
+	return fmt.Sprintf("error: %s", e.Message)
 }
 
 /////////////////////////////////////////////////////////////////////////
